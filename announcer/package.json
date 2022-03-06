@@ -2,11 +2,13 @@
     "name": "entretien-announcer",
     "version": "0.0.1",
     "description": "Generates monthly Jira reports",
+    "type": "module",
     "dependencies": {
         "jira.js": "2.11.0"
     },
     "devDependencies": {
-        "jest": "^27.5.1"
+        "jest": "^27.5.1",
+        "typescript": "^4.6.2"
     },
     "scripts": {
         "test": "jest"
