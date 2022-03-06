@@ -1,0 +1,8 @@
+{
+    "name": "entretien-announcer",
+    "version": "0.0.1",
+    "description": "Generates monthly Jira reports",
+    "dependencies": {
+        "jira.js": "2.11.0"
+    }
+}
