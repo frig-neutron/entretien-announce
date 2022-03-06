@@ -12,6 +12,7 @@
     },
     "scripts": {
         "test": "jest",
-        "build": "rm -rf dist; tsc"
+        "build": "rm -rf dist; tsc",
+        "dev": "node dist/entretien-announce.js"
     }
 }
