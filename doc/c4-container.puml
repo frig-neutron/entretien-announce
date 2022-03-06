@@ -1,0 +1,16 @@
+@startuml C4_Elements
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(entretienStaff, "Entretien Member")
+System(gmail, Gmail)
+System(jira, Jira)
+System_Boundary("gcp", "Google Cloud Platform"){
+  System(gcloudsched, "Google Cloud Scheduler")
+  System(gcf, "Google Cloud Function", "Generate report out of Jira tickets")
+}
+
+Rel(gcloudsched, gcf, "Triggers", "Monthly schedule")
+Rel(gcf, jira, "Query", "Get all changes for the past month")
+Rel(gcf, gmail, "Post", "Send report")
+Rel(gmail, entretienStaff, "Notify")
+@enduml
