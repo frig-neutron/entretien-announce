@@ -16,11 +16,12 @@
         "typescript": "^4.6.2"
     },
     "scripts": {
-        "test": "jest",
-        "clean": "rm -rf dist",
-        "copyfiles": "cp .env dist",
         "build": "yarn clean; tsc && yarn copyfiles",
         "build-watch": "yarn build && tsc --watch",
-        "dev": "node dist/entretien-announce.js"
+        "clean": "rm -rf dist",
+        "copyfiles": "cp .env package.json yarn.lock dist",
+        "deploy": "./scripts/deploy.sh",
+        "dev": "node dist/function.js",
+        "test": "jest"
     }
 }
