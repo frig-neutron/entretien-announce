@@ -16,7 +16,8 @@
         "test": "jest",
         "clean": "rm -rf dist",
         "copyfiles": "cp .env dist",
-        "build": "yarn clean; tsc && yarn copyfiles && tsc --watch",
+        "build": "yarn clean; tsc && yarn copyfiles",
+        "build-watch": "yarn build && tsc --watch",
         "dev": "node dist/entretien-announce.js"
     }
 }
