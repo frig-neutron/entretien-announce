@@ -1,7 +1,10 @@
 import {Version2Client} from "jira.js";
 import {config as dotenv_config} from "dotenv"
+import {google} from "@google-cloud/pubsub/build/protos/protos";
+import PubsubMessage = google.pubsub.v1.PubsubMessage;
+import {Context} from "@google-cloud/functions-framework";
 
-exports.announcer = (message: any, context: any) => {
+exports.announcer = (message: PubsubMessage, context: Context) => {
   const result = dotenv_config()
 
   const email = String(process.env.JIRA_AUTH_EMAIL)
@@ -28,5 +31,6 @@ exports.announcer = (message: any, context: any) => {
   //   expand: ""
   // })
 
-  console.log(environment)
+  console.log(JSON.stringify(message))
+  console.log(JSON.stringify(context))
 }
