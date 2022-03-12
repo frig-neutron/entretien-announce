@@ -1,8 +1,7 @@
 import {Version2Client} from "jira.js";
 import {config as dotenv_config} from "dotenv"
 
-
-async function main() {
+async function announcer(res: any, req: any) {
   const result = dotenv_config()
 
   const email = String(process.env.JIRA_AUTH_EMAIL)
@@ -31,5 +30,3 @@ async function main() {
 
   console.log(environment)
 }
-
-main();
