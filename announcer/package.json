@@ -2,7 +2,6 @@
     "name": "entretien-announcer",
     "version": "0.0.1",
     "description": "Generates monthly Jira reports",
-    "main": "dist/entretien-announce.js",
     "license": "GPL-3.0-only",
     "dependencies": {
         "dotenv": "^16.0.0",
@@ -16,12 +15,10 @@
         "typescript": "^4.6.2"
     },
     "scripts": {
-        "build": "yarn clean; tsc && yarn copyfiles",
+        "build": "tsc",
         "build-watch": "yarn build && tsc --watch",
-        "clean": "rm -rf dist",
-        "copyfiles": "cp .env package.json yarn.lock dist",
         "deploy": "./scripts/deploy.sh",
-        "dev": "node dist/function.js",
+        "gcp-build": "tsc",
         "test": "jest"
     }
 }

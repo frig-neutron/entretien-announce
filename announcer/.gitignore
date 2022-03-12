@@ -1,8 +1,10 @@
 # TypeScript
-dist
+*.js
 
 .env
 coverage
 
 # using yarn lock instead
 package-lock.json
+
+
