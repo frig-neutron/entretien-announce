@@ -17,7 +17,7 @@
     },
     "scripts": {
         "build": "tsc",
-        "build-watch": "yarn build && tsc --watch",
+        "build-watch": "npm run build && tsc --watch",
         "deploy": "./scripts/deploy.sh",
         "gcp-build": "tsc",
         "test": "jest"
