@@ -22,3 +22,10 @@ resource "google_secret_manager_secret_version" "announcer" {
   secret      = google_secret_manager_secret.announcer.id
   secret_data = jsonencode(var.announcer_secret_data)
 }
+
+resource "google_secret_manager_secret_iam_binding" "announcer" {
+  project   = google_project.entretien.project_id
+  secret_id = google_secret_manager_secret.announcer.id
+  role      = "roles/secretmanager.secretAccessor"
+  members   = ["serviceAccount:${google_service_account.announcer.email}"]
+}
