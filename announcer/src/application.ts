@@ -7,6 +7,7 @@ export interface Application {
 export function applicationImpl(jiraClient: JiraClient): Application {
   return {
     announce(today: string): void {
+      jiraClient.fetchTicketsClosedDuringInterval()
     }
   }
 }
