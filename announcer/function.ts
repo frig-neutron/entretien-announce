@@ -4,7 +4,15 @@ import {google} from "@google-cloud/pubsub/build/protos/protos";
 import PubsubMessage = google.pubsub.v1.PubsubMessage;
 import {Context} from "@google-cloud/functions-framework";
 
+import {Application_factory, defaultApplicationFactory} from "./src/application_factory";
+
+let applicationFactory: Application_factory = defaultApplicationFactory;
+
 exports.announcer = (message: PubsubMessage, context: Context) => {
+
+  let application: Application = applicationFactory()
+  application.announce("")
+
   const result = dotenv_config()
 
   const email = String(process.env.JIRA_AUTH_EMAIL)
