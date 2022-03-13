@@ -4,7 +4,3 @@
 .env
 coverage
 
-# using yarn lock instead
-package-lock.json
-
-
