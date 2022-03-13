@@ -10,12 +10,19 @@ export interface JiraCreds {
  * Interfaces to Jira system
  */
 export interface JiraClient {
-  fetchTicketsClosedDuringInterval(interval: Interval): JiraTicket[]
+  ticketsClosed(interval: Interval): JiraTicket[]
+  ticketsCreated(interval: Interval): JiraTicket[]
+  allOpenTickets(): JiraTicket[]
 }
 
 export function jiraClientImpl(jiraCreds: JiraCreds): JiraClient {
   return {
-    fetchTicketsClosedDuringInterval(interval: Interval): JiraTicket[] {
+    allOpenTickets(): JiraTicket[] {
+      return [];
+    }, ticketsCreated(interval: Interval): JiraTicket[] {
+      return [];
+    },
+    ticketsClosed(interval: Interval): JiraTicket[] {
       return [];
     }
   }
