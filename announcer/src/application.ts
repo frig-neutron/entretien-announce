@@ -1,12 +1,18 @@
 import {JiraClient} from "./jira_client"
 import {DateTime, Interval} from "luxon";
 import {ReportService} from "./report_model";
+import {AnnouncementFactory} from "./announcement";
+import {Sender} from "./sender";
 
 export interface Application {
   announce(today: string): void
 }
 
-export function applicationImpl(jiraClient: JiraClient, reportService: ReportService): Application {
+export function applicationImpl(
+    jiraClient: JiraClient,
+    reportService: ReportService,
+    announcementFactory: AnnouncementFactory,
+    sender: Sender): Application {
   function parseReportInterval(today: string): Interval {
     const thisInstant = DateTime.fromISO(today);
     const startOfThisMonth = thisInstant.set({day: 1, hour: 0, minute: 0, second: 0, millisecond: 0})
@@ -22,7 +28,9 @@ export function applicationImpl(jiraClient: JiraClient, reportService: ReportSer
         ticketsCreated: jiraClient.ticketsCreated(reportInterval),
         allOpenTickets: jiraClient.allOpenTickets()
       }
-      reportService.processReport(reportParam, reportInterval)
+      const reportModel = reportService.processReport(reportParam, reportInterval);
+      const announcements = announcementFactory.createReportAnnouncements(reportModel);
+      announcements.forEach(a => sender.sendAnnouncement(a))
     }
   }
 }

@@ -17,3 +17,11 @@ export interface ReportModel {
 export interface ReportService {
   processReport(param: ReportParams, reportInterval: Interval): ReportModel
 }
+
+export function reportServiceImpl(): ReportService {
+  return {
+    processReport(param: ReportParams, reportInterval: Interval): ReportModel {
+      return {};
+    }
+  }
+}

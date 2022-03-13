@@ -4,11 +4,15 @@ import {JiraTicket} from "../src/jira_ticket";
 import {mock} from "jest-mock-extended";
 
 import {Interval} from "luxon";
-import {ReportService} from "../src/report_model";
+import {ReportModel, ReportService} from "../src/report_model";
+import {Announcement, AnnouncementFactory} from "../src/announcement";
+import {Sender} from "../src/sender";
 
 
 const jiraClient = mock<JiraClient>()
 const reportService = mock<ReportService>()
+const announcementFactory = mock<AnnouncementFactory>()
+const sender = mock<Sender>()
 
 describe("application", () => {
   test("happy_path", () => {
@@ -16,13 +20,17 @@ describe("application", () => {
     const closedTicket = mock<JiraTicket>()
     const createdTicket = mock<JiraTicket>()
     const openTicket = mock<JiraTicket>()
+    const reportModel = mock<ReportModel>()
+    const announcement = mock<Announcement>()
 
     jiraClient.allOpenTickets.mockReturnValue([openTicket])
     jiraClient.ticketsClosed.mockReturnValue([closedTicket])
     jiraClient.ticketsCreated.mockReturnValue([createdTicket])
+    reportService.processReport.mockReturnValue(reportModel)
+    announcementFactory.createReportAnnouncements.mockReturnValue([announcement])
 
     const application: Application = applicationImpl(
-        jiraClient, reportService
+        jiraClient, reportService, announcementFactory, sender
     )
 
     application.announce("2038-01-19T12:34:56.789")
@@ -37,5 +45,7 @@ describe("application", () => {
       ticketsCreated: [createdTicket],
       allOpenTickets: [openTicket]
     }, reportInterval)
+    expect(announcementFactory.createReportAnnouncements).toBeCalledWith(reportModel)
+    expect(sender.sendAnnouncement).toBeCalledWith(announcement)
   })
 });
