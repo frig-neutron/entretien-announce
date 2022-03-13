@@ -4,13 +4,18 @@ import {google} from "@google-cloud/pubsub/build/protos/protos";
 import PubsubMessage = google.pubsub.v1.PubsubMessage;
 import {Context} from "@google-cloud/functions-framework";
 
-import {Application_factory, defaultApplicationFactory} from "./src/application_factory";
+import {ApplicationFactory, defaultApplicationFactory} from "./src/application_factory";
+import {Application} from "./src/application"
+import {JiraCreds} from "./src/jira_client";
 
-let applicationFactory: Application_factory = defaultApplicationFactory;
+let applicationFactory: ApplicationFactory = defaultApplicationFactory;
 
 exports.announcer = (message: PubsubMessage, context: Context) => {
 
-  let application: Application = applicationFactory()
+  let jiraCreds: JiraCreds = {
+    email: "", token: ""
+  }
+  let application: Application = applicationFactory(jiraCreds)
   application.announce("")
 
   const result = dotenv_config()
