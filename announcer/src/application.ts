@@ -3,6 +3,7 @@ import {DateTime, Interval} from "luxon";
 import {ReportService} from "./report_model";
 import {AnnouncementFactory} from "./announcement";
 import {Sender} from "./sender";
+import {logger as log} from "./logger";
 
 export interface Application {
   announce(today: string): void
@@ -31,6 +32,7 @@ export function applicationImpl(
       const reportModel = reportService.processReport(reportParam, reportInterval);
       const announcements = announcementFactory.createReportAnnouncements(reportModel);
       announcements.forEach(a => sender.sendAnnouncement(a))
+      log.info(`Done. Processed ${announcements.length} announcements. `)
     }
   }
 }
