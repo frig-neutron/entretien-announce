@@ -3,6 +3,8 @@ import {JiraClient} from "../src/jira_client";
 import {JiraTicket} from "../src/jira_ticket";
 import {mock} from "jest-mock-extended";
 
+import {Interval} from "luxon";
+
 describe("application", () => {
   test("happy_path", () => {
 
@@ -14,8 +16,10 @@ describe("application", () => {
         jiraClient
     )
 
-    application.announce("abc")
+    application.announce("2038-01-19T12:34:56.789")
 
-    expect(jiraClient.fetchTicketsClosedDuringInterval).toBeCalledTimes(1)
+    const reportInterval = Interval.fromISO("2037-12-01/2038-01-01")
+
+    expect(jiraClient.fetchTicketsClosedDuringInterval).toBeCalledWith(reportInterval)
   })
 });
