@@ -1,5 +1,5 @@
 import {JiraTicket} from "./jira_ticket";
-import {Interval} from "luxon";
+import {DateTime, Interval} from "luxon";
 import {Version2Client} from "jira.js";
 
 /**
@@ -15,10 +15,10 @@ export interface JiraClient {
 
 const jqlDefaultConstants = {
   project: "TRIAG",
-  closedStatuses:"Closed, Done, Resolved"
+  closedStatuses: "Closed, Done, Resolved"
 }
 
-export function jiraClientImpl(version2Client: Version2Client, jqlConstants = jqlDefaultConstants): JiraClient {
+export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDefaultConstants): JiraClient {
   return {
     allOpenTickets(): JiraTicket[] {
       return [];
@@ -26,12 +26,23 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConstants = jq
       return [];
     },
     ticketsClosed(interval: Interval): JiraTicket[] {
-      const jql = `project = "TRIAG" AND status in (Closed, Done, Resolved) AND status changed to (Closed, Done, Resolved) DURING ("2022-01-01", "2022-04-04")`
+      const jql = [
+        `project = ${jqlConst.project} AND `,
+        `status in (${jqlConst.closedStatuses}) AND `,
+        `status changed to (${jqlConst.closedStatuses}) DURING (${formatInterval(interval)})`
+      ].join('')
+
       const recentlyClosed = version2Client.issueSearch.searchForIssuesUsingJql(
           {jql: jql, expand: ""}
-      )
-
+      ).then()
       return [];
     }
   }
+}
+
+const formatInterval = function (interval: Interval): string {
+  const formatDate = (dateTime: DateTime): string => {
+    return dateTime.toFormat("y-MM-dd")
+  }
+  return `${formatDate(interval.start)}, ${formatDate(interval.end)}`
 }
