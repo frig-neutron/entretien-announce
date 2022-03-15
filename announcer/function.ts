@@ -27,10 +27,6 @@ exports.announcer = (message: PubsubMessage, context: Context) => {
   //   expand: ""
   // })
   const environment = process.env
-  // const recentlyClosed = await client.issueSearch.searchForIssuesUsingJql({
-  //   jql: `project = "TRIAG" AND status in (Closed, Done, Resolved) AND status changed to (Closed, Done, Resolved) DURING ("2022-01-01", "2022-04-04")`,
-  //   expand: ""
-  // })
 
   console.log(JSON.stringify(message))
   console.log(JSON.stringify(context))
