@@ -6,32 +6,20 @@ import {Context} from "@google-cloud/functions-framework";
 
 import {ApplicationFactory, defaultApplicationFactory} from "./src/application_factory";
 import {Application} from "./src/application"
-import {JiraCreds} from "./src/jira_client";
+import {JiraBasicAuth} from "./src/application_factory";
 
 let applicationFactory: ApplicationFactory = defaultApplicationFactory;
 
 exports.announcer = (message: PubsubMessage, context: Context) => {
-
-  let jiraCreds: JiraCreds = {
-    email: "", token: ""
-  }
-  let application: Application = applicationFactory(jiraCreds)
-  application.announce("")
-
   const result = dotenv_config()
 
-  const email = String(process.env.JIRA_AUTH_EMAIL)
-  const apiToken = String(process.env.JIRA_API_TOKEN)
+  let jiraCreds: JiraBasicAuth = {
+    email: String(process.env.JIRA_AUTH_EMAIL),
+    apiToken: String(process.env.JIRA_API_TOKEN)
+  }
 
-  const client = new Version2Client({
-    host: "https://lalliance.atlassian.net",
-    authentication: {
-      basic: {
-        email: email,
-        apiToken: apiToken
-      }
-    }
-  });
+  let application: Application = applicationFactory(jiraCreds)
+  application.announce("")
 
 
   // const open = await client.issueSearch.searchForIssuesUsingJql({

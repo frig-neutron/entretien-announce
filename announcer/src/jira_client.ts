@@ -1,10 +1,6 @@
 import {JiraTicket} from "./jira_ticket";
 import {Interval} from "luxon";
-
-export interface JiraCreds {
-  email: string
-  token: string
-}
+import {Version2Client} from "jira.js";
 
 /**
  * Interfaces to Jira system
@@ -15,7 +11,7 @@ export interface JiraClient {
   allOpenTickets(): JiraTicket[]
 }
 
-export function jiraClientImpl(jiraCreds: JiraCreds): JiraClient {
+export function jiraClientImpl(version2Client: Version2Client): JiraClient {
   return {
     allOpenTickets(): JiraTicket[] {
       return [];
