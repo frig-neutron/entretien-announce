@@ -6,11 +6,11 @@ import {Version2Client} from "jira.js";
  * Interfaces to Jira system
  */
 export interface JiraClient {
-  ticketsClosed(interval: Interval): JiraTicket[]
+  ticketsClosed(interval: Interval): Promise<JiraTicket[]>
 
-  ticketsCreated(interval: Interval): JiraTicket[]
+  ticketsCreated(interval: Interval): Promise<JiraTicket[]>
 
-  allOpenTickets(): JiraTicket[]
+  allOpenTickets(): Promise<JiraTicket[]>
 }
 
 const jqlDefaultConstants = {
@@ -20,12 +20,12 @@ const jqlDefaultConstants = {
 
 export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDefaultConstants): JiraClient {
   return {
-    allOpenTickets(): JiraTicket[] {
-      return [];
-    }, ticketsCreated(interval: Interval): JiraTicket[] {
-      return [];
+    allOpenTickets(): Promise<JiraTicket[]> {
+      return Promise.resolve([]);
+    }, ticketsCreated(interval: Interval): Promise<JiraTicket[]> {
+      return Promise.resolve([])
     },
-    ticketsClosed(interval: Interval): JiraTicket[] {
+    async ticketsClosed(interval: Interval): Promise<JiraTicket[]> {
       const jql = [
         `project = ${jqlConst.project} AND `,
         `status in (${jqlConst.closedStatuses}) AND `,
@@ -34,8 +34,8 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
 
       const recentlyClosed = version2Client.issueSearch.searchForIssuesUsingJql(
           {jql: jql, expand: ""}
-      ).then()
-      return [];
+      )
+      return Promise.resolve([]);
     }
   }
 }

@@ -7,6 +7,7 @@ import {Context} from "@google-cloud/functions-framework";
 import {ApplicationFactory, defaultApplicationFactory} from "./src/application_factory";
 import {Application} from "./src/application"
 import {JiraBasicAuth} from "./src/application_factory";
+import log from "winston";
 
 let applicationFactory: ApplicationFactory = defaultApplicationFactory;
 
@@ -20,6 +21,7 @@ exports.announcer = (message: PubsubMessage, context: Context) => {
 
   let application: Application = applicationFactory(jiraCreds)
   application.announce("")
+  .then(nothing => log.info("moo"))
 
 
   // const open = await client.issueSearch.searchForIssuesUsingJql({

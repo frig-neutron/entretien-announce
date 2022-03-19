@@ -6,7 +6,7 @@ import {Sender} from "./sender";
 import {logger as log} from "./logger";
 
 export interface Application {
-  announce(today: string): void
+  announce(today: string): Promise<void>
 }
 
 export function applicationImpl(
@@ -22,12 +22,12 @@ export function applicationImpl(
   }
 
   return {
-    announce(today: string): void {
+    async announce(today: string): Promise<void> {
       const reportInterval = parseReportInterval(today);
       const reportParam = {
-        ticketsClosed: jiraClient.ticketsClosed(reportInterval),
-        ticketsCreated: jiraClient.ticketsCreated(reportInterval),
-        allOpenTickets: jiraClient.allOpenTickets()
+        ticketsClosed: await jiraClient.ticketsClosed(reportInterval),
+        ticketsCreated: await jiraClient.ticketsCreated(reportInterval),
+        allOpenTickets: await jiraClient.allOpenTickets()
       }
       const reportModel = reportService.processReport(reportParam, reportInterval);
       const announcements = announcementFactory.createReportAnnouncements(reportModel);

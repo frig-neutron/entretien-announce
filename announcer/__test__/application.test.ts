@@ -15,7 +15,7 @@ const announcementFactory = mock<AnnouncementFactory>()
 const sender = mock<Sender>()
 
 describe("application", () => {
-  test("happy_path", () => {
+  test("happy_path",  async () => {
 
     const closedTicket = mock<JiraTicket>()
     const createdTicket = mock<JiraTicket>()
@@ -23,9 +23,9 @@ describe("application", () => {
     const reportModel = mock<ReportModel>()
     const announcement = mock<Announcement>()
 
-    jiraClient.allOpenTickets.mockReturnValue([openTicket])
-    jiraClient.ticketsClosed.mockReturnValue([closedTicket])
-    jiraClient.ticketsCreated.mockReturnValue([createdTicket])
+    jiraClient.allOpenTickets.mockReturnValue(Promise.resolve([openTicket]))
+    jiraClient.ticketsClosed.mockReturnValue(Promise.resolve([closedTicket]))
+    jiraClient.ticketsCreated.mockReturnValue(Promise.resolve([createdTicket]))
     reportService.processReport.mockReturnValue(reportModel)
     announcementFactory.createReportAnnouncements.mockReturnValue([announcement])
 
@@ -33,7 +33,7 @@ describe("application", () => {
         jiraClient, reportService, announcementFactory, sender
     )
 
-    application.announce("2038-01-19T12:34:56.789")
+    await application.announce("2038-01-19T12:34:56.789")
 
     const reportInterval = Interval.fromISO("2037-12-01/2038-01-01")
 
