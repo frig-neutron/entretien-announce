@@ -35,6 +35,7 @@ describe("jira client facade", () => {
         }
     )
     expect(ticketsClosed.length).toBe(1)
+    expect(ticketsClosed[0].key).toBe("ISSUE_KEY")
   })
 
   test("find all open tickest", async () => {
