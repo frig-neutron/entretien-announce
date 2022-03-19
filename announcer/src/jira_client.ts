@@ -1,4 +1,4 @@
-import {JiraTicket} from "./jira_ticket";
+import {JiraTicket, proxyJiraJsIssue} from "./jira_ticket";
 import {DateTime, Interval} from "luxon";
 import {Version2Client} from "jira.js";
 
@@ -19,6 +19,11 @@ const jqlDefaultConstants = {
 }
 
 export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDefaultConstants): JiraClient {
+
+  function requiredFieldMissing(fieldName: string, response: object) {
+    return `Response missing field ${fieldName}: ${JSON.stringify(response)}`
+  }
+
   return {
     allOpenTickets(): Promise<JiraTicket[]> {
       return Promise.resolve([]);
@@ -32,10 +37,14 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
         `status changed to (${jqlConst.closedStatuses}) DURING (${formatInterval(interval)})`
       ].join('')
 
-      const recentlyClosed = version2Client.issueSearch.searchForIssuesUsingJql(
+      const response = await version2Client.issueSearch.searchForIssuesUsingJql(
           {jql: jql, expand: ""}
       )
-      return Promise.resolve([]);
+      const wrappedIssues = response.issues?.map(proxyJiraJsIssue);
+
+      return wrappedIssues !== undefined
+          ? Promise.resolve(wrappedIssues)
+          : Promise.reject(requiredFieldMissing("issues", response))
     }
   }
 }
