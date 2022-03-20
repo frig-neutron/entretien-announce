@@ -26,6 +26,7 @@
         "build": "tsc",
         "build-watch": "npm run build && tsc --watch",
         "deploy": "./scripts/deploy.sh",
+        "function": "functions-framework --target=announcer",
         "gcp-build": "tsc",
         "test": "jest"
     }

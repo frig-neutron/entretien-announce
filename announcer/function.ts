@@ -20,7 +20,7 @@ exports.announcer = (message: PubsubMessage, context: Context) => {
   }
 
   let application: Application = applicationFactory(jiraCreds)
-  application.announce("")
+  application.announce("2021-12")
   .then(nothing => log.info("moo"))
 
 
