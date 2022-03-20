@@ -5,7 +5,18 @@ import {Interval} from "luxon";
 import {SearchResults, Issue} from "jira.js/out/version2/models";
 
 const version2Client = mockDeep<Version2Client>()
+const searchForIssuesUsingJql = version2Client.issueSearch.searchForIssuesUsingJql;
 const reportInterval = Interval.fromISO("2000-01-01/2038-01-19")
+
+const sampleIssue: Issue = {
+  fields: mock(),
+  id: "", key: "ISSUE_KEY"
+}
+searchForIssuesUsingJql.mockReturnValue(
+    Promise.resolve<SearchResults>({
+      issues: [sampleIssue]
+    })
+)
 
 describe("jira client facade", () => {
   const jiraClient = jiraClientImpl(version2Client, {
@@ -14,17 +25,7 @@ describe("jira client facade", () => {
   });
 
   test("find closed tickets", async () => {
-    const searchForIssuesUsingJql = version2Client.issueSearch.searchForIssuesUsingJql;
-    const resolvedIssue: Issue = {
-      fields: mock(),
-      id: "", key: "ISSUE_KEY"
-    }
-    searchForIssuesUsingJql.mockReturnValue(
-        Promise.resolve<SearchResults>({
-          issues: [resolvedIssue]
-        })
-    )
-    const ticketsClosed = await jiraClient.ticketsClosed(reportInterval);
+    const tickets = await jiraClient.ticketsClosed(reportInterval);
     expect(searchForIssuesUsingJql).toBeCalledWith(
         {
           jql:
@@ -34,17 +35,40 @@ describe("jira client facade", () => {
           expand: ""
         }
     )
-    expect(ticketsClosed.length).toBe(1)
-    expect(ticketsClosed[0].key).toBe("ISSUE_KEY")
+    expect(tickets.length).toBe(1)
+    expect(tickets[0].key).toBe("ISSUE_KEY")
   })
 
   test("find all open tickest", async () => {
-    const openTickets = await jiraClient.allOpenTickets()
+    const tickets = await jiraClient.allOpenTickets()
 
+    expect(searchForIssuesUsingJql).toBeCalledWith(
+        {
+          jql:
+              'project = PAPERCLIP AND ' +
+              'status not in (DISAVOWED)',
+          expand: ""
+        }
+    )
+    expect(tickets.length).toBe(1)
+    expect(tickets[0].key).toBe("ISSUE_KEY")
   })
 
   test("find newly opened tickets", async () => {
-    const ticketsCreated = await jiraClient.ticketsCreated(reportInterval)
+    const tickets = await jiraClient.ticketsCreated(reportInterval)
+
+    expect(searchForIssuesUsingJql).toBeCalledWith(
+        {
+          jql:
+              'project = PAPERCLIP AND ' +
+              'created >= 2000-01-01 AND ' +
+              'created <  2038-01-19',
+          expand: ""
+        }
+    )
+    expect(tickets.length).toBe(1)
+    expect(tickets[0].key).toBe("ISSUE_KEY")
+
   })
 
   test("reject promise if closed tickets missing issues field", () => {
