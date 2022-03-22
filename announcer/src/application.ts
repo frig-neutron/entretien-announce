@@ -1,6 +1,6 @@
 import {JiraClient} from "./jira_client"
 import {DateTime, Interval} from "luxon";
-import {ReportService} from "./report_model";
+import {ReportService} from "./report_service";
 import {AnnouncementFactory} from "./announcement";
 import {Sender} from "./sender";
 import {logger as log} from "./logger";

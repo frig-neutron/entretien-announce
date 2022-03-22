@@ -2,7 +2,7 @@
  * Report ready for public consumption.
  * Includes rendered content and intended recipient - everything needed by a notification channel
  */
-import {ReportModel} from "./report_model";
+import {ReportModel} from "./report_service";
 
 export interface Announcement {
   primaryRecipient: string

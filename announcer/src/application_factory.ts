@@ -1,6 +1,6 @@
 import {Application, applicationImpl} from "./application";
 import {jiraClientImpl} from "./jira_client";
-import {reportServiceImpl} from "./report_model";
+import {reportServiceImpl} from "./report_service";
 import {announcementFactoryImpl} from "./announcement";
 import {senderImpl} from "./sender";
 import {Version2Client} from "jira.js";

@@ -4,7 +4,7 @@ import {JiraTicket} from "../src/jira_ticket";
 import {mock} from "jest-mock-extended";
 
 import {Interval} from "luxon";
-import {ReportModel, ReportService} from "../src/report_model";
+import {ReportModel, ReportService} from "../src/report_service";
 import {Announcement, AnnouncementFactory} from "../src/announcement";
 import {Sender} from "../src/sender";
 
