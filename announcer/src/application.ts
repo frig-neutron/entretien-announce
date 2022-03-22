@@ -14,6 +14,7 @@ export function applicationImpl(
     reportService: ReportService,
     announcementFactory: AnnouncementFactory,
     sender: Sender): Application {
+
   function parseReportInterval(today: string): Interval {
     const thisInstant = DateTime.fromISO(today);
     const startOfThisMonth = thisInstant.set({day: 1, hour: 0, minute: 0, second: 0, millisecond: 0})
