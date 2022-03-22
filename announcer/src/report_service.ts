@@ -41,13 +41,24 @@ export function reportServiceImpl(): ReportService {
 }
 
 function ticketBlockImpl(tickets: JiraTicket[], reportInterval: Interval): TicketBlock {
-  type G = [string, JiraTicket[]]
+  const ticketsByBuilding = groupBy(tickets, t => t.building);
+
+  return {
+    highPriorityTickets: [],
+    tickets: tickets,
+    ticketsByBuilding: new Map(ticketsByBuilding)
+  }
+}
+
+function groupBy<E>(entities: E[], keyFunc: (e: E) => string): [string, E[]][] {
+  type G = [string, E[]]
   type T = G[]
 
-  const groupByBuilding = (t1: T, t2: T): T => {
-    let ret = [[t1[0][0], []]] as T
+  const groupByKey = (t1: T, t2: T): T => {
+    let ret = [] as T
+
     const groupOf = (bldg: string): G => {
-      for (let g of ret){
+      for (let g of ret) {
         if (g[0] === bldg)
           return g;
       }
@@ -55,10 +66,11 @@ function ticketBlockImpl(tickets: JiraTicket[], reportInterval: Interval): Ticke
       ret.push(newGroup)
       return newGroup
     }
+
     const process = (groupList: T): void => {
       for (const [bldg, tix] of groupList) {
         const group: G = groupOf(bldg)
-        const oldTix: JiraTicket[] = group[1]
+        const oldTix: E[] = group[1]
         tix.forEach(t => oldTix.push(t))
       }
     }
@@ -69,13 +81,8 @@ function ticketBlockImpl(tickets: JiraTicket[], reportInterval: Interval): Ticke
     return ret
   }
 
-  const ticketsByBuilding = tickets
-    .map(t => [[t.building, [t]]] as [string, JiraTicket[]][])
-    .reduce(groupByBuilding, [["unknown", []]]);
-
-  return {
-    highPriorityTickets: [],
-    tickets: tickets,
-    ticketsByBuilding: new Map(ticketsByBuilding)
-  }
+  return entities
+  .map(t => [[keyFunc(t), [t]]] as T)
+  .reduce(groupByKey, [["unknown", []]])
+  .filter(t => t[1].length > 0)
 }

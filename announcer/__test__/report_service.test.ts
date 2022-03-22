@@ -47,14 +47,12 @@ describe("Report service", () => {
             ticketInBuilding("abc"),
             ticketInBuilding("abc")]
           ],
-          ["unknown", []]
         ])
     )
     expect(reportModel.closed.ticketsByBuilding).toStrictEqual(
         new Map([
           ["abc", [ticketInBuilding("abc")]],
           ["def", [ticketInBuilding("def")]],
-          ["unknown", []]
         ])
     )
   })
