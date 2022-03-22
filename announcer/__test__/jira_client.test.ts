@@ -27,13 +27,6 @@ const issues: Issue[] = [
   }
 ]
 
-searchForIssuesUsingJql.mockReturnValue(
-    Promise.resolve<SearchResults>({
-      issues: [issues[0]],
-      total: 1
-    })
-)
-
 const jiraQueryConst = {
   project: "PAPERCLIP",
   closedStatuses: "DISAVOWED",
@@ -45,114 +38,103 @@ const jiraClient = jiraClientImpl(version2Client, jiraQueryConst);
 describe("jira client facade", () => {
 
   test("find closed tickets", async () => {
-    const tickets = await jiraClient.ticketsClosed(reportInterval);
-    expect(searchForIssuesUsingJql).toBeCalledWith(
-        {
-          jql:
-              'project = PAPERCLIP AND ' +
-              'status in (DISAVOWED) AND ' +
-              'status changed to (DISAVOWED) DURING (2000-01-01, 2038-01-19)',
-          expand: "",
-          startAt: 0,
-          maxResults: jiraQueryConst.pageSize
-        }
+    setupPagingOverQuery(
+        'project = PAPERCLIP AND ' +
+        'status in (DISAVOWED) AND ' +
+        'status changed to (DISAVOWED) DURING (2000-01-01, 2038-01-19)'
     )
-    expect(tickets.length).toBe(1)
-    expect(tickets[0].key).toBe("ISSUE_1")
+    const tickets = await jiraClient.ticketsClosed(reportInterval);
+    const ticketKeys = tickets.map(t => t.key);
+
+    expect(tickets.length).toBe(3)
+    expect(ticketKeys).toStrictEqual(["ISSUE_1", "ISSUE_2", "ISSUE_3"])
   })
 
   test("find all open tickets", async () => {
-    const tickets = await jiraClient.allOpenTickets()
-
-    expect(searchForIssuesUsingJql).toBeCalledWith(
-        {
-          jql:
-              'project = PAPERCLIP AND ' +
-              'status not in (DISAVOWED)',
-          expand: "",
-          startAt: 0,
-          maxResults: jiraQueryConst.pageSize,
-        }
-    )
-    expect(tickets.length).toBe(1)
-    expect(tickets[0].key).toBe("ISSUE_1")
-  })
-
-  test("find newly opened tickets", async () => {
-    const tickets = await jiraClient.ticketsCreated(reportInterval)
-
-    expect(searchForIssuesUsingJql).toBeCalledWith(
-        {
-          jql:
-              'project = PAPERCLIP AND ' +
-              'created >= 2000-01-01 AND ' +
-              'created <  2038-01-19',
-          expand: "",
-          startAt: 0,
-          maxResults: jiraQueryConst.pageSize
-        }
-    )
-    expect(tickets.length).toBe(1)
-    expect(tickets[0].key).toBe("ISSUE_1")
-
-  })
-
-  test("page through all results", async () => {
-    const paging = pageOver(
+    setupPagingOverQuery(
         'project = PAPERCLIP AND ' +
         'status not in (DISAVOWED)'
     );
-    searchForIssuesUsingJql.mockImplementation(
-        (args: SearchForIssuesUsingJql | undefined): Promise<SearchResults> => {
-          if (args === undefined) {
-            return Promise.reject(`Request data should be defined ${JSON.stringify(args)}`)
-          }
-          if (paging.requestOnPage(1, args))
-            return pageOfIssues(1)
-
-          return Promise.reject(`Request data should include paging info ${JSON.stringify(args)}`)
-        }
-    )
 
     const tickets = await jiraClient.allOpenTickets()
+    const ticketKeys = tickets.map(t => t.key);
 
-    expect(tickets.length).toBe(2)
-    expect(tickets[0].key).toBe("ISSUE_1")
-    expect(tickets[1].key).toBe("ISSUE_2")
+    expect(tickets.length).toBe(3)
+    expect(ticketKeys).toStrictEqual(["ISSUE_1", "ISSUE_2", "ISSUE_3"])
+  })
+
+  test("find newly opened tickets", async () => {
+    setupPagingOverQuery(
+        'project = PAPERCLIP AND ' +
+        'created >= 2000-01-01 AND ' +
+        'created <  2038-01-19'
+    )
+
+    const tickets = await jiraClient.ticketsCreated(reportInterval)
+    const ticketKeys = tickets.map(t => t.key);
+
+    expect(tickets.length).toBe(3)
+    expect(ticketKeys).toStrictEqual(["ISSUE_1", "ISSUE_2", "ISSUE_3"])
   })
 
   test("reject promise if closed tickets missing issues field", () => {
-    const searchForIssuesUsingJql = version2Client.issueSearch.searchForIssuesUsingJql;
     searchForIssuesUsingJql.mockReturnValue(
         Promise.resolve<SearchResults>({
           total: 666 // included value to test error message rendering
         })
     )
     const ticketsClosed = jiraClient.ticketsClosed(reportInterval);
-    expect(ticketsClosed).rejects.toMatch('Response missing field issues: {"total":666}')
+    expect(ticketsClosed).rejects.toMatch(`Response missing field 'issues': {"total":666}`)
   })
 })
 
-function pageOver(jql: String) {
-  return {
-    requestOnPage: function (page: number, args: SearchForIssuesUsingJql): boolean {
-      if (args.startAt === undefined)
-        return false;
-      const actualPageNumber = args.startAt * jiraQueryConst.pageSize + 1
-      return page == actualPageNumber
-          && jiraQueryConst.pageSize == args.maxResults
-          && jql == args.jql;
+function setupPagingOverQuery(jql: String): void {
+  let numPages = Math.ceil(issues.length / jiraQueryConst.pageSize)
+
+  /**
+   * Check if args are for the right page. If true, next call to pageOfIssues will return the page
+   */
+  const requestOnPage = function (page: number, args: SearchForIssuesUsingJql): boolean {
+    if (args.startAt === undefined)
+      return false;
+    const actualPageNumber = args.startAt / jiraQueryConst.pageSize
+    return page == actualPageNumber
+        && jiraQueryConst.pageSize == args.maxResults
+        && jql == args.jql;
+  }
+
+  /**
+   * return page of issues we last checked
+   */
+  const pageOfIssues = function (page: number): Promise<SearchResults> {
+    const startAt = page * jiraQueryConst.pageSize;
+    const endAt = Math.min(startAt + jiraQueryConst.pageSize, issues.length);
+    return Promise.resolve({
+      issues: issues.slice(startAt, endAt),
+      startAt: startAt,
+      total: issues.length
+    });
+  }
+
+  const guardOvershot = function (args: SearchForIssuesUsingJql): void {
+    if (args.startAt && args.startAt >= issues.length) {
+      throw `startAt index too high - max is ${issues.length - 1}: ${JSON.stringify(args)}`
     }
   }
-}
 
+  searchForIssuesUsingJql.mockImplementation(
+      (args: SearchForIssuesUsingJql | undefined): Promise<SearchResults> => {
+        if (args === undefined) {
+          return Promise.reject(`Request data should be defined ${JSON.stringify(args)}`)
+        }
 
-function pageOfIssues(page: number): Promise<SearchResults> {
-  const startAt = (page - 1) * jiraQueryConst.pageSize;
-  const endAt = Math.min(startAt + jiraQueryConst.pageSize, issues.length);
-  return Promise.resolve({
-    issues: issues.slice(startAt, endAt),
-    startAt: startAt,
-    total: issues.length
-  });
+        for (let pageNum = 0; pageNum < numPages; pageNum++) {
+          if (requestOnPage(pageNum, args))
+            return pageOfIssues(pageNum)
+        }
+
+        guardOvershot(args);
+        return Promise.reject(`Did not recognize ${JSON.stringify(args)}`)
+      }
+  )
 }
