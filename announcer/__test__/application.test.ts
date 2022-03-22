@@ -14,6 +14,10 @@ const reportService = mock<ReportService>()
 const announcementFactory = mock<AnnouncementFactory>()
 const sender = mock<Sender>()
 
+const application: Application = applicationImpl(
+    jiraClient, reportService, announcementFactory, sender
+)
+
 describe("application", () => {
   test("happy_path",  async () => {
 
@@ -28,10 +32,6 @@ describe("application", () => {
     jiraClient.ticketsCreated.mockReturnValue(Promise.resolve([createdTicket]))
     reportService.processReport.mockReturnValue(reportModel)
     announcementFactory.createReportAnnouncements.mockReturnValue([announcement])
-
-    const application: Application = applicationImpl(
-        jiraClient, reportService, announcementFactory, sender
-    )
 
     await application.announce("2038-01-19T12:34:56.789")
 

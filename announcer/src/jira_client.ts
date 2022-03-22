@@ -31,13 +31,32 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
   }
 
   async function queryJira(jql: string) {
-    async function pages(jql: string): Promise<SearchResults[]> {
-
-      let currentPage = 0;
+    async function jiraResponsePages(): Promise<SearchResults[]> {
       let done = false;
+
+      const areWeDone = function (searchResults: SearchResults): boolean {
+        function requiredFieldMissing(fieldName: string) {
+          return `Response missing field '${fieldName}': ${JSON.stringify(searchResults)}`
+        }
+
+        if (searchResults.issues === undefined) {
+          throw requiredFieldMissing("issues")
+        }
+        if (searchResults.total === undefined) {
+          throw requiredFieldMissing("total")
+        }
+        if (searchResults.startAt === undefined) {
+          throw requiredFieldMissing("startAt")
+        }
+
+        const responseSize = searchResults.issues.length
+        const totalIssuesFetched = searchResults.startAt + responseSize
+        return  totalIssuesFetched >= searchResults.total
+      }
 
       const responses: SearchResults[] = []
       while (!done) {
+        const currentPage = responses.length
         const startAt = currentPage * jqlConst.pageSize
         const response = await version2Client.issueSearch.searchForIssuesUsingJql(
             {
@@ -45,23 +64,8 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
             }
         )
 
-        function requiredFieldMissing(fieldName: string) {
-          return `Response missing field '${fieldName}': ${JSON.stringify(response)}`
-        }
-
-        if (response.issues === undefined) {
-          throw requiredFieldMissing("issues")
-        }
-        if (response.total === undefined) {
-          throw requiredFieldMissing("total")
-        }
-
-        const responseSize = response.issues.length
-        const totalIssuesFetched = startAt + responseSize
-        done = totalIssuesFetched >= response.total
-
+        done = areWeDone(response)
         responses.push(response)
-        currentPage++;
       }
 
       return responses;
@@ -82,7 +86,7 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
       return allDefinedIssues.map(proxyJiraJsIssue);
     }
 
-    const pageSearchResults = await pages(jql)
+    const pageSearchResults = await jiraResponsePages()
     return await convertResponseToTickets(pageSearchResults);
   }
 

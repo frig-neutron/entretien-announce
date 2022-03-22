@@ -7,7 +7,7 @@ import {Context} from "@google-cloud/functions-framework";
 import {ApplicationFactory, defaultApplicationFactory} from "./src/application_factory";
 import {Application} from "./src/application"
 import {JiraBasicAuth} from "./src/application_factory";
-import log from "winston";
+import {logger as log} from "./src/logger";
 
 let applicationFactory: ApplicationFactory = defaultApplicationFactory;
 
@@ -23,13 +23,4 @@ exports.announcer = (message: PubsubMessage, context: Context) => {
   application.announce("2021-12")
   .then(nothing => log.info("moo"))
 
-
-  // const open = await client.issueSearch.searchForIssuesUsingJql({
-  //   jql: `project = "TRIAG" AND ((updated >= "2022-01-01" AND status in (Done, Closed)) OR status not in (Done, Closed)) ORDER BY updated DESC `,
-  //   expand: ""
-  // })
-  const environment = process.env
-
-  console.log(JSON.stringify(message))
-  console.log(JSON.stringify(context))
 }
