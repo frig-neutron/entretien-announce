@@ -17,16 +17,32 @@ export interface AnnouncementFactory {
   createReportAnnouncements(report: ReportModel): Announcement[]
 }
 
+export enum Role {
+  SUPERVISOR,
+  DETAILED_REPORT_RECIPIENT,
+  SUMMARY_REPORT_RECIPIENT,
+  OWN_TICKET_RECIPIENT
+}
+
 export interface Recipient{
   email: string
   name: string
   lang: string
+  roles: Role[]
 }
 
 export function announcementFactoryImpl(directory: Recipient[] = []): AnnouncementFactory {
   return {
     createReportAnnouncements(report: ReportModel): Announcement[] {
-      return [];
+
+      const renderReport = function (recipient: Recipient): Announcement {
+        return {
+          primaryRecipient: recipient.email,
+          secondaryRecipients: []
+        }
+      }
+
+      return directory.map(renderReport);
     }
   };
 }
