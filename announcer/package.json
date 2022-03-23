@@ -12,6 +12,7 @@
         "handlebars": "^4.7.7",
         "jira.js": "2.11.0",
         "luxon": "^2.3.1",
+        "tiny-html-builder": "^2.1.0",
         "typesafe-i18n": "^5.0.1",
         "winston": "^3.6.0"
     },
