@@ -8,7 +8,7 @@ import {DateTimeFormatOptions, Interval} from "luxon";
 import L from './i18n/i18n-node'
 import {loadAllLocales} from './i18n/i18n-util.sync'
 import {detectLocale, i18nObject, locales} from './i18n/i18n-util'
-import {TranslationFunctions} from "./i18n/i18n-types";
+import {Locales, TranslationFunctions} from "./i18n/i18n-types";
 
 export interface Announcement {
   primaryRecipient: string
@@ -48,7 +48,7 @@ export function announcementFactoryImpl(directory: Recipient[] = []): Announceme
     createReportAnnouncements(report: ReportModel): Announcement[] {
 
       const renderReport = function (recipient: Recipient): Announcement {
-        const L: TranslationFunctions = i18nObject("en")
+        const L: TranslationFunctions = i18nObject(<Locales>recipient.lang)
 
         const formattedReportInterval = report.reportInterval().start.setLocale(recipient.lang).toLocaleString(formatOpts);
 
