@@ -15,10 +15,10 @@ export interface ReportParams {
 }
 
 export interface ReportModel {
-  reportInterval: Interval,
-  closed: TicketBlock,
-  created: TicketBlock,
-  allOpen: TicketBlock
+  reportInterval: () => Interval,
+  closed: () => TicketBlock,
+  created: () => TicketBlock,
+  allOpen: () => TicketBlock
 }
 
 export interface TicketBlock {
@@ -31,10 +31,10 @@ export function reportServiceImpl(): ReportService {
   return {
     processReport(param: ReportParams, reportInterval: Interval): ReportModel {
       return {
-        allOpen: ticketBlockImpl(param.allOpenTickets, reportInterval),
-        closed: ticketBlockImpl(param.ticketsClosed, reportInterval),
-        created: ticketBlockImpl(param.ticketsCreated, reportInterval),
-        reportInterval: reportInterval
+        allOpen: () => ticketBlockImpl(param.allOpenTickets, reportInterval),
+        closed: () => ticketBlockImpl(param.ticketsClosed, reportInterval),
+        created: () => ticketBlockImpl(param.ticketsCreated, reportInterval),
+        reportInterval: () => reportInterval
       };
     }
   }

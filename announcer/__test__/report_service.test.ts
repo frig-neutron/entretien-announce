@@ -8,17 +8,17 @@ const reportService = reportServiceImpl()
 describe("Report service", () => {
   test("empty report", () => {
 
-    const reportInterval = Interval.fromISO("2020-01 / T1d");
+    const reportInterval = Interval.fromISO("2020-01/T1D");
     const reportModel = reportService.processReport({
       allOpenTickets: [],
       ticketsClosed: [],
       ticketsCreated: []
     }, reportInterval);
 
-    expect(reportModel.allOpen.tickets).toEqual([])
-    expect(reportModel.closed.tickets).toEqual([])
-    expect(reportModel.created.tickets).toEqual([])
-    expect(reportModel.reportInterval).toEqual(reportInterval)
+    expect(reportModel.allOpen().tickets).toEqual([])
+    expect(reportModel.closed().tickets).toEqual([])
+    expect(reportModel.created().tickets).toEqual([])
+    expect(reportModel.reportInterval()).toEqual(reportInterval)
   })
 
   test("sum up by bldg", () => {
@@ -28,7 +28,7 @@ describe("Report service", () => {
       ticket.building.mockReturnValue(bldg)
       return ticket
     }
-    const reportInterval = Interval.fromISO("2020-01 / T1d");
+    const reportInterval = Interval.fromISO("2020-01/P1D");
 
     const ticketInAbc = [ticketInBuilding("abc"), ticketInBuilding("abc"), ticketInBuilding("abc")]
     const ticketInDef = [ticketInBuilding("def")]
@@ -40,12 +40,12 @@ describe("Report service", () => {
 
     const reportModel = reportService.processReport(reportParam, reportInterval);
 
-    expect(reportModel.allOpen.tickets).toEqual(reportParam.allOpenTickets)
-    expect(reportModel.closed.tickets).toEqual(reportParam.ticketsClosed)
-    expect(reportModel.created.tickets).toEqual(reportParam.ticketsCreated)
-    expect(reportModel.reportInterval).toEqual(reportInterval)
+    expect(reportModel.allOpen().tickets).toEqual(reportParam.allOpenTickets)
+    expect(reportModel.closed().tickets).toEqual(reportParam.ticketsClosed)
+    expect(reportModel.created().tickets).toEqual(reportParam.ticketsCreated)
+    expect(reportModel.reportInterval()).toEqual(reportInterval)
 
-    expect(reportModel.allOpen.ticketsByBuilding).toStrictEqual(
+    expect(reportModel.allOpen().ticketsByBuilding).toStrictEqual(
         new Map([
           ["abc", [
             ticketInAbc[0],
@@ -53,7 +53,7 @@ describe("Report service", () => {
           ],
         ])
     )
-    expect(reportModel.closed.ticketsByBuilding).toStrictEqual(
+    expect(reportModel.closed().ticketsByBuilding).toStrictEqual(
         new Map([
           ["abc", [ticketInAbc[2]]],
           ["def", [ticketInDef[0]]],
