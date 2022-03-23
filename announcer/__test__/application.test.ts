@@ -5,7 +5,7 @@ import {mock} from "jest-mock-extended";
 
 import {Interval} from "luxon";
 import {ReportModel, ReportService} from "../src/report_service";
-import {Announcement, AnnouncementFactory} from "../src/announcement";
+import {Announcement, AnnouncementFactory} from "../src/announcement_factory";
 import {Sender} from "../src/sender";
 
 

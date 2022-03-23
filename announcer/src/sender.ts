@@ -1,4 +1,4 @@
-import {Announcement} from "./announcement";
+import {Announcement} from "./announcement_factory";
 
 /**
  * Transport adaptor. Probably email but could be pubsub one day.

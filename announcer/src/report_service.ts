@@ -41,7 +41,7 @@ export function reportServiceImpl(): ReportService {
 }
 
 function ticketBlockImpl(tickets: JiraTicket[], reportInterval: Interval): TicketBlock {
-  const ticketsByBuilding = groupBy(tickets, t => t.building);
+  const ticketsByBuilding = groupBy(tickets, t => t.building());
 
   return {
     highPriorityTickets: [],

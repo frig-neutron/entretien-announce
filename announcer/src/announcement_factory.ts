@@ -17,7 +17,13 @@ export interface AnnouncementFactory {
   createReportAnnouncements(report: ReportModel): Announcement[]
 }
 
-export function announcementFactoryImpl(): AnnouncementFactory {
+export interface Recipient{
+  email: string
+  name: string
+  lang: string
+}
+
+export function announcementFactoryImpl(directory: Recipient[] = []): AnnouncementFactory {
   return {
     createReportAnnouncements(report: ReportModel): Announcement[] {
       return [];

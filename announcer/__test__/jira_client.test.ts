@@ -44,7 +44,7 @@ describe("jira client facade", () => {
         'status changed to (DISAVOWED) DURING (2000-01-01, 2038-01-19)'
     )
     const tickets = await jiraClient.ticketsClosed(reportInterval);
-    const ticketKeys = tickets.map(t => t.key);
+    const ticketKeys = tickets.map(t => t.key());
 
     expect(tickets.length).toBe(3)
     expect(ticketKeys).toStrictEqual(["ISSUE_1", "ISSUE_2", "ISSUE_3"])
@@ -57,7 +57,7 @@ describe("jira client facade", () => {
     );
 
     const tickets = await jiraClient.allOpenTickets()
-    const ticketKeys = tickets.map(t => t.key);
+    const ticketKeys = tickets.map(t => t.key());
 
     expect(tickets.length).toBe(3)
     expect(ticketKeys).toStrictEqual(["ISSUE_1", "ISSUE_2", "ISSUE_3"])
@@ -71,7 +71,7 @@ describe("jira client facade", () => {
     )
 
     const tickets = await jiraClient.ticketsCreated(reportInterval)
-    const ticketKeys = tickets.map(t => t.key);
+    const ticketKeys = tickets.map(t => t.key());
 
     expect(tickets.length).toBe(3)
     expect(ticketKeys).toStrictEqual(["ISSUE_1", "ISSUE_2", "ISSUE_3"])

@@ -5,12 +5,17 @@ import {JiraTicket, proxyJiraJsIssue} from "../src/jira_ticket";
 
 
 describe("jira ticket", () => {
-  test("field access", () => {
-    const issue: Issue = mockDeep()
+  const issue: Issue = mockDeep()
+  const ticket: JiraTicket = proxyJiraJsIssue(issue)
+
+  test("issue key", () => {
     issue.key = "ISSUE_KEY"
-
-    const ticket: JiraTicket = proxyJiraJsIssue(issue)
-
-    expect(ticket.key).toMatch("ISSUE_KEY")
+    expect(ticket.key()).toEqual("ISSUE_KEY")
   })
+
+  test("ticket summary", () => {
+    issue.fields.summary = "SUMMARY"
+    expect(ticket.summary()).toEqual("SUMMARY")
+  })
+
 })

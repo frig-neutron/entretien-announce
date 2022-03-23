@@ -1,6 +1,7 @@
 import {reportServiceImpl} from "../src/report_service";
 import {Interval} from "luxon";
 import {JiraTicket} from "../src/jira_ticket";
+import {mockDeep} from "jest-mock-extended";
 
 const reportService = reportServiceImpl()
 
@@ -23,14 +24,17 @@ describe("Report service", () => {
   test("sum up by bldg", () => {
 
     const ticketInBuilding = function (bldg: string): JiraTicket {
-      return {
-        key: "", building: bldg
-      }
+      const ticket = mockDeep<JiraTicket>()
+      ticket.building.mockReturnValue(bldg)
+      return ticket
     }
     const reportInterval = Interval.fromISO("2020-01 / T1d");
+
+    const ticketInAbc = [ticketInBuilding("abc"), ticketInBuilding("abc"), ticketInBuilding("abc")]
+    const ticketInDef = [ticketInBuilding("def")]
     const reportParam = {
-      allOpenTickets: [ticketInBuilding("abc"), ticketInBuilding("abc")],
-      ticketsClosed: [ticketInBuilding("abc"), ticketInBuilding("def")],
+      allOpenTickets: [ticketInAbc[0], ticketInAbc[1]],
+      ticketsClosed: [ticketInAbc[2], ticketInDef[0]],
       ticketsCreated: []
     };
 
@@ -44,15 +48,15 @@ describe("Report service", () => {
     expect(reportModel.allOpen.ticketsByBuilding).toStrictEqual(
         new Map([
           ["abc", [
-            ticketInBuilding("abc"),
-            ticketInBuilding("abc")]
+            ticketInAbc[0],
+            ticketInAbc[1]]
           ],
         ])
     )
     expect(reportModel.closed.ticketsByBuilding).toStrictEqual(
         new Map([
-          ["abc", [ticketInBuilding("abc")]],
-          ["def", [ticketInBuilding("def")]],
+          ["abc", [ticketInAbc[2]]],
+          ["def", [ticketInDef[0]]],
         ])
     )
   })
