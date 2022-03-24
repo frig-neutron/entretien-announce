@@ -9,6 +9,8 @@ export interface JiraTicket {
   building(): string,
 
   summary(): string
+
+  // todo: add "date created" / "age"
 }
 
 export function proxyJiraJsIssue(issue: Issue): JiraTicket {

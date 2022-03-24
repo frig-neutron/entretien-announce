@@ -37,7 +37,9 @@ export interface Recipient {
   roles: Role[]
 }
 
-export function announcementFactoryImpl(directory: Recipient[] = []): AnnouncementFactory {
+export function announcementFactoryImpl(directory: Recipient[] = [], config = {
+  jiraDomain: "lalliance.atlassian.net"
+}): AnnouncementFactory {
   loadAllLocales()
 
   return {
@@ -48,10 +50,12 @@ export function announcementFactoryImpl(directory: Recipient[] = []): Announceme
 
         const detailedTicketRow = (ticket: JiraTicket): string => {
           return `
-            <li>
-              <a href="https://lalliance.atlassian.net/browse/${ticket.key()}">${ticket.key()}</a>
-              <span>${ticket.summary()}</span>
-            </li>
+            <tr>
+              <td class="issue-key">              
+                <a href="https://${config.jiraDomain}/browse/${ticket.key()}">${ticket.key()}</a>
+              </td>
+              <td class="issue-summary">${ticket.summary()}</td>
+            </tr>
           `
         }
 
@@ -60,13 +64,17 @@ export function announcementFactoryImpl(directory: Recipient[] = []): Announceme
           return `
             <div>
               <h2>${strings.heading}</h2>
-              ${jiraTickets.map(t => detailedTicketRow(t))}
+              <table>
+                <tbody>
+                  ${jiraTickets.map(t => detailedTicketRow(t))}
+                </tbody>
+              </table>
             </div>
           `
         }
 
         const root = `
-          <div>
+          <div id="created-tickets">
             ${ticketSection(report.created(), {
               heading: L.created.heading({
                 start: report.reportInterval().start, 

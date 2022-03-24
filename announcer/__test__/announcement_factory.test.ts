@@ -2,6 +2,7 @@ import {announcementFactoryImpl} from "../src/announcement_factory";
 import {mockDeep} from "jest-mock-extended";
 import {ReportModel, TicketBlock} from "../src/report_service";
 import {Interval} from "luxon";
+import {parse} from "node-html-parser"
 
 const createdTickets = mockTicketBlock()
 const allTickets = mockTicketBlock()
@@ -62,16 +63,29 @@ describe("Announcement factory", () => {
   test("template rendering", () => {
     const factory = announcementFactoryImpl([
       {email: "charlie@bar", lang: "en", name: "charlie", roles: []},
-    ])
+    ], {jiraDomain: "3rd.circle"})
     createdTickets.tickets.mockReturnValue(
         [{
-          building: () => "BLDG",
-          key: () => "KEY",
-          summary: () => "SUMMARY"
+          building: () => "BLDG_CREATED",
+          key: () => "KEY_CREATED",
+          summary: () => "SUMMARY_CREATED"
         }]
     )
 
     const announcements = factory.createReportAnnouncements(report);
+
+    const reportBody = parse(announcements[0].body);
+
+    const createdHeading = reportBody.querySelector('#created-tickets h2');
+    const createdTicketRow = reportBody.querySelector('#created-tickets table tr');
+    const issueKeyLink = createdTicketRow!.querySelector(".issue-key a")
+    const issueSummaryCell = createdTicketRow!.querySelector(".issue-summary")
+    // TODO: date opened / ticket age
+
     expect(announcements[0].subject).toEqual("Ticket report for December 2021")
+    expect(createdHeading!.textContent).toEqual("Tickets created between 12/1/2021 and 12/2/2021")
+    expect(issueKeyLink!.attributes['href']).toEqual("https://3rd.circle/browse/KEY_CREATED")
+    expect(issueKeyLink!.textContent).toEqual("KEY_CREATED")
+    expect(issueSummaryCell!.textContent).toEqual("SUMMARY_CREATED")
   })
 })

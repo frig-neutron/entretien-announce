@@ -25,6 +25,7 @@ export interface TicketBlock {
   tickets(): JiraTicket[],
   highPriorityTickets(): JiraTicket[],
   ticketsByBuilding(): Map<string, JiraTicket[]>
+  // todo: add oldest ticket
 }
 
 export function reportServiceImpl(): ReportService {
