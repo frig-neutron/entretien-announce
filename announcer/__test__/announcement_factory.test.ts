@@ -69,23 +69,63 @@ describe("Announcement factory", () => {
           building: () => "BLDG_CREATED",
           key: () => "KEY_CREATED",
           summary: () => "SUMMARY_CREATED"
-        }]
-    )
+        }])
+    closedTickets.tickets.mockReturnValue(
+        [{
+          building: () => "BLDG_CLOSED",
+          key: () => "KEY_CLOSED",
+          summary: () => "SUMMARY_CLOSED"
+        }])
+    allTickets.tickets.mockReturnValue(
+        [{
+          building: () => "BLDG_EXISTS",
+          key: () => "KEY_EXISTS",
+          summary: () => "SUMMARY_EXISTS"
+        }])
 
     const announcements = factory.createReportAnnouncements(report);
 
     const reportBody = parse(announcements[0].body);
 
-    const createdHeading = reportBody.querySelector('#created-tickets h2');
-    const createdTicketRow = reportBody.querySelector('#created-tickets table tr');
-    const issueKeyLink = createdTicketRow!.querySelector(".issue-key a")
-    const issueSummaryCell = createdTicketRow!.querySelector(".issue-summary")
-    // TODO: date opened / ticket age
+    type TicketBlockStrings = {
+      containerElementSelector: string,
+      header: string,
+      issueKey: string,
+      issueSummary: string
+    }
+
+    const checkTicketBlock = (strings: TicketBlockStrings) => {
+      const createdHeadingContainer = reportBody.querySelector(strings.containerElementSelector)
+      const createdHeading = createdHeadingContainer!.querySelector('h2');
+      const createdTicketRow = createdHeadingContainer!.querySelector('table tr');
+      const issueKeyLink = createdTicketRow!.querySelector(".issue-key a")
+      const issueSummaryCell = createdTicketRow!.querySelector(".issue-summary")
+      // TODO: date opened / ticket age
+
+      expect(createdHeading!.textContent).toEqual(strings.header)
+      expect(issueKeyLink!.attributes['href']).toEqual(`https://3rd.circle/browse/${strings.issueKey}`)
+      expect(issueKeyLink!.textContent).toEqual(strings.issueKey)
+      expect(issueSummaryCell!.textContent).toEqual(strings.issueSummary)
+    }
 
     expect(announcements[0].subject).toEqual("Ticket report for December 2021")
-    expect(createdHeading!.textContent).toEqual("Tickets created between 12/1/2021 and 12/2/2021")
-    expect(issueKeyLink!.attributes['href']).toEqual("https://3rd.circle/browse/KEY_CREATED")
-    expect(issueKeyLink!.textContent).toEqual("KEY_CREATED")
-    expect(issueSummaryCell!.textContent).toEqual("SUMMARY_CREATED")
+    checkTicketBlock({
+      containerElementSelector: '#tickets-created',
+      header: "Tickets created between 12/1/2021 and 12/2/2021",
+      issueKey: "KEY_CREATED",
+      issueSummary: "SUMMARY_CREATED"
+    })
+    checkTicketBlock({
+      containerElementSelector: '#tickets-closed',
+      header: "Tickets closed between 12/1/2021 and 12/2/2021",
+      issueKey: "KEY_CLOSED",
+      issueSummary: "SUMMARY_CLOSED"
+    })
+    checkTicketBlock({
+      containerElementSelector: '#tickets-all-open',
+      header: "All open tickets",
+      issueKey: "KEY_EXISTS",
+      issueSummary: "SUMMARY_EXISTS"
+    })
   })
 })

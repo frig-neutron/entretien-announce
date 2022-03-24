@@ -31,7 +31,7 @@ type RootTranslation = {
 	}
 	allTickets: {
 		/**
-		 * All currently open tickets
+		 * All open tickets
 		 */
 		heading: string
 	}
@@ -58,7 +58,7 @@ export type TranslationFunctions = {
 	}
 	allTickets: {
 		/**
-		 * All currently open tickets
+		 * All open tickets
 		 */
 		heading: () => LocalizedString
 	}

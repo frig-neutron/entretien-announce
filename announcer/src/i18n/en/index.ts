@@ -6,7 +6,7 @@ const en: BaseTranslation = {
 		heading: "Tickets created between {start:DateTime|dtHeader} and {end:DateTime|dtHeader}"
 	},
 	allTickets: {
-		heading: "All currently open tickets"
+		heading: "All open tickets"
 	},
 	closed: {
 		heading: "Tickets closed between {start:DateTime|dtHeader} and {end:DateTime|dtHeader}"

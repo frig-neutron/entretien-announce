@@ -74,7 +74,7 @@ export function announcementFactoryImpl(directory: Recipient[] = [], config = {
         }
 
         const root = `
-          <div id="created-tickets">
+          <div id="tickets-created">
             ${ticketSection(report.created(), {
               heading: L.created.heading({
                 start: report.reportInterval().start, 
@@ -82,6 +82,22 @@ export function announcementFactoryImpl(directory: Recipient[] = [], config = {
               })
             })}
           </div>
+          
+          <div id="tickets-closed">
+            ${ticketSection(report.closed(), {
+              heading: L.closed.heading({
+                start: report.reportInterval().start,
+                end: report.reportInterval().end
+              })
+            })}
+          </div>
+
+          <div id="tickets-all-open">
+            ${ticketSection(report.allOpen(), {
+              heading: L.allTickets.heading()
+            })}
+          </div>
+        
         `
 
         return {
