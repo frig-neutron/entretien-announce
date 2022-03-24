@@ -2,7 +2,7 @@
 /* eslint-disable */
 import type { BaseTranslation as BaseTranslationType, LocalizedString, RequiredParams } from 'typesafe-i18n'
 
-import type { Interval } from './custom-types'
+import type { DateTime, Interval } from './custom-types'
 
 export type BaseTranslation = BaseTranslationType
 export type BaseLocale = 'en'
@@ -21,6 +21,28 @@ type RootTranslation = {
 	 * @param {Interval} interval
 	 */
 	subject: RequiredParams<'interval|subjectReportInterval'>
+	created: {
+		/**
+		 * Tickets created between {start|dtHeader} and {end|dtHeader}
+		 * @param {DateTime} end
+		 * @param {DateTime} start
+		 */
+		heading: RequiredParams<'end|dtHeader' | 'start|dtHeader'>
+	}
+	allTickets: {
+		/**
+		 * All currently open tickets
+		 */
+		heading: string
+	}
+	closed: {
+		/**
+		 * Tickets closed between {start|dtHeader} and {end|dtHeader}
+		 * @param {DateTime} end
+		 * @param {DateTime} start
+		 */
+		heading: RequiredParams<'end|dtHeader' | 'start|dtHeader'>
+	}
 }
 
 export type TranslationFunctions = {
@@ -28,8 +50,27 @@ export type TranslationFunctions = {
 	 * Ticket report for {interval|subjectReportInterval}
 	 */
 	subject: (arg: { interval: Interval }) => LocalizedString
+	created: {
+		/**
+		 * Tickets created between {start|dtHeader} and {end|dtHeader}
+		 */
+		heading: (arg: { end: DateTime, start: DateTime }) => LocalizedString
+	}
+	allTickets: {
+		/**
+		 * All currently open tickets
+		 */
+		heading: () => LocalizedString
+	}
+	closed: {
+		/**
+		 * Tickets closed between {start|dtHeader} and {end|dtHeader}
+		 */
+		heading: (arg: { end: DateTime, start: DateTime }) => LocalizedString
+	}
 }
 
 export type Formatters = {
+	dtHeader: (value: DateTime) => unknown
 	subjectReportInterval: (value: Interval) => unknown
 }

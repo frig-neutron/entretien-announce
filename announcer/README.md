@@ -34,9 +34,8 @@ Handlebars template, but it seems like too much work compared to the alternative
 
 The alternative is directly buidling HTML using a fluent builder. This requires all the same 
 work as re-wrapping the report model, only at the end you're left with a direct HTML 
-representation, and not a data object that needs _another_ level of templating. I'm choosing 
-[tiny-html-builder][tiny-html-builder] because it looks small, simple and fluent.
+representation, and not a data object that needs _another_ level of templating. For now I'm 
+using basic JS templates... because I didn't find anything better.
 
 
-[tiny-html-builder]: https://www.npmjs.com/package/tiny-html-builder
 [typesafe-i18n]: https://github.com/ivanhofer/typesafe-i18n

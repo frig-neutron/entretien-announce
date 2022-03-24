@@ -46,4 +46,22 @@ describe("Announcement factory", () => {
     const announcements = factory.createReportAnnouncements(report);
     expect(announcements[0].subject).toEqual("Rapport de billetterie pour décembre 2021")
   })
+
+  test("template rendering", () => {
+    const factory = announcementFactoryImpl([
+      {email: "charlie@bar", lang: "en", name: "charlie", roles: []},
+    ])
+    report.created.mockReturnValue({
+      highPriorityTickets: [],
+      tickets: [{
+        building: () => "BLDG",
+        key: () => "KEY",
+        summary: () => "SUMMARY"
+      }],
+      ticketsByBuilding: new Map()
+    })
+
+    const announcements = factory.createReportAnnouncements(report);
+    expect(announcements[0].subject).toEqual("Ticket report for December 2021")
+  })
 })

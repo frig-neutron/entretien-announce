@@ -2,13 +2,11 @@
  * Report ready for public consumption.
  * Includes rendered content and intended recipient - everything needed by a notification channel
  */
-import {ReportModel} from "./report_service";
-import {BaseTranslation} from "typesafe-i18n";
-import {DateTimeFormatOptions, Interval} from "luxon";
-import L from './i18n/i18n-node'
+import {ReportModel, TicketBlock} from "./report_service";
 import {loadAllLocales} from './i18n/i18n-util.sync'
-import {detectLocale, i18nObject, locales} from './i18n/i18n-util'
+import {i18nObject} from './i18n/i18n-util'
 import {Locales, TranslationFunctions} from "./i18n/i18n-types";
+import {JiraTicket} from "./jira_ticket";
 
 export interface Announcement {
   primaryRecipient: string
@@ -42,18 +40,43 @@ export interface Recipient {
 export function announcementFactoryImpl(directory: Recipient[] = []): AnnouncementFactory {
   loadAllLocales()
 
-  const formatOpts: DateTimeFormatOptions = {month: "long", year: "numeric"};
-
   return {
     createReportAnnouncements(report: ReportModel): Announcement[] {
 
       const renderReport = function (recipient: Recipient): Announcement {
         const L: TranslationFunctions = i18nObject(<Locales>recipient.lang)
 
-        const formattedReportInterval = report.reportInterval().start.setLocale(recipient.lang).toLocaleString(formatOpts);
+        const detailedTicketRow = (ticket: JiraTicket): string => {
+          return `
+            <li>
+              <a href="https://lalliance.atlassian.net/browse/${ticket.key()}">${ticket.key()}</a>
+              <span>${ticket.summary()}</span>
+            </li>
+          `
+        }
+
+        const ticketSection = (block: TicketBlock, strings: { heading: string }): string => {
+          return `
+            <div>
+              <h2>${strings.heading}</h2>
+              ${block.tickets.map(t => detailedTicketRow(t))}
+            </div>
+          `
+        }
+
+        const root = `
+          <div>
+            ${ticketSection(report.created(), {
+              heading: L.created.heading({
+                start: report.reportInterval().start, 
+                end: report.reportInterval().end
+              })
+            })}
+          </div>
+        `
 
         return {
-          body: "",
+          body: root,
           subject: L.subject({interval: report.reportInterval()}),
           primaryRecipient: recipient.email,
           secondaryRecipients: []
