@@ -56,10 +56,11 @@ export function announcementFactoryImpl(directory: Recipient[] = []): Announceme
         }
 
         const ticketSection = (block: TicketBlock, strings: { heading: string }): string => {
+          const jiraTickets = block.tickets();
           return `
             <div>
               <h2>${strings.heading}</h2>
-              ${block.tickets.map(t => detailedTicketRow(t))}
+              ${jiraTickets.map(t => detailedTicketRow(t))}
             </div>
           `
         }

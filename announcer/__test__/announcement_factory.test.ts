@@ -1,14 +1,26 @@
 import {announcementFactoryImpl} from "../src/announcement_factory";
 import {mockDeep} from "jest-mock-extended";
-import {ReportModel} from "../src/report_service";
+import {ReportModel, TicketBlock} from "../src/report_service";
 import {Interval} from "luxon";
 
-let report = mockDeep<ReportModel>()
-beforeEach(() => {
-  // necessary b/c clearing mocks doesn't fix reassigned props
-  report = mockDeep<ReportModel>()
-  report.reportInterval.mockReturnValue(Interval.fromISO("2021-12/P1D"))
-})
+const createdTickets = mockTicketBlock()
+const allTickets = mockTicketBlock()
+const closedTickets = mockTicketBlock()
+
+const report = mockDeep<ReportModel>()
+
+report.created.mockReturnValue(createdTickets)
+report.closed.mockReturnValue(closedTickets)
+report.allOpen.mockReturnValue(allTickets)
+report.reportInterval.mockReturnValue(Interval.fromISO("2021-12/P1D"))
+
+function mockTicketBlock() {
+  const ticketBlock = mockDeep<TicketBlock>();
+  ticketBlock.highPriorityTickets.mockReturnValue([])
+  ticketBlock.tickets.mockReturnValue([])
+  ticketBlock.ticketsByBuilding.mockReturnValue(new Map())
+  return ticketBlock;
+}
 
 describe("Announcement factory", () => {
   test("no recipients => no announcements", () => {
@@ -51,15 +63,13 @@ describe("Announcement factory", () => {
     const factory = announcementFactoryImpl([
       {email: "charlie@bar", lang: "en", name: "charlie", roles: []},
     ])
-    report.created.mockReturnValue({
-      highPriorityTickets: [],
-      tickets: [{
-        building: () => "BLDG",
-        key: () => "KEY",
-        summary: () => "SUMMARY"
-      }],
-      ticketsByBuilding: new Map()
-    })
+    createdTickets.tickets.mockReturnValue(
+        [{
+          building: () => "BLDG",
+          key: () => "KEY",
+          summary: () => "SUMMARY"
+        }]
+    )
 
     const announcements = factory.createReportAnnouncements(report);
     expect(announcements[0].subject).toEqual("Ticket report for December 2021")

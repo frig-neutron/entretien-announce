@@ -22,9 +22,9 @@ export interface ReportModel {
 }
 
 export interface TicketBlock {
-  tickets: JiraTicket[],
-  highPriorityTickets: JiraTicket[],
-  ticketsByBuilding: Map<string, JiraTicket[]>
+  tickets(): JiraTicket[],
+  highPriorityTickets(): JiraTicket[],
+  ticketsByBuilding(): Map<string, JiraTicket[]>
 }
 
 export function reportServiceImpl(): ReportService {
@@ -44,9 +44,9 @@ function ticketBlockImpl(tickets: JiraTicket[], reportInterval: Interval): Ticke
   const ticketsByBuilding = groupBy(tickets, t => t.building());
 
   return {
-    highPriorityTickets: [],
-    tickets: tickets,
-    ticketsByBuilding: new Map(ticketsByBuilding)
+    highPriorityTickets: () => [],
+    tickets: () => tickets,
+    ticketsByBuilding: () => new Map(ticketsByBuilding)
   }
 }
 

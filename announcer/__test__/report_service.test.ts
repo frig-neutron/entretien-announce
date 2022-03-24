@@ -15,9 +15,9 @@ describe("Report service", () => {
       ticketsCreated: []
     }, reportInterval);
 
-    expect(reportModel.allOpen().tickets).toEqual([])
-    expect(reportModel.closed().tickets).toEqual([])
-    expect(reportModel.created().tickets).toEqual([])
+    expect(reportModel.allOpen().tickets()).toEqual([])
+    expect(reportModel.closed().tickets()).toEqual([])
+    expect(reportModel.created().tickets()).toEqual([])
     expect(reportModel.reportInterval()).toEqual(reportInterval)
   })
 
@@ -40,12 +40,12 @@ describe("Report service", () => {
 
     const reportModel = reportService.processReport(reportParam, reportInterval);
 
-    expect(reportModel.allOpen().tickets).toEqual(reportParam.allOpenTickets)
-    expect(reportModel.closed().tickets).toEqual(reportParam.ticketsClosed)
-    expect(reportModel.created().tickets).toEqual(reportParam.ticketsCreated)
+    expect(reportModel.allOpen().tickets()).toEqual(reportParam.allOpenTickets)
+    expect(reportModel.closed().tickets()).toEqual(reportParam.ticketsClosed)
+    expect(reportModel.created().tickets()).toEqual(reportParam.ticketsCreated)
     expect(reportModel.reportInterval()).toEqual(reportInterval)
 
-    expect(reportModel.allOpen().ticketsByBuilding).toStrictEqual(
+    expect(reportModel.allOpen().ticketsByBuilding()).toStrictEqual(
         new Map([
           ["abc", [
             ticketInAbc[0],
@@ -53,7 +53,7 @@ describe("Report service", () => {
           ],
         ])
     )
-    expect(reportModel.closed().ticketsByBuilding).toStrictEqual(
+    expect(reportModel.closed().ticketsByBuilding()).toStrictEqual(
         new Map([
           ["abc", [ticketInAbc[2]]],
           ["def", [ticketInDef[0]]],
