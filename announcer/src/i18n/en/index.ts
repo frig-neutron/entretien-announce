@@ -2,6 +2,8 @@ import type { BaseTranslation } from '../i18n-types'
 
 const en: BaseTranslation = {
 	subject: 'Ticket report for {interval:Interval|subjectReportInterval}',
+	greeting: 'Dear {name:string},',
+	preamble: `Here is a summary of jira ticket activity for {month:DateTime|monthYear}`,
 	issueKey: 'Ticket no.',
 	issueSummary: 'Summary',
 	created: {

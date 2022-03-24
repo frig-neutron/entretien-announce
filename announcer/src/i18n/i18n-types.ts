@@ -22,6 +22,16 @@ type RootTranslation = {
 	 */
 	subject: RequiredParams<'interval|subjectReportInterval'>
 	/**
+	 * Dear {name},
+	 * @param {string} name
+	 */
+	greeting: RequiredParams<'name'>
+	/**
+	 * Here is a summary of jira ticket activity for {month|monthYear}
+	 * @param {DateTime} month
+	 */
+	preamble: RequiredParams<'month|monthYear'>
+	/**
 	 * Ticket no.
 	 */
 	issueKey: string
@@ -59,6 +69,14 @@ export type TranslationFunctions = {
 	 */
 	subject: (arg: { interval: Interval }) => LocalizedString
 	/**
+	 * Dear {name},
+	 */
+	greeting: (arg: { name: string }) => LocalizedString
+	/**
+	 * Here is a summary of jira ticket activity for {month|monthYear}
+	 */
+	preamble: (arg: { month: DateTime }) => LocalizedString
+	/**
 	 * Ticket no.
 	 */
 	issueKey: () => LocalizedString
@@ -88,5 +106,6 @@ export type TranslationFunctions = {
 
 export type Formatters = {
 	dtHeader: (value: DateTime) => unknown
+	monthYear: (value: DateTime) => unknown
 	subjectReportInterval: (value: Interval) => unknown
 }

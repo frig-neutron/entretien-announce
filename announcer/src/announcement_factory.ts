@@ -80,30 +80,38 @@ export function announcementFactoryImpl(directory: Recipient[] = [], config = {
         }
 
         const root = `
-          <div id="tickets-created">
-            ${ticketSection(report.created(), {
-              heading: L.created.heading({
-                start: report.reportInterval().start, 
-                end: report.reportInterval().end
-              })
-            })}
-          </div>
+          <html>
+            <body>
+              <div id="intro">
+                <span id="greeting">${L.greeting({name: recipient.name})}</span> <br>
+                <span id="preamble">${L.preamble({month: report.reportInterval().start})}</span>
+              </div>
+              <div id="tickets-created">
+                ${ticketSection(report.created(), {
+                  heading: L.created.heading({
+                    start: report.reportInterval().start, 
+                    end: report.reportInterval().end
+                  })
+                })}
+              </div>
+              
+              <div id="tickets-closed">
+                ${ticketSection(report.closed(), {
+                  heading: L.closed.heading({
+                    start: report.reportInterval().start,
+                    end: report.reportInterval().end
+                  })
+                })}
+              </div>
+    
+              <div id="tickets-all-open">
+                ${ticketSection(report.allOpen(), {
+                  heading: L.allTickets.heading()
+                })}
+              </div>
           
-          <div id="tickets-closed">
-            ${ticketSection(report.closed(), {
-              heading: L.closed.heading({
-                start: report.reportInterval().start,
-                end: report.reportInterval().end
-              })
-            })}
-          </div>
-
-          <div id="tickets-all-open">
-            ${ticketSection(report.allOpen(), {
-              heading: L.allTickets.heading()
-            })}
-          </div>
-        
+            </body>
+          </html>
         `
 
         return {

@@ -12,6 +12,13 @@ export const initFormatters: FormattersInitializer<Locales, Formatters> = (local
         return "undefined"
       }
     },
+    monthYear(value: DateTime): string {
+      if (value) {
+        return value.setLocale(locale).toLocaleString({month: "long", year: "numeric"})
+      } else {
+        return "undefined"
+      }
+    },
     subjectReportInterval: (interval: Interval): string => {
       const formatOpts: DateTimeFormatOptions = {month: "long", year: "numeric"};
       return interval.start.setLocale(locale).toLocaleString(formatOpts)

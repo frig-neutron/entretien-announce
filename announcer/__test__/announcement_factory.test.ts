@@ -115,6 +115,10 @@ describe("Announcement factory", () => {
       expect(issueSummaryCell!.textContent).toEqual(strings.issueSummary)
     }
 
+    expect(reportBody.querySelector("#greeting")!.textContent).toEqual("Dear charlie,")
+    expect(reportBody.querySelector("#preamble")!.textContent).toEqual(
+        "Here is a summary of jira ticket activity for December 2021"
+    )
     expect(announcements[0].subject).toEqual("Ticket report for December 2021")
     checkTicketBlock({
       containerElementSelector: '#tickets-created',

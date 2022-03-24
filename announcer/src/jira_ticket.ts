@@ -11,6 +11,7 @@ export interface JiraTicket {
   summary(): string
 
   // todo: add "date created" / "age"
+  // todo: add "creator", parsing from ticket body
 }
 
 export function proxyJiraJsIssue(issue: Issue): JiraTicket {
