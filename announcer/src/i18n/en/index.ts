@@ -2,6 +2,8 @@ import type { BaseTranslation } from '../i18n-types'
 
 const en: BaseTranslation = {
 	subject: 'Ticket report for {interval:Interval|subjectReportInterval}',
+	issueKey: 'Ticket no.',
+	issueSummary: 'Summary',
 	created: {
 		heading: "Tickets created between {start:DateTime|dtHeader} and {end:DateTime|dtHeader}"
 	},

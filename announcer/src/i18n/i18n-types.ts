@@ -21,6 +21,14 @@ type RootTranslation = {
 	 * @param {Interval} interval
 	 */
 	subject: RequiredParams<'interval|subjectReportInterval'>
+	/**
+	 * Ticket no.
+	 */
+	issueKey: string
+	/**
+	 * Summary
+	 */
+	issueSummary: string
 	created: {
 		/**
 		 * Tickets created between {start|dtHeader} and {end|dtHeader}
@@ -50,6 +58,14 @@ export type TranslationFunctions = {
 	 * Ticket report for {interval|subjectReportInterval}
 	 */
 	subject: (arg: { interval: Interval }) => LocalizedString
+	/**
+	 * Ticket no.
+	 */
+	issueKey: () => LocalizedString
+	/**
+	 * Summary
+	 */
+	issueSummary: () => LocalizedString
 	created: {
 		/**
 		 * Tickets created between {start|dtHeader} and {end|dtHeader}

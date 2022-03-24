@@ -95,14 +95,21 @@ describe("Announcement factory", () => {
     }
 
     const checkTicketBlock = (strings: TicketBlockStrings) => {
-      const createdHeadingContainer = reportBody.querySelector(strings.containerElementSelector)
-      const createdHeading = createdHeadingContainer!.querySelector('h2');
-      const createdTicketRow = createdHeadingContainer!.querySelector('table tr');
-      const issueKeyLink = createdTicketRow!.querySelector(".issue-key a")
-      const issueSummaryCell = createdTicketRow!.querySelector(".issue-summary")
+      const container = reportBody.querySelector(strings.containerElementSelector)
+      const headingElement = container!.querySelector('h2');
+
+      const headerRow = container!.querySelector("table thead tr")
+      const issueKeyHeader = headerRow!.querySelector(".issue-key")
+      const issueSummaryHeader = headerRow!.querySelector(".issue-summary")
+
+      const issueRow = container!.querySelector('table tbody tr');
+      const issueKeyLink = issueRow!.querySelector(".issue-key a")
+      const issueSummaryCell = issueRow!.querySelector(".issue-summary")
       // TODO: date opened / ticket age
 
-      expect(createdHeading!.textContent).toEqual(strings.header)
+      expect(headingElement!.textContent).toEqual(strings.header)
+      expect(issueKeyHeader!.textContent).toEqual("Ticket no.")
+      expect(issueSummaryHeader!.textContent).toEqual("Summary")
       expect(issueKeyLink!.attributes['href']).toEqual(`https://3rd.circle/browse/${strings.issueKey}`)
       expect(issueKeyLink!.textContent).toEqual(strings.issueKey)
       expect(issueSummaryCell!.textContent).toEqual(strings.issueSummary)

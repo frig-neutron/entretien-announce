@@ -65,6 +65,12 @@ export function announcementFactoryImpl(directory: Recipient[] = [], config = {
             <div>
               <h2>${strings.heading}</h2>
               <table>
+                <thead>
+                  <tr>
+                    <th class="issue-key">${L.issueKey()}</th>
+                    <th class="issue-summary">${L.issueSummary()}</th>
+                  </tr>
+                </thead>
                 <tbody>
                   ${jiraTickets.map(t => detailedTicketRow(t))}
                 </tbody>
