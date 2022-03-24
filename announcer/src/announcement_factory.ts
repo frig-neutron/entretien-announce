@@ -110,6 +110,7 @@ export function announcementFactoryImpl(directory: Recipient[] = [], config = {
                 })}
               </div>
           
+              <div id="outtro">${L.outtro()}</div>
             </body>
           </html>
         `

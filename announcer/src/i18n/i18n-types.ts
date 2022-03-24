@@ -39,6 +39,10 @@ type RootTranslation = {
 	 * Summary
 	 */
 	issueSummary: string
+	/**
+	 * This email has been sent by an automated system. If you do not wish to receive these messages please contact Daniil.
+	 */
+	outtro: string
 	created: {
 		/**
 		 * Tickets created between {start|dtHeader} and {end|dtHeader}
@@ -84,6 +88,10 @@ export type TranslationFunctions = {
 	 * Summary
 	 */
 	issueSummary: () => LocalizedString
+	/**
+	 * This email has been sent by an automated system. If you do not wish to receive these messages please contact Daniil.
+	 */
+	outtro: () => LocalizedString
 	created: {
 		/**
 		 * Tickets created between {start|dtHeader} and {end|dtHeader}
