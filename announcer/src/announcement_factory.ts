@@ -109,7 +109,7 @@ export function announcementFactoryImpl(directory: Recipient[], config = {
                 })}
               </div>
           
-              <div id="outtro">${L.outtro()}</div>
+              <div id="outtro" style="display: block; margin-top: 1em;">${L.outtro()}</div>
             </body>
           </html>`
         return {
