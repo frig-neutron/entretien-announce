@@ -8,6 +8,8 @@ import {ApplicationFactory, defaultApplicationFactory} from "./src/application_f
 import {Application} from "./src/application"
 import {JiraBasicAuth} from "./src/application_factory";
 import {logger as log} from "./src/logger";
+import {SmtpConfig} from "./src/sender";
+import {Recipient} from "./src/announcement_factory";
 
 let applicationFactory: ApplicationFactory = defaultApplicationFactory;
 
@@ -19,7 +21,18 @@ exports.announcer = (message: PubsubMessage, context: Context) => {
     apiToken: String(process.env.JIRA_API_TOKEN)
   }
 
-  let application: Application = applicationFactory(jiraCreds)
+  let smtpConfig: SmtpConfig = {
+    username: String(process.env.SMTP_USERNAME),
+    password: String(process.env.SMTP_PASSWORD),
+    serverHost: "smtp.gmail.com",
+    mailFrom: "robot.d.entretien.alliance@gmail.com"
+  }
+
+  const directory: Recipient[] = [
+    {name: "Daniil", email: "daniil.alliance+test@gmail.com", lang: "en", roles: []}
+  ]
+
+  let application: Application = applicationFactory(directory, jiraCreds, smtpConfig)
   application.announce("2021-12")
   .then(nothing => log.info("moo"))
 

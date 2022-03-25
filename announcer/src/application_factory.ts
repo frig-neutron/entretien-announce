@@ -1,18 +1,25 @@
 import {Application, applicationImpl} from "./application";
 import {jiraClientImpl} from "./jira_client";
 import {reportServiceImpl} from "./report_service";
-import {announcementFactoryImpl} from "./announcement_factory";
-import {senderImpl} from "./sender";
+import {announcementFactoryImpl, Recipient} from "./announcement_factory";
+import {SmtpConfig, smtpSender} from "./sender";
 import {Version2Client} from "jira.js";
 
-export type ApplicationFactory = (jiraBasicAuth: JiraBasicAuth) => Application
+export type ApplicationFactory = (
+    directory: Recipient[],
+    jiraBasicAuth: JiraBasicAuth,
+    smtpConfig: SmtpConfig
+) => Application
 
-export function defaultApplicationFactory(jiraBasicAuth: JiraBasicAuth): Application {
+export function defaultApplicationFactory(
+    directory: Recipient[],
+    jiraBasicAuth: JiraBasicAuth,
+    smtpConfig: SmtpConfig): Application {
   const version2Client = jiraV2Client(jiraBasicAuth);
   const jiraClient = jiraClientImpl(version2Client);
   const reportService = reportServiceImpl();
-  const announcementFactory = announcementFactoryImpl();
-  const sender = senderImpl();
+  const announcementFactory = announcementFactoryImpl(directory);
+  const sender = smtpSender(smtpConfig);
   return applicationImpl(jiraClient, reportService, announcementFactory, sender);
 }
 

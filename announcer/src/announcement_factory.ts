@@ -37,7 +37,7 @@ export interface Recipient {
   roles: Role[]
 }
 
-export function announcementFactoryImpl(directory: Recipient[] = [], config = {
+export function announcementFactoryImpl(directory: Recipient[], config = {
   jiraDomain: "lalliance.atlassian.net"
 }): AnnouncementFactory {
   loadAllLocales()
@@ -51,12 +51,11 @@ export function announcementFactoryImpl(directory: Recipient[] = [], config = {
         const detailedTicketRow = (ticket: JiraTicket): string => {
           return `
             <tr>
-              <td class="issue-key">              
+              <td class="issue-key">
                 <a href="https://${config.jiraDomain}/browse/${ticket.key()}">${ticket.key()}</a>
               </td>
               <td class="issue-summary">${ticket.summary()}</td>
-            </tr>
-          `
+            </tr>`
         }
 
         const ticketSection = (block: TicketBlock, strings: { heading: string }): string => {
@@ -72,11 +71,10 @@ export function announcementFactoryImpl(directory: Recipient[] = [], config = {
                   </tr>
                 </thead>
                 <tbody>
-                  ${jiraTickets.map(t => detailedTicketRow(t))}
+                  ${jiraTickets.map(t => detailedTicketRow(t)).join('')}
                 </tbody>
               </table>
-            </div>
-          `
+            </div>`
         }
 
         const root = `
@@ -112,8 +110,7 @@ export function announcementFactoryImpl(directory: Recipient[] = [], config = {
           
               <div id="outtro">${L.outtro()}</div>
             </body>
-          </html>
-        `
+          </html>`
 
         return {
           body: root,
