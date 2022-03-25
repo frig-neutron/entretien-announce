@@ -31,7 +31,7 @@
         "build": "tsc",
         "build-watch": "npm run build && tsc --watch",
         "deploy": "./scripts/deploy.sh",
-        "function": "functions-framework --target=announcer",
+        "function": "functions-framework --target=announcer --signature-type=event",
         "gcp-build": "tsc",
         "test": "jest",
         "typesafe-i18n": "typesafe-i18n",

@@ -4,6 +4,13 @@ This component queries jira and produces announcements for a directory of recipi
 
 The number of announcements == number of recipients.
 
+## Running
+
+Running locally can be done w/ the `functions-framework`. Use the script command. The 
+`--signature-type=event` makes it only listen to HTTP POST, so `curl -XPOST localhost:8080`. 
+Removing the signature type makes it accept HTTP GET, but then it just hangs there. I think this 
+is because it expects a response on the 2nd function param.
+
 ## Localization
 
 - done using the [`typesafe-i18n`][typesafe-i18n] lib

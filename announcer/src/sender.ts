@@ -19,7 +19,7 @@ export function smtpSender(config: SmtpConfig): Sender {
   const transporter = createTransport({
     host: config.serverHost,
     port: 465,
-    secure: true, // true for 465, false for other ports
+    secure: true,
     auth: {
       user: config.username,
       pass: config.password,
