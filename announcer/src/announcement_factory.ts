@@ -7,6 +7,7 @@ import {loadAllLocales} from './i18n/i18n-util.sync'
 import {i18nObject} from './i18n/i18n-util'
 import {Locales, TranslationFunctions} from "./i18n/i18n-types";
 import {JiraTicket} from "./jira_ticket";
+import prettify from "html-prettify";
 
 export interface Announcement {
   primaryRecipient: string
@@ -111,9 +112,8 @@ export function announcementFactoryImpl(directory: Recipient[], config = {
               <div id="outtro">${L.outtro()}</div>
             </body>
           </html>`
-
         return {
-          body: root,
+          body: prettify(root),
           subject: L.subject({interval: report.reportInterval()}),
           primaryRecipient: recipient.email,
           secondaryRecipients: []
