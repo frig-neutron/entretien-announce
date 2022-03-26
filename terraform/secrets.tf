@@ -7,6 +7,8 @@ variable "announcer_secret_data" {
     jira_token    = string
     smtp_username = string
     smtp_password = string
+    smtp_host     = string
+    smtp_from     = string
   })
 }
 
