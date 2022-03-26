@@ -3,9 +3,10 @@ variable "announcer_secret_data" {
   sensitive = true
   nullable  = false
   type = object({
-    jira_email  = string
-    jira_token  = string
-    gmail_token = string
+    jira_email    = string
+    jira_token    = string
+    smtp_username = string
+    smtp_password = string
   })
 }
 
