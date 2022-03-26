@@ -32,6 +32,7 @@ describe("application", () => {
     jiraClient.ticketsCreated.mockReturnValue(Promise.resolve([createdTicket]))
     reportService.processReport.mockReturnValue(reportModel)
     announcementFactory.createReportAnnouncements.mockReturnValue([announcement])
+    sender.sendAnnouncement.mockReturnValue(Promise.resolve())
 
     await application.announce("2038-01-19T12:34:56.789")
 
