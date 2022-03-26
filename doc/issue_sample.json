@@ -1,0 +1,191 @@
+{
+  "expand": "operations,versionedRepresentations,editmeta,changelog,customfield_10010.requestTypePractice,renderedFields",
+  "id": "10195",
+  "self": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/issue/10195",
+  "key": "TRIAG-97",
+  "fields": {
+    "statuscategorychangedate": "2021-11-04T20:09:53.475-0400",
+    "issuetype": {
+      "self": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/issuetype/10012",
+      "id": "10012",
+      "description": "First stage of data collection",
+      "iconUrl": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/universal_avatar/view/type/issuetype/avatar/10300?size=medium",
+      "name": "Intake",
+      "subtask": false,
+      "avatarId": 10300,
+      "hierarchyLevel": 0
+    },
+    "timespent": null,
+    "customfield_10030": null,
+    "customfield_10031": null,
+    "project": {
+      "self": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/project/10004",
+      "id": "10004",
+      "key": "TRIAG",
+      "name": "Triage",
+      "projectTypeKey": "software",
+      "simplified": false,
+      "avatarUrls": {
+        "48x48": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10423",
+        "24x24": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10423?size=small",
+        "16x16": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10423?size=xsmall",
+        "32x32": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/universal_avatar/view/type/project/avatar/10423?size=medium"
+      }
+    },
+    "customfield_10032": null,
+    "customfield_10033": null,
+    "fixVersions": [],
+    "aggregatetimespent": null,
+    "resolution": {
+      "self": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/resolution/10000",
+      "id": "10000",
+      "description": "Work has been completed on this issue.",
+      "name": "Done"
+    },
+    "customfield_10036": null,
+    "customfield_10029": null,
+    "resolutiondate": "2021-11-04T20:09:53.472-0400",
+    "workratio": -1,
+    "watches": {
+      "self": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/issue/TRIAG-97/watchers",
+      "watchCount": 1,
+      "isWatching": false
+    },
+    "lastViewed": null,
+    "created": "2021-11-04T20:09:26.183-0400",
+    "customfield_10020": null,
+    "customfield_10021": null,
+    "customfield_10022": null,
+    "priority": {
+      "self": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/priority/3",
+      "iconUrl": "https://JIRA_SUBDOMAIN.atlassian.net/images/icons/priorities/medium.svg",
+      "name": "Medium",
+      "id": "3"
+    },
+    "customfield_10023": null,
+    "customfield_10024": null,
+    "customfield_10025": "10000_*:*_1_*:*_27306_*|*_10002_*:*_1_*:*_0",
+    "labels": [],
+    "customfield_10016": null,
+    "customfield_10017": null,
+    "customfield_10018": {
+      "hasEpicLinkFieldDependency": false,
+      "showField": false,
+      "nonEditableReason": {
+        "reason": "PLUGIN_LICENSE_ERROR",
+        "message": "The Parent Link is only available to Jira Premium users."
+      }
+    },
+    "customfield_10019": "0|i001gf:",
+    "timeestimate": null,
+    "aggregatetimeoriginalestimate": null,
+    "versions": [],
+    "issuelinks": [],
+    "assignee": {
+      "self": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/user?accountId=6029570f1bf1ce006b93a33b",
+      "accountId": "6029570f1bf1ce006b93a33b",
+      "avatarUrls": {
+        "48x48": "https://secure.gravatar.com/avatar/10272b9685b27fc0fffbc642cdeb17d8?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FK-3.png",
+        "24x24": "https://secure.gravatar.com/avatar/10272b9685b27fc0fffbc642cdeb17d8?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FK-3.png",
+        "16x16": "https://secure.gravatar.com/avatar/10272b9685b27fc0fffbc642cdeb17d8?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FK-3.png",
+        "32x32": "https://secure.gravatar.com/avatar/10272b9685b27fc0fffbc642cdeb17d8?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FK-3.png"
+      },
+      "displayName": "FIRST_NAME",
+      "active": true,
+      "timeZone": "America/Toronto",
+      "accountType": "atlassian"
+    },
+    "updated": "2021-11-04T20:37:09.254-0400",
+    "status": {
+      "self": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/status/10002",
+      "description": "",
+      "iconUrl": "https://JIRA_SUBDOMAIN.atlassian.net/",
+      "name": "Done",
+      "id": "10002",
+      "statusCategory": {
+        "self": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/statuscategory/3",
+        "id": 3,
+        "key": "done",
+        "colorName": "green",
+        "name": "Done"
+      }
+    },
+    "components": [],
+    "timeoriginalestimate": null,
+    "description": "install two new fixtures in the kitchen.",
+    "customfield_10010": null,
+    "customfield_10014": null,
+    "customfield_10015": null,
+    "customfield_10005": null,
+    "customfield_10006": null,
+    "security": null,
+    "customfield_10007": null,
+    "customfield_10008": null,
+    "aggregatetimeestimate": null,
+    "customfield_10009": null,
+    "summary": "BUILDING_NUMBER#3 Fixture ",
+    "creator": {
+      "self": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/user?accountId=6029570f1bf1ce006b93a33b",
+      "accountId": "6029570f1bf1ce006b93a33b",
+      "avatarUrls": {
+        "48x48": "https://secure.gravatar.com/avatar/10272b9685b27fc0fffbc642cdeb17d8?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FK-3.png",
+        "24x24": "https://secure.gravatar.com/avatar/10272b9685b27fc0fffbc642cdeb17d8?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FK-3.png",
+        "16x16": "https://secure.gravatar.com/avatar/10272b9685b27fc0fffbc642cdeb17d8?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FK-3.png",
+        "32x32": "https://secure.gravatar.com/avatar/10272b9685b27fc0fffbc642cdeb17d8?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FK-3.png"
+      },
+      "displayName": "FIRST_NAME",
+      "active": true,
+      "timeZone": "America/Toronto",
+      "accountType": "atlassian"
+    },
+    "subtasks": [],
+    "customfield_10040": null,
+    "customfield_10041": null,
+    "customfield_10042": null,
+    "customfield_10043": [],
+    "reporter": {
+      "self": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/user?accountId=6029570f1bf1ce006b93a33b",
+      "accountId": "6029570f1bf1ce006b93a33b",
+      "avatarUrls": {
+        "48x48": "https://secure.gravatar.com/avatar/10272b9685b27fc0fffbc642cdeb17d8?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FK-3.png",
+        "24x24": "https://secure.gravatar.com/avatar/10272b9685b27fc0fffbc642cdeb17d8?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FK-3.png",
+        "16x16": "https://secure.gravatar.com/avatar/10272b9685b27fc0fffbc642cdeb17d8?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FK-3.png",
+        "32x32": "https://secure.gravatar.com/avatar/10272b9685b27fc0fffbc642cdeb17d8?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FK-3.png"
+      },
+      "displayName": "FIRST_NAME",
+      "active": true,
+      "timeZone": "America/Toronto",
+      "accountType": "atlassian"
+    },
+    "customfield_10000": "{}",
+    "aggregateprogress": {
+      "progress": 0,
+      "total": 0
+    },
+    "customfield_10001": null,
+    "customfield_10002": null,
+    "customfield_10003": null,
+    "customfield_10004": null,
+    "customfield_10038": {
+      "self": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/customFieldOption/10031",
+      "value": "BUILDING_NUMBER",
+      "id": "10031"
+    },
+    "customfield_10039": {
+      "self": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/customFieldOption/10038",
+      "value": "Unit #3",
+      "id": "10038"
+    },
+    "environment": null,
+    "duedate": null,
+    "progress": {
+      "progress": 0,
+      "total": 0
+    },
+    "votes": {
+      "self": "https://JIRA_SUBDOMAIN.atlassian.net/rest/api/2/issue/TRIAG-97/votes",
+      "votes": 0,
+      "hasVoted": false
+    }
+  }
+}
