@@ -1,10 +1,13 @@
 locals {
-  project_id = "entretien-prd"
+  # using ternary switch b/c I don't want to use multiple varfiles
+  environment = terraform.workspace == "default" ? "prd" : "stg"
+  project_id = "entretien-${local.environment}"
 }
 
 resource "google_project" "entretien" {
-  name       = "entretien-prd"
+  name       = local.project_id
   project_id = local.project_id
+  labels     = {}
 
   billing_account = data.google_billing_account.default.id
 }

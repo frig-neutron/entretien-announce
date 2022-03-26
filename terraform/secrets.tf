@@ -18,6 +18,7 @@ resource "google_secret_manager_secret" "announcer" {
   replication {
     automatic = true
   }
+  labels     = {}
   depends_on = [google_project_service.enabled_services]
 }
 
