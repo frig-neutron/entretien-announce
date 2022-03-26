@@ -32,7 +32,10 @@ function jiraV2Client(jiraCreds: JiraBasicAuth): Version2Client{
   return new Version2Client({
     host: "https://lalliance.atlassian.net",
     authentication: {
-      basic: jiraCreds
+      basic: {
+        apiToken: jiraCreds.jira_token,
+        email: jiraCreds.jira_email
+      }
     }
   });
 }

@@ -12,6 +12,7 @@ import PubsubMessage = google.pubsub.v1.PubsubMessage;
 let applicationFactory: ApplicationFactory = defaultApplicationFactory;
 
 exports.announcer = (message: PubsubMessage, context: Context) => {
+  log.info(`Starting with input ${JSON.stringify(message)}`)
   const result = dotenv_config()
 
   let secrets = parseSecrets()
@@ -36,5 +37,5 @@ function parseSecrets(): Secrets {
   if (rawSecrets)
     return JSON.parse(rawSecrets);
   else
-    throw "secrets env var not defined"
+    throw "ANNOUNCER_SECRETS env var not defined"
 }
