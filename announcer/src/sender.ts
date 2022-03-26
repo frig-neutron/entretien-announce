@@ -1,5 +1,6 @@
 import {Announcement} from "./announcement_factory";
 import {createTransport} from "nodemailer"
+
 /**
  * Transport adaptor. Probably email but could be pubsub one day.
  */
@@ -8,30 +9,32 @@ export interface Sender {
 }
 
 export interface SmtpConfig {
-  username: string,
-  password: string,
-  serverHost: string,
-  mailFrom: string
+  smtp_username: string,
+  smtp_password: string,
+  smtp_host: string,
+  smtp_from: string
 }
 
 
 export function smtpSender(config: SmtpConfig): Sender {
   const transporter = createTransport({
-    host: config.serverHost,
+    host: config.smtp_host,
     port: 465,
     secure: true,
     auth: {
-      user: config.username,
-      pass: config.password,
+      user: config.smtp_username,
+      pass: config.smtp_password,
     },
   });
 
-  transporter.verify().then(console.log).catch(console.error);
+  transporter.verify().
+  then(console.log).
+  catch(console.error);
 
   return {
     async sendAnnouncement(announcement: Announcement): Promise<void> {
       const info = await transporter.sendMail({
-        from: config.mailFrom,
+        from: config.smtp_from,
         to: announcement.primaryRecipient,
         subject: announcement.subject,
         html: announcement.body

@@ -24,8 +24,8 @@ export function defaultApplicationFactory(
 }
 
 export interface JiraBasicAuth {
-  email: string
-  apiToken: string
+  jira_email: string
+  jira_token: string
 }
 
 function jiraV2Client(jiraCreds: JiraBasicAuth): Version2Client{
