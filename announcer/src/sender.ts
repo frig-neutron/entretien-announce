@@ -29,8 +29,8 @@ export function smtpSender(config: SmtpConfig): Sender {
   });
 
   transporter.verify().
-  then(log.info).
-  catch(log.error);
+  then(_ => log.info("Verified SMTP connection")).
+  catch(e => log.error(`SMTP verification error ${e}`));
 
   return {
     async sendAnnouncement(announcement: Announcement): Promise<void> {
@@ -40,7 +40,7 @@ export function smtpSender(config: SmtpConfig): Sender {
         subject: announcement.subject,
         html: announcement.body
       })
-      log.info(info)
+      log.info(`Sent announcement to ${announcement.primaryRecipient}: ${info.response}`)
     }
   }
 }
