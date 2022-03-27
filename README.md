@@ -21,28 +21,15 @@ Useful git-crypt commants
     git-crypt unlock 
     git-crypt status 
 
-## Secret storage stragegy
+## Secret storage strategy
 
 Since we're only using one set of production creds (jira, gmail) I'm going to go simple and just
 encrypt the whole TF secrets varfile. This implies that to use Terraform you need to
 unlock `git-crypt`.
 
-## Report structure
-
-The plan is to have 2 types of reports: a detailed report for the members of the maintenance
-committee, and a privacy-preserving summary report for everyone else. The summary report should
-probably be aggregated at building granularity.
-
-The report covers one month. For example if the announcer is triggered on the 2nd of the month then
-the report will cover the whole previous month. With this in mind, the report should be sent out
-early in the month.
-
-In both reports, the headings are:
-
-* New tickets
-* All open tickets
-* Tickets in progress (where in progress is defined as "not in backlog and not done")
-* Tickets closed during the previous month
+We're also storing the user directory files at `./announcer/deploy/directory*json` encrypted. 
+Those files content goes into the function deployment string, so they're not gcp secrets. 
+Technically the jira/gmail creds could have been deployed in the same way.
 
 ## GCP infra
 

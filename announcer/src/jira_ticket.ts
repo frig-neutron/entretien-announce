@@ -12,6 +12,7 @@ export interface JiraTicket {
 
   // todo: add "date created" / "age"
   // todo: add "creator", parsing from ticket body
+  // todo: add "status" and "resolution"
 }
 
 export function proxyJiraJsIssue(issue: Issue): JiraTicket {
