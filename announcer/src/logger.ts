@@ -16,3 +16,7 @@ export const logger = winston.createLogger({
     loggingWinston,
   ],
 });
+
+logger.on('finish', function (info: any) {
+  // wait for logs to flush
+})
