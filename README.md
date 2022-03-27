@@ -43,3 +43,24 @@ In both reports, the headings are:
 * All open tickets
 * Tickets in progress (where in progress is defined as "not in backlog and not done")
 * Tickets closed during the previous month
+
+## GCP infra
+
+Using 2 environments: stg/prd.
+
+* Staging env goes to `entretien-stg` project.
+* Production env goes to `entretien-prd` project.
+
+Project state is stored in TF workspaces. 
+
+* The production workspace is `default`, 
+* the staging workspace is `stg`
+
+Applying terraform plans can be done in one of two ways:
+
+    terraform workspace select stg
+    terraform apply
+
+..or in one shot:
+
+    TF_WORKSPACE=stg terraform plan apply
