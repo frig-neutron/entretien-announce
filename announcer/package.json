@@ -30,7 +30,8 @@
     "scripts": {
         "build": "tsc",
         "build-watch": "npm run build && tsc --watch",
-        "deploy": "./scripts/deploy.sh",
+        "deploy-prd": "env=prd ./scripts/deploy.sh",
+        "deploy-stg": "env=stg ./scripts/deploy.sh",
         "function": "functions-framework --target=announcer --signature-type=event",
         "gcp-build": "tsc",
         "test": "jest",
