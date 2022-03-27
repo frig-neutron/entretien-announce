@@ -1,5 +1,6 @@
 import {Announcement} from "./announcement_factory";
 import {createTransport} from "nodemailer"
+import {logger as log} from "./logger";
 
 /**
  * Transport adaptor. Probably email but could be pubsub one day.
@@ -28,8 +29,8 @@ export function smtpSender(config: SmtpConfig): Sender {
   });
 
   transporter.verify().
-  then(console.log).
-  catch(console.error);
+  then(log.info).
+  catch(log.error);
 
   return {
     async sendAnnouncement(announcement: Announcement): Promise<void> {
@@ -39,7 +40,7 @@ export function smtpSender(config: SmtpConfig): Sender {
         subject: announcement.subject,
         html: announcement.body
       })
-      console.log(info)
+      log.info(info)
     }
   }
 }
