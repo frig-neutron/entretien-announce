@@ -40,7 +40,10 @@ export function smtpSender(config: SmtpConfig): Sender {
         subject: announcement.subject,
         html: announcement.body
       })
-      log.info(`Sent announcement to ${announcement.primaryRecipient}: ${info.response}`)
+      log.info({
+          info: `Sent announcement to ${announcement.primaryRecipient}`,
+          smtpInfo: info
+      })
     }
   }
 }
