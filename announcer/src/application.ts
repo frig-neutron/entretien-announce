@@ -35,7 +35,7 @@ export function applicationImpl(
       for (const announcement of announcements){
         await sender.sendAnnouncement(announcement).catch(log.error)
       }
-      log.info(`Done. Processed ${announcements.length} announcements. `)
+      log.info(`Done. Processed ${announcements.length} announcements.`)
     }
   }
 }

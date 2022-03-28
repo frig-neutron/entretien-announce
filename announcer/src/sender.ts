@@ -1,6 +1,7 @@
 import {Announcement} from "./announcement_factory";
-import {createTransport} from "nodemailer"
-import {logger as log} from "./logger";
+import {createTransport, Transporter, TransportOptions} from "nodemailer"
+import {logger, logger as log} from "./logger";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 /**
  * Transport adaptor. Probably email but could be pubsub one day.
@@ -16,9 +17,11 @@ export interface SmtpConfig {
   smtp_from: string
 }
 
+const defaultTransporterFactory: (options: SMTPTransport.Options) => Transporter<SMTPTransport.SentMessageInfo> = createTransport
 
-export function smtpSender(config: SmtpConfig): Sender {
-  const transporter = createTransport({
+
+export function smtpSender(config: SmtpConfig, transporterFactory = defaultTransporterFactory): Sender {
+  const transporter = transporterFactory({
     host: config.smtp_host,
     port: 465,
     secure: true,
@@ -28,21 +31,27 @@ export function smtpSender(config: SmtpConfig): Sender {
     },
   });
 
-  transporter.verify().
-  then(_ => log.info("Verified SMTP connection")).
-  catch(e => log.error(`SMTP verification error ${e}`));
+
+  const loggerPromise = transporter.verify()
+  .then(_ => log.info("Verified SMTP connection"));
+  const verificationResult = loggerPromise
+  .catch(e => {
+    log.error(`SMTP verification error ${e}`)
+    throw e // necessary to short-circuit sendMail
+  });
 
   return {
     async sendAnnouncement(announcement: Announcement): Promise<void> {
-      const info = await transporter.sendMail({
+      loggerPromise[Symbol.toStringTag]
+      const info = await verificationResult.then(() => transporter.sendMail({
         from: config.smtp_from,
         to: announcement.primaryRecipient,
         subject: announcement.subject,
         html: announcement.body
-      })
+      }))
       log.info({
-          info: `Sent announcement to ${announcement.primaryRecipient}`,
-          smtpInfo: info
+        info: `Sent announcement to ${announcement.primaryRecipient}`,
+        smtpInfo: info
       })
     }
   }
