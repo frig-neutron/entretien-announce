@@ -1,16 +1,18 @@
-import {mockDeep, mock} from "jest-mock-extended";
+import {mock, mockDeep} from "jest-mock-extended";
 
 import {Issue} from "jira.js/out/version2/models";
-import {JiraTicket, proxyJiraJsIssue} from "../src/jira_ticket";
+import {Clock, JiraTicket, proxyJiraJsIssue} from "../src/jira_ticket";
+import {DateTime, Duration} from "luxon";
 
 
 describe("jira ticket", () => {
   let issue = mock<Issue>()
-  let ticket: JiraTicket = proxyJiraJsIssue(issue)
+  let clock = mockDeep<Clock>()
+  let ticket: JiraTicket = proxyJiraJsIssue(issue, clock)
 
   beforeEach(() => {
     issue = mock<Issue>()
-    ticket = proxyJiraJsIssue(issue)
+    ticket = proxyJiraJsIssue(issue, clock)
   })
 
   test("issue key", () => {
@@ -42,5 +44,17 @@ describe("jira ticket", () => {
 
   test("building number unknown if no title set", () => {
     expect(ticket.building()).toEqual("unknown")
+  })
+
+  test("date created", () => {
+    issue.fields.created = "2021-11-04T20:09:26.183-0400"
+    expect(ticket.dateCreated()).toEqual(DateTime.fromISO("2021-11-04T20:09:26.183-0400"))
+  })
+
+  test("ticket age", () => {
+    issue.fields.created = "2021-11-04T20:09:26.183-0400"
+    clock.time.mockReturnValue(DateTime.fromISO("2021-11-05T20:09:26.183-0400")) // one day after issue creation
+    const oneDay = Duration.fromISO("P1D").seconds;
+    expect(ticket.age().seconds).toEqual(oneDay)
   })
 })

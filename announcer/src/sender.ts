@@ -42,7 +42,6 @@ export function smtpSender(config: SmtpConfig, transporterFactory = defaultTrans
 
   return {
     async sendAnnouncement(announcement: Announcement): Promise<void> {
-      loggerPromise[Symbol.toStringTag]
       const info = await verificationResult.then(() => transporter.sendMail({
         from: config.smtp_from,
         to: announcement.primaryRecipient,
