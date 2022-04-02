@@ -3,7 +3,8 @@ import {mock, mockDeep} from "jest-mock-extended";
 import {Issue} from "jira.js/out/version2/models";
 import {Clock, JiraTicket, proxyJiraJsIssue} from "../src/jira_ticket";
 import {DateTime, Duration} from "luxon";
-import {Some, Option} from "prelude-ts";
+import {Option} from "prelude-ts";
+import {google} from "@google-cloud/pubsub/build/protos/protos";
 
 
 describe("jira ticket", () => {
@@ -45,6 +46,16 @@ describe("jira ticket", () => {
 
   test("building number unknown if no title set", () => {
     expect(ticket.building()).toEqual("unknown")
+  })
+
+  test("ticket status", () => {
+    issue.fields.status = {name: "Done"}
+    expect(ticket.status()).toEqual(Option.of("Done"))
+  })
+
+  test("ticket status missing", () => {
+    issue.fields.status = {}
+    expect(ticket.status()).toEqual(Option.none())
   })
 
   test("date created", () => {

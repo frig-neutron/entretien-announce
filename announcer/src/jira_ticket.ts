@@ -6,18 +6,16 @@ import {DateTime, Duration, Interval} from "luxon";
 import {Option} from "prelude-ts";
 
 export interface JiraTicket {
+  age(): Option<Duration>
+  building(): string, // TODO: most things are option
+  dateCreated(): Option<DateTime>
   key(): string
-
-  building(): string,
-
+  status(): Option<string>
   summary(): string
 
-  dateCreated(): Option<DateTime>
-
-  age(): Option<Duration>
-  // todo: add "date created" / "age"
   // todo: add "creator", parsing from ticket body
-  // todo: add "status" and "resolution"
+  // todo: add "resolution"
+  // todo: add priority
 }
 
 export interface Clock {
@@ -63,9 +61,10 @@ export function proxyJiraJsIssue(issue: Issue, clock = defaultClock): JiraTicket
 
   return {
     age: () => ticketLifeInterval().map(i => i.toDuration()),
+    building: () => parseBuilding(),
     dateCreated: parseDateTime,
     key: () => issue.key,
-    building: () => parseBuilding(),
+    status: () => Option.ofNullable(issue.fields.status.name),
     summary: () => issue.fields.summary
   }
 }
