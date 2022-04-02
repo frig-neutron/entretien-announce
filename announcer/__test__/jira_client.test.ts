@@ -88,7 +88,7 @@ describe("jira client facade", () => {
   })
 })
 
-function setupPagingOverQuery(jql: String): void {
+function setupPagingOverQuery(jql: string): void {
   let numPages = Math.ceil(issues.length / jiraQueryConst.pageSize)
 
   /**

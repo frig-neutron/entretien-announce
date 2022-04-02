@@ -83,7 +83,7 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
       const allIssues: (Issue | undefined)[] = responses.flatMap(r => r.issues)
       // @ts-ignore: tsc doesn't see that the filter effectively removes undefined
       const allDefinedIssues: Issue[] = allIssues.filter(i => i !== undefined)
-      return allDefinedIssues.map(proxyJiraJsIssue);
+      return allDefinedIssues.map(i => proxyJiraJsIssue(i));
     }
 
     const pageSearchResults = await jiraResponsePages()
