@@ -3,6 +3,7 @@
  */
 import {Issue} from "jira.js/out/version2/models";
 import {DateTime, Duration, Interval} from "luxon";
+import {Option} from "prelude-ts";
 
 export interface JiraTicket {
   key(): string
@@ -11,9 +12,9 @@ export interface JiraTicket {
 
   summary(): string
 
-  dateCreated(): DateTime
+  dateCreated(): Option<DateTime>
 
-  age(): Duration
+  age(): Option<Duration>
   // todo: add "date created" / "age"
   // todo: add "creator", parsing from ticket body
   // todo: add "status" and "resolution"
@@ -54,11 +55,14 @@ export function proxyJiraJsIssue(issue: Issue, clock = defaultClock): JiraTicket
     }
   }
 
-  const parseDateTime = () => DateTime.fromISO(issue.fields.created);
-  const ticketLifeInterval = () => Interval.fromDateTimes(parseDateTime(), clock.time())
+  const parseDateTime = (): Option<DateTime> => {
+    const parsed = DateTime.fromISO(issue.fields.created);
+    return  parsed.isValid ? Option.of(parsed) : Option.none();
+  };
+  const ticketLifeInterval = () => parseDateTime().map(dt => Interval.fromDateTimes(dt, clock.time()))
 
   return {
-    age: (): Duration => ticketLifeInterval().toDuration(),
+    age: () => ticketLifeInterval().map(i => i.toDuration()),
     dateCreated: parseDateTime,
     key: () => issue.key,
     building: () => parseBuilding(),

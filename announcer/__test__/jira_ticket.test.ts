@@ -3,6 +3,7 @@ import {mock, mockDeep} from "jest-mock-extended";
 import {Issue} from "jira.js/out/version2/models";
 import {Clock, JiraTicket, proxyJiraJsIssue} from "../src/jira_ticket";
 import {DateTime, Duration} from "luxon";
+import {Some, Option} from "prelude-ts";
 
 
 describe("jira ticket", () => {
@@ -48,13 +49,24 @@ describe("jira ticket", () => {
 
   test("date created", () => {
     issue.fields.created = "2021-11-04T20:09:26.183-0400"
-    expect(ticket.dateCreated()).toEqual(DateTime.fromISO("2021-11-04T20:09:26.183-0400"))
+    expect(ticket.dateCreated()).toEqual(Option.of(DateTime.fromISO("2021-11-04T20:09:26.183-0400")))
   })
 
   test("ticket age", () => {
     issue.fields.created = "2021-11-04T20:09:26.183-0400"
     clock.time.mockReturnValue(DateTime.fromISO("2021-11-05T20:09:26.183-0400")) // one day after issue creation
+    const ticketAgeInSeconds = ticket.age().getOrNull()?.seconds;
     const oneDay = Duration.fromISO("P1D").seconds;
-    expect(ticket.age().seconds).toEqual(oneDay)
+    expect(ticketAgeInSeconds).toEqual(oneDay)
+  })
+
+  test("ticket creation parse fail", () => {
+    issue.fields.created = "can't parse this"
+    expect(ticket.dateCreated()).toEqual(Option.none())
+  })
+
+  test("ticket age parse fail", () => {
+    issue.fields.created = "can't parse this"
+    expect(ticket.age()).toEqual(Option.none())
   })
 })
