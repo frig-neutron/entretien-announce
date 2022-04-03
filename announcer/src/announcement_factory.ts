@@ -55,6 +55,9 @@ export function announcementFactoryImpl(directory: Recipient[], config = {
               <td class="issue-key">
                 <a href="https://${config.jiraDomain}/browse/${ticket.key()}">${ticket.key()}</a>
               </td>
+              <td class="issue-status">
+                ${ticket.status().getOrElse(L.missingValue())}
+              </td>
               <td class="issue-summary">${ticket.summary()}</td>
             </tr>`
         }
@@ -68,6 +71,7 @@ export function announcementFactoryImpl(directory: Recipient[], config = {
                 <thead>
                   <tr>
                     <th class="issue-key">${L.issueKey()}</th>
+                    <th class="issue-status">${L.issueStatus()}</th>
                     <th class="issue-summary">${L.issueSummary()}</th>
                   </tr>
                 </thead>

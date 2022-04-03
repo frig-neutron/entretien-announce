@@ -5,7 +5,9 @@ const en: BaseTranslation = {
   greeting: 'Dear {name:string},',
   preamble: `Here is a summary of jira ticket activity for {month:DateTime|monthYear}`,
   issueKey: 'Ticket no.',
+  issueStatus: 'Status',
   issueSummary: 'Summary',
+  missingValue: "Unknown",
   outtro: [
     'This email has been sent by an automated system. ',
     'If you do not wish to receive these messages please contact Daniil.'

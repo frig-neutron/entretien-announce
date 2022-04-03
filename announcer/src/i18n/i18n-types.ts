@@ -36,9 +36,17 @@ type RootTranslation = {
 	 */
 	issueKey: string
 	/**
+	 * Status
+	 */
+	issueStatus: string
+	/**
 	 * Summary
 	 */
 	issueSummary: string
+	/**
+	 * Unknown
+	 */
+	missingValue: string
 	/**
 	 * This email has been sent by an automated system. If you do not wish to receive these messages please contact Daniil.
 	 */
@@ -85,9 +93,17 @@ export type TranslationFunctions = {
 	 */
 	issueKey: () => LocalizedString
 	/**
+	 * Status
+	 */
+	issueStatus: () => LocalizedString
+	/**
 	 * Summary
 	 */
 	issueSummary: () => LocalizedString
+	/**
+	 * Unknown
+	 */
+	missingValue: () => LocalizedString
 	/**
 	 * This email has been sent by an automated system. If you do not wish to receive these messages please contact Daniil.
 	 */

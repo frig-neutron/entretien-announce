@@ -3,6 +3,7 @@ import {mockDeep} from "jest-mock-extended";
 import {ReportModel, TicketBlock} from "../src/report_service";
 import {DateTime, Duration, Interval} from "luxon";
 import {Option} from "prelude-ts";
+import {HTMLElement} from "node-html-parser";
 
 import {parse} from "node-html-parser"
 
@@ -26,6 +27,38 @@ function mockTicketBlock() {
 }
 
 describe("Announcement factory", () => {
+
+  type TicketBlockStrings = {
+    containerElementSelector: string,
+    header: string,
+    issueKey: string,
+    issueSummary: string,
+    issueStatus: string
+  }
+
+  const checkTicketBlock = (reportBody: HTMLElement, strings: TicketBlockStrings) => {
+    const container = reportBody.querySelector(strings.containerElementSelector)
+    const headingElement = container!.querySelector('h2');
+
+    const headerRow = container!.querySelector("table thead tr")
+    const issueKeyHeader = headerRow!.querySelector(".issue-key")
+    const issueSummaryHeader = headerRow!.querySelector(".issue-summary")
+
+    const issueRow = container!.querySelector('table tbody tr');
+    const issueKeyLink = issueRow!.querySelector(".issue-key a")
+    const issueSummaryCell = issueRow!.querySelector(".issue-summary")
+    const issueStatus = issueRow!.querySelector(".issue-status")
+    // TODO: date opened / ticket age
+
+    expect(headingElement!.textContent.trim()).toEqual(strings.header)
+    expect(issueKeyHeader!.textContent.trim()).toEqual("Ticket no.")
+    expect(issueSummaryHeader!.textContent.trim()).toEqual("Summary")
+    expect(issueKeyLink!.attributes['href']).toEqual(`https://3rd.circle/browse/${strings.issueKey}`)
+    expect(issueKeyLink!.textContent.trim()).toEqual(strings.issueKey)
+    expect(issueSummaryCell!.textContent.trim()).toEqual(strings.issueSummary)
+    expect(issueStatus!.textContent.trim()).toEqual(strings.issueStatus)
+  }
+
   test("no recipients => no announcements", () => {
     const factory = announcementFactoryImpl([])
     const announcements = factory.createReportAnnouncements(report);
@@ -96,58 +129,62 @@ describe("Announcement factory", () => {
 
     const announcements = factory.createReportAnnouncements(report);
 
-    const reportBody = parse(announcements[0].body);
-
-    type TicketBlockStrings = {
-      containerElementSelector: string,
-      header: string,
-      issueKey: string,
-      issueSummary: string
-    }
-
-    const checkTicketBlock = (strings: TicketBlockStrings) => {
-      const container = reportBody.querySelector(strings.containerElementSelector)
-      const headingElement = container!.querySelector('h2');
-
-      const headerRow = container!.querySelector("table thead tr")
-      const issueKeyHeader = headerRow!.querySelector(".issue-key")
-      const issueSummaryHeader = headerRow!.querySelector(".issue-summary")
-
-      const issueRow = container!.querySelector('table tbody tr');
-      const issueKeyLink = issueRow!.querySelector(".issue-key a")
-      const issueSummaryCell = issueRow!.querySelector(".issue-summary")
-      // TODO: date opened / ticket age
-
-      expect(headingElement!.textContent).toEqual(strings.header)
-      expect(issueKeyHeader!.textContent).toEqual("Ticket no.")
-      expect(issueSummaryHeader!.textContent).toEqual("Summary")
-      expect(issueKeyLink!.attributes['href']).toEqual(`https://3rd.circle/browse/${strings.issueKey}`)
-      expect(issueKeyLink!.textContent).toEqual(strings.issueKey)
-      expect(issueSummaryCell!.textContent).toEqual(strings.issueSummary)
-    }
+    const reportBody: HTMLElement = parse(announcements[0].body);
 
     expect(reportBody.querySelector("#greeting")!.textContent).toEqual("Dear charlie,")
     expect(reportBody.querySelector("#preamble")!.textContent).toEqual(
         "Here is a summary of jira ticket activity for December 2021"
     )
     expect(announcements[0].subject).toEqual("Ticket report for December 2021")
-    checkTicketBlock({
+    checkTicketBlock(reportBody, {
       containerElementSelector: '#tickets-created',
       header: "Tickets created between 12/1/2021 and 12/2/2021",
       issueKey: "KEY_CREATED",
-      issueSummary: "SUMMARY_CREATED"
+      issueSummary: "SUMMARY_CREATED",
+      issueStatus: "STATUS_CREATED"
     })
-    checkTicketBlock({
+    checkTicketBlock(reportBody,{
       containerElementSelector: '#tickets-closed',
       header: "Tickets closed between 12/1/2021 and 12/2/2021",
       issueKey: "KEY_CLOSED",
-      issueSummary: "SUMMARY_CLOSED"
+      issueSummary: "SUMMARY_CLOSED",
+      issueStatus: "STATUS_CLOSED"
     })
-    checkTicketBlock({
+    checkTicketBlock(reportBody,{
       containerElementSelector: '#tickets-all-open',
       header: "All open tickets",
       issueKey: "KEY_EXISTS",
-      issueSummary: "SUMMARY_EXISTS"
+      issueSummary: "SUMMARY_EXISTS",
+      issueStatus: "STATUS_EXISTS"
     })
+  })
+
+  test("missing value rendering", () => {
+    const factory = announcementFactoryImpl([
+      {email: "charlie@bar", lang: "en", name: "charlie", roles: []},
+    ], {jiraDomain: "3rd.circle"})
+
+    createdTickets.tickets.mockReturnValue(
+        [{
+          building: () => "BLDG_CREATED",
+          key: () => "KEY_CREATED",
+          summary: () => "SUMMARY_CREATED",
+          age: () => Option.none(),
+          dateCreated: () => Option.none(),
+          status: () => Option.none()
+        }])
+
+    const announcements = factory.createReportAnnouncements(report);
+
+    const reportBody: HTMLElement = parse(announcements[0].body);
+
+    checkTicketBlock(reportBody, {
+      containerElementSelector: '#tickets-created',
+      header: "Tickets created between 12/1/2021 and 12/2/2021",
+      issueKey: "KEY_CREATED",
+      issueSummary: "SUMMARY_CREATED",
+      issueStatus: "Unknown"
+    })
+
   })
 })
