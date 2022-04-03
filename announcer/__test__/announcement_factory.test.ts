@@ -1,7 +1,9 @@
 import {announcementFactoryImpl} from "../src/announcement_factory";
 import {mockDeep} from "jest-mock-extended";
 import {ReportModel, TicketBlock} from "../src/report_service";
-import {Interval} from "luxon";
+import {DateTime, Duration, Interval} from "luxon";
+import {Option} from "prelude-ts";
+
 import {parse} from "node-html-parser"
 
 const createdTickets = mockTicketBlock()
@@ -68,19 +70,28 @@ describe("Announcement factory", () => {
         [{
           building: () => "BLDG_CREATED",
           key: () => "KEY_CREATED",
-          summary: () => "SUMMARY_CREATED"
+          summary: () => "SUMMARY_CREATED",
+          age: () => Option.some(Duration.fromISO("P1D")),
+          dateCreated: () => Option.some(DateTime.fromISO("2020-01-01")),
+          status: () => Option.some("STATUS_CREATED")
         }])
     closedTickets.tickets.mockReturnValue(
         [{
           building: () => "BLDG_CLOSED",
           key: () => "KEY_CLOSED",
-          summary: () => "SUMMARY_CLOSED"
+          summary: () => "SUMMARY_CLOSED",
+          age: () => Option.some(Duration.fromISO("P2D")),
+          dateCreated: () => Option.some(DateTime.fromISO("2020-02-01")),
+          status: () => Option.some("STATUS_CLOSED")
         }])
     allTickets.tickets.mockReturnValue(
         [{
           building: () => "BLDG_EXISTS",
           key: () => "KEY_EXISTS",
-          summary: () => "SUMMARY_EXISTS"
+          summary: () => "SUMMARY_EXISTS",
+          age: () => Option.some(Duration.fromISO("P3D")),
+          dateCreated: () => Option.some(DateTime.fromISO("2020-03-01")),
+          status: () => Option.some("STATUS_EXISTS")
         }])
 
     const announcements = factory.createReportAnnouncements(report);
