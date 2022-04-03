@@ -59,6 +59,11 @@ export function announcementFactoryImpl(directory: Recipient[], config = {
                 ${ticket.status().getOrElse(L.missingValue())}
               </td>
               <td class="issue-summary">${ticket.summary()}</td>
+              <td class="issue-age">
+                ${ticket.age().
+                  map(d => L.issue.age.value({duration: d})).
+                  getOrElse(L.missingValue())}
+              </td>
             </tr>`
         }
 
@@ -70,9 +75,10 @@ export function announcementFactoryImpl(directory: Recipient[], config = {
               <table>
                 <thead>
                   <tr>
-                    <th class="issue-key">${L.issueKey()}</th>
-                    <th class="issue-status">${L.issueStatus()}</th>
-                    <th class="issue-summary">${L.issueSummary()}</th>
+                    <th class="issue-key">${L.issue.key.header()}</th>
+                    <th class="issue-status">${L.issue.status.header()}</th>
+                    <th class="issue-summary">${L.issue.summary.header()}</th>
+                    <th class="issue-age">${L.issue.age.header()}</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -31,6 +31,7 @@ describe("Announcement factory", () => {
   type TicketBlockStrings = {
     containerElementSelector: string,
     header: string,
+    issueAge: string,
     issueKey: string,
     issueSummary: string,
     issueStatus: string
@@ -45,6 +46,7 @@ describe("Announcement factory", () => {
     const issueSummaryHeader = headerRow!.querySelector(".issue-summary")
 
     const issueRow = container!.querySelector('table tbody tr');
+    const issueAge = issueRow!.querySelector(".issue-age")
     const issueKeyLink = issueRow!.querySelector(".issue-key a")
     const issueSummaryCell = issueRow!.querySelector(".issue-summary")
     const issueStatus = issueRow!.querySelector(".issue-status")
@@ -53,10 +55,11 @@ describe("Announcement factory", () => {
     expect(headingElement!.textContent.trim()).toEqual(strings.header)
     expect(issueKeyHeader!.textContent.trim()).toEqual("Ticket no.")
     expect(issueSummaryHeader!.textContent.trim()).toEqual("Summary")
+    expect(issueAge!.textContent.trim()).toEqual(strings.issueAge)
     expect(issueKeyLink!.attributes['href']).toEqual(`https://3rd.circle/browse/${strings.issueKey}`)
     expect(issueKeyLink!.textContent.trim()).toEqual(strings.issueKey)
-    expect(issueSummaryCell!.textContent.trim()).toEqual(strings.issueSummary)
     expect(issueStatus!.textContent.trim()).toEqual(strings.issueStatus)
+    expect(issueSummaryCell!.textContent.trim()).toEqual(strings.issueSummary)
   }
 
   test("no recipients => no announcements", () => {
@@ -104,7 +107,7 @@ describe("Announcement factory", () => {
           building: () => "BLDG_CREATED",
           key: () => "KEY_CREATED",
           summary: () => "SUMMARY_CREATED",
-          age: () => Option.some(Duration.fromISO("P1D")),
+          age: () => Option.some(Duration.fromISO("P1DT3H")),
           dateCreated: () => Option.some(DateTime.fromISO("2020-01-01")),
           status: () => Option.some("STATUS_CREATED")
         }])
@@ -113,7 +116,7 @@ describe("Announcement factory", () => {
           building: () => "BLDG_CLOSED",
           key: () => "KEY_CLOSED",
           summary: () => "SUMMARY_CLOSED",
-          age: () => Option.some(Duration.fromISO("P2D")),
+          age: () => Option.some(Duration.fromISO("P2DT3H")),
           dateCreated: () => Option.some(DateTime.fromISO("2020-02-01")),
           status: () => Option.some("STATUS_CLOSED")
         }])
@@ -122,7 +125,7 @@ describe("Announcement factory", () => {
           building: () => "BLDG_EXISTS",
           key: () => "KEY_EXISTS",
           summary: () => "SUMMARY_EXISTS",
-          age: () => Option.some(Duration.fromISO("P3D")),
+          age: () => Option.some(Duration.fromISO("P3DT3H")),
           dateCreated: () => Option.some(DateTime.fromISO("2020-03-01")),
           status: () => Option.some("STATUS_EXISTS")
         }])
@@ -139,6 +142,7 @@ describe("Announcement factory", () => {
     checkTicketBlock(reportBody, {
       containerElementSelector: '#tickets-created',
       header: "Tickets created between 12/1/2021 and 12/2/2021",
+      issueAge: "1 day",
       issueKey: "KEY_CREATED",
       issueSummary: "SUMMARY_CREATED",
       issueStatus: "STATUS_CREATED"
@@ -146,6 +150,7 @@ describe("Announcement factory", () => {
     checkTicketBlock(reportBody,{
       containerElementSelector: '#tickets-closed',
       header: "Tickets closed between 12/1/2021 and 12/2/2021",
+      issueAge: "2 days",
       issueKey: "KEY_CLOSED",
       issueSummary: "SUMMARY_CLOSED",
       issueStatus: "STATUS_CLOSED"
@@ -153,6 +158,7 @@ describe("Announcement factory", () => {
     checkTicketBlock(reportBody,{
       containerElementSelector: '#tickets-all-open',
       header: "All open tickets",
+      issueAge: "3 days",
       issueKey: "KEY_EXISTS",
       issueSummary: "SUMMARY_EXISTS",
       issueStatus: "STATUS_EXISTS"
@@ -181,10 +187,10 @@ describe("Announcement factory", () => {
     checkTicketBlock(reportBody, {
       containerElementSelector: '#tickets-created',
       header: "Tickets created between 12/1/2021 and 12/2/2021",
+      issueAge: "Unknown",
       issueKey: "KEY_CREATED",
       issueSummary: "SUMMARY_CREATED",
       issueStatus: "Unknown"
     })
-
   })
 })

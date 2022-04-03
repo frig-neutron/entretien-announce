@@ -2,7 +2,7 @@
 /* eslint-disable */
 import type { BaseTranslation as BaseTranslationType, LocalizedString, RequiredParams } from 'typesafe-i18n'
 
-import type { DateTime, Interval } from './custom-types'
+import type { DateTime, Duration, Interval } from './custom-types'
 
 export type BaseTranslation = BaseTranslationType
 export type BaseLocale = 'en'
@@ -31,18 +31,37 @@ type RootTranslation = {
 	 * @param {DateTime} month
 	 */
 	preamble: RequiredParams<'month|monthYear'>
-	/**
-	 * Ticket no.
-	 */
-	issueKey: string
-	/**
-	 * Status
-	 */
-	issueStatus: string
-	/**
-	 * Summary
-	 */
-	issueSummary: string
+	issue: {
+		age: {
+			/**
+			 * Ticket age
+			 */
+			header: string
+			/**
+			 * {duration|durationInDays}
+			 * @param {Duration} duration
+			 */
+			value: RequiredParams<'duration|durationInDays'>
+		}
+		key: {
+			/**
+			 * Ticket no.
+			 */
+			header: string
+		}
+		status: {
+			/**
+			 * Status
+			 */
+			header: string
+		}
+		summary: {
+			/**
+			 * Summary
+			 */
+			header: string
+		}
+	}
 	/**
 	 * Unknown
 	 */
@@ -88,18 +107,36 @@ export type TranslationFunctions = {
 	 * Here is a summary of jira ticket activity for {month|monthYear}
 	 */
 	preamble: (arg: { month: DateTime }) => LocalizedString
-	/**
-	 * Ticket no.
-	 */
-	issueKey: () => LocalizedString
-	/**
-	 * Status
-	 */
-	issueStatus: () => LocalizedString
-	/**
-	 * Summary
-	 */
-	issueSummary: () => LocalizedString
+	issue: {
+		age: {
+			/**
+			 * Ticket age
+			 */
+			header: () => LocalizedString
+			/**
+			 * {duration|durationInDays}
+			 */
+			value: (arg: { duration: Duration }) => LocalizedString
+		}
+		key: {
+			/**
+			 * Ticket no.
+			 */
+			header: () => LocalizedString
+		}
+		status: {
+			/**
+			 * Status
+			 */
+			header: () => LocalizedString
+		}
+		summary: {
+			/**
+			 * Summary
+			 */
+			header: () => LocalizedString
+		}
+	}
 	/**
 	 * Unknown
 	 */
@@ -130,6 +167,7 @@ export type TranslationFunctions = {
 
 export type Formatters = {
 	dtHeader: (value: DateTime) => unknown
+	durationInDays: (value: Duration) => unknown
 	monthYear: (value: DateTime) => unknown
 	subjectReportInterval: (value: Interval) => unknown
 }

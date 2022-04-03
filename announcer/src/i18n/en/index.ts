@@ -4,9 +4,21 @@ const en: BaseTranslation = {
   subject: 'Ticket report for {interval:Interval|subjectReportInterval}',
   greeting: 'Dear {name:string},',
   preamble: `Here is a summary of jira ticket activity for {month:DateTime|monthYear}`,
-  issueKey: 'Ticket no.',
-  issueStatus: 'Status',
-  issueSummary: 'Summary',
+  issue: {
+    age: {
+      header: 'Ticket age',
+      value: '{duration:Duration|durationInDays}'
+    },
+    key: {
+      header: 'Ticket no.'
+    },
+    status: {
+      header: 'Status'
+    },
+    summary: {
+      header: 'Summary',
+    }
+  },
   missingValue: "Unknown",
   outtro: [
     'This email has been sent by an automated system. ',
