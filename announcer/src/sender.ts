@@ -1,6 +1,6 @@
 import {Announcement} from "./announcement_factory";
-import {createTransport, Transporter, TransportOptions} from "nodemailer"
-import {logger, logger as log} from "./logger";
+import {createTransport, Transporter} from "nodemailer"
+import {logger as log} from "./logger";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 
 /**
@@ -32,10 +32,10 @@ export function smtpSender(config: SmtpConfig, transporterFactory = defaultTrans
   });
 
 
-  const loggerPromise = transporter.verify()
-  .then(_ => log.info("Verified SMTP connection"));
-  const verificationResult = loggerPromise
-  .catch(e => {
+  const verificationResult = transporter.
+  verify().
+  then(_ => log.info("Verified SMTP connection")).
+  catch(e => {
     log.error(`SMTP verification error ${e}`)
     throw e // necessary to short-circuit sendMail
   });

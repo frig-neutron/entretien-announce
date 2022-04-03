@@ -11,7 +11,7 @@ import PubsubMessage = google.pubsub.v1.PubsubMessage;
 
 let applicationFactory: ApplicationFactory = defaultApplicationFactory;
 
-exports.announcer = (message: PubsubMessage, context: Context) => {
+exports.announcer = async (message: PubsubMessage, context: Context) => {
   log.info(`Starting with input ${JSON.stringify(message)}`)
   const result = dotenv_config()
 
@@ -22,11 +22,8 @@ exports.announcer = (message: PubsubMessage, context: Context) => {
   ]
 
   let application: Application = applicationFactory(directory, secrets, secrets)
-  application.announce("2021-12")
-  .then(nothing => log.info("moo"))
-  .catch(reason => {
-    throw reason
-  })
+  await application.announce("2021-12")
+  log.info("Exiting function")
 }
 
 interface Secrets extends JiraBasicAuth, SmtpConfig {

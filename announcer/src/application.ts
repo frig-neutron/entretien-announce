@@ -33,7 +33,8 @@ export function applicationImpl(
       const reportModel = reportService.processReport(reportParam, reportInterval);
       const announcements = announcementFactory.createReportAnnouncements(reportModel);
       for (const announcement of announcements){
-        await sender.sendAnnouncement(announcement).catch(log.error)
+        await sender.sendAnnouncement(announcement).
+        catch(e => log.error(`Error sending to ${announcement.primaryRecipient}. ${e}`))
       }
       log.info(`Done. Processed ${announcements.length} announcements.`)
     }
