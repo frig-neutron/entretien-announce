@@ -15,7 +15,7 @@ process.on('uncaughtException', function (err) {
   console.error('Uncaught exception', err);
 });
 
-exports.announcer = async (message: PubsubMessage, context: Context) => {
+exports.announcer = (message: PubsubMessage, context: Context) => {
   log.info(`Starting with input ${JSON.stringify(message)}`)
   const result = dotenv_config()
   log.info({"environment": result})
@@ -26,14 +26,8 @@ exports.announcer = async (message: PubsubMessage, context: Context) => {
     {name: "Daniil", email: "daniil.alliance+test@gmail.com", lang: "en", roles: []}
   ]
 
-  try {
-    let application: Application = applicationFactory(directory, secrets, secrets)
-    await application.announce("2021-12")
-    return Promise.resolve()
-  } catch (e){
-    log.error(e)
-    return Promise.reject(e)
-  }
+  let application: Application = applicationFactory(directory, secrets, secrets)
+  return application.announce("2021-12")
 }
 
 interface Secrets extends JiraBasicAuth, SmtpConfig {
