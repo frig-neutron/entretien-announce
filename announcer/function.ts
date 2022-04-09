@@ -15,7 +15,11 @@ process.on('uncaughtException', function (err) {
   console.error('Uncaught exception', err);
 });
 
-exports.announcer = (message: PubsubMessage, context: Context) => {
+// Speculating about the type. Type information not specified in doc.
+// https://cloud.google.com/functions/docs/writing/background#function_parameters
+type GcfBackgroundNodeCallback = (lose: any, win: any) => void
+
+exports.announcer = (message: PubsubMessage, context: Context, callback: GcfBackgroundNodeCallback) => {
   log.info(`Starting with input ${JSON.stringify(message)}`)
   const result = dotenv_config()
   log.info({"environment": result})
@@ -27,7 +31,8 @@ exports.announcer = (message: PubsubMessage, context: Context) => {
   ]
 
   let application: Application = applicationFactory(directory, secrets, secrets)
-  return application.announce("2021-12").then(_ => log.info("Terminating OK"))
+  return application.announce("2021-12").
+    then(_ => callback(null,"Terminating OK"))
 }
 
 interface Secrets extends JiraBasicAuth, SmtpConfig {
