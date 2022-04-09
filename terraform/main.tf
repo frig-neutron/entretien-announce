@@ -25,3 +25,11 @@ resource "google_project_service" "enabled_services" {
   project = google_project.entretien.project_id
   service = each.key
 }
+
+resource "google_project_iam_binding" "log_writers" {
+  project = local.project_id
+  role    = "roles/logging.logWriter"
+  members = [
+    "serviceAccount:${google_service_account.announcer.email}"
+  ]
+}
