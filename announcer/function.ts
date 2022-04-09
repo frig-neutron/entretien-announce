@@ -17,12 +17,18 @@ process.on('uncaughtException', function (err) {
 // Absolutely MUST use the 3-param version b/c otherwise there seems to be no way to terminate the function properly.
 // Returning a resolved Promise doesn't cut it - you still get "Finished with status: response error"
 const announcer: EventFunctionWithCallback = (data: any, context, callback) => {
-  log.info(`Starting with input ${JSON.stringify(data)}`)
+  log.info(`Starting with data=${JSON.stringify(data)}`)
+  if (typeof data === "string"){
+    // For local testing. For some reason the functions framework insists on passing the json object `-d data={...}`
+    // as a string
+    data = JSON.parse(data)
+  }
+
   const result = dotenv_config()
   log.info({"environment": result})
 
   let secrets = parseSecrets()
-  const directory: Recipient[] = parseDirectory()
+  const directory: Recipient[] = parseDirectory() // todo: validate structure in all the parsing / test parsing
 
   const {now: announcementDate} = data
 
