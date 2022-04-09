@@ -2,7 +2,7 @@ import {JiraTicket, proxyJiraJsIssue} from "./jira_ticket";
 import {DateTime, Interval} from "luxon";
 import {Version2Client} from "jira.js";
 import {Issue, SearchResults} from "jira.js/out/version2/models";
-import {logger as log} from "./logger";
+import {log} from "./logger";
 
 /**
  * Interfaces to Jira system
@@ -53,7 +53,7 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
         const responseSize = searchResults.issues.length
         log.info(`Response had ${responseSize} issues`)
         const totalIssuesFetched = searchResults.startAt + responseSize
-        return  totalIssuesFetched >= searchResults.total
+        return totalIssuesFetched >= searchResults.total
       }
 
       const responses: SearchResults[] = []
@@ -63,21 +63,12 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
         const jiraParam = {
           jql: jql, expand: "", startAt: startAt, maxResults: jqlConst.pageSize
         };
+
         log.info(`Querying jira with ${JSON.stringify(jiraParam)}`)
+        const response = await version2Client.issueSearch.searchForIssuesUsingJql(jiraParam)
 
-        try {
-          const start = Date.now()
-          const response = await version2Client.issueSearch.searchForIssuesUsingJql(jiraParam)
-
-          log.info(`Jira response ok in ${Date.now() - start} ms`)
-          log.info("Sleeping")
-          await new Promise((a, _) => setTimeout(a, 1000))
-          done = areWeDone(response)
-          responses.push(response)
-        } catch (e){
-          log.error("Jira response error " + e)
-          throw e;
-        }
+        done = areWeDone(response)
+        responses.push(response)
       }
 
       return responses;

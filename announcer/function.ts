@@ -4,7 +4,7 @@ import {Context} from "@google-cloud/functions-framework";
 
 import {ApplicationFactory, defaultApplicationFactory, JiraBasicAuth} from "./src/application_factory";
 import {Application} from "./src/application"
-import {logger as log} from "./src/logger";
+import {log} from "./src/logger";
 import {SmtpConfig} from "./src/sender";
 import {Recipient} from "./src/announcement_factory";
 import PubsubMessage = google.pubsub.v1.PubsubMessage;
@@ -31,10 +31,10 @@ exports.announcer = async (message: PubsubMessage, context: Context) => {
     log.info("Application factory built application")
     await application.announce("2021-12")
     log.info("Exiting function")
+    return Promise.resolve()
   } catch (e){
-    log.error("NOOOO")
-    log.info("NOOOO as info")
     log.error(e)
+    return Promise.reject(e)
   }
 }
 

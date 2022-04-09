@@ -3,7 +3,7 @@ import {DateTime, Interval} from "luxon";
 import {ReportService} from "./report_service";
 import {AnnouncementFactory} from "./announcement_factory";
 import {Sender} from "./sender";
-import {logger as log} from "./logger";
+import {log} from "./logger";
 
 export interface Application {
   announce(today: string): Promise<void>

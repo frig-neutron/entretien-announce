@@ -8,7 +8,7 @@ const loggingWinston = new LoggingWinston();
 
 // Create a Winston logger that streams to Stackdriver Logging
 // Logs will be written to: "projects/YOUR_PROJECT_ID/logs/winston_log"
-export const logger = winston.createLogger({
+export const log = winston.createLogger({
   level: 'info',
   transports: [
     new winston.transports.Console(),
@@ -17,6 +17,13 @@ export const logger = winston.createLogger({
   ],
 });
 
-logger.on('finish', function (info: any) {
+log.on('finish', function (info: any) {
   // wait for logs to flush
 })
+
+log.on("error", function (err: any) {
+  console.error("Winston error",  err)
+})
+// logger.rejections.handle(
+//     new winston.transports.Console()
+// )
