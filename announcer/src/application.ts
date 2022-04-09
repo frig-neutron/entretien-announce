@@ -25,6 +25,7 @@ export function applicationImpl(
   return {
     async announce(today: string): Promise<void> {
       const reportInterval = parseReportInterval(today);
+      log.info(`Report interval ${reportInterval}`)
       const reportParam = {
         ticketsClosed: await jiraClient.ticketsClosed(reportInterval),
         ticketsCreated: await jiraClient.ticketsCreated(reportInterval),
@@ -32,6 +33,7 @@ export function applicationImpl(
       }
       const reportModel = reportService.processReport(reportParam, reportInterval);
       const announcements = announcementFactory.createReportAnnouncements(reportModel);
+      log.info(`Processing ${announcements.length} announcements.`)
       for (const announcement of announcements){
         await sender.sendAnnouncement(announcement).
         catch(e => log.error(`Error sending to ${announcement.primaryRecipient}. ${e}`))

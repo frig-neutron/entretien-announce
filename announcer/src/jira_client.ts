@@ -2,6 +2,7 @@ import {JiraTicket, proxyJiraJsIssue} from "./jira_ticket";
 import {DateTime, Interval} from "luxon";
 import {Version2Client} from "jira.js";
 import {Issue, SearchResults} from "jira.js/out/version2/models";
+import {logger as log} from "./logger";
 
 /**
  * Interfaces to Jira system
@@ -30,7 +31,7 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
     return dateTime.toFormat("y-MM-dd")
   }
 
-  async function queryJira(jql: string) {
+  async function queryJira(jql: string): Promise<JiraTicket[]> {
     async function jiraResponsePages(): Promise<SearchResults[]> {
       let done = false;
 
@@ -50,6 +51,7 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
         }
 
         const responseSize = searchResults.issues.length
+        log.info(`Response had ${responseSize} issues`)
         const totalIssuesFetched = searchResults.startAt + responseSize
         return  totalIssuesFetched >= searchResults.total
       }
@@ -58,14 +60,24 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
       while (!done) {
         const currentPage = responses.length
         const startAt = currentPage * jqlConst.pageSize
-        const response = await version2Client.issueSearch.searchForIssuesUsingJql(
-            {
-              jql: jql, expand: "", startAt: startAt, maxResults: jqlConst.pageSize
-            }
-        )
+        const jiraParam = {
+          jql: jql, expand: "", startAt: startAt, maxResults: jqlConst.pageSize
+        };
+        log.info(`Querying jira with ${JSON.stringify(jiraParam)}`)
 
-        done = areWeDone(response)
-        responses.push(response)
+        try {
+          const start = Date.now()
+          const response = await version2Client.issueSearch.searchForIssuesUsingJql(jiraParam)
+
+          log.info(`Jira response ok in ${Date.now() - start} ms`)
+          log.info("Sleeping")
+          await new Promise((a, _) => setTimeout(a, 1000))
+          done = areWeDone(response)
+          responses.push(response)
+        } catch (e){
+          log.error("Jira response error " + e)
+          throw e;
+        }
       }
 
       return responses;
@@ -92,14 +104,17 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
 
   return {
     async allOpenTickets(): Promise<JiraTicket[]> {
+      log.info("Querying jira for all open tickets")
       const jql = [
         `project = ${jqlConst.project} AND `,
         `status not in (${jqlConst.closedStatuses})`
       ].join('')
 
-      return await queryJira(jql);
+      const jiraTickets = await queryJira(jql);
+      return jiraTickets;
     },
     async ticketsCreated(interval: Interval): Promise<JiraTicket[]> {
+      log.info("Querying jira for newly created tickets")
       const jql = [
         `project = ${jqlConst.project} AND `,
         `created >= ${formatDate(interval.start)} AND `,
@@ -109,6 +124,7 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
       return await queryJira(jql);
     },
     async ticketsClosed(interval: Interval): Promise<JiraTicket[]> {
+      log.info("Querying jira for closed tickets")
       const jql = [
         `project = ${jqlConst.project} AND `,
         `status in (${jqlConst.closedStatuses}) AND `,

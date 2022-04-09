@@ -32,22 +32,24 @@ export function smtpSender(config: SmtpConfig, transporterFactory = defaultTrans
   });
 
 
-  const verificationResult = transporter.
-  verify().
-  then(_ => log.info("Verified SMTP connection")).
-  catch(e => {
-    log.error(`SMTP verification error ${e}`)
-    throw e // necessary to short-circuit sendMail
-  });
+  const verificationResult = transporter.verify().
+    then(_ => log.info("Verified SMTP connection")).
+    catch(e => {
+      log.error(`SMTP verification error ${e}`)
+      throw e // necessary to short-circuit sendMail
+    });
 
   return {
     async sendAnnouncement(announcement: Announcement): Promise<void> {
-      const info = await verificationResult.then(() => transporter.sendMail({
-        from: config.smtp_from,
-        to: announcement.primaryRecipient,
-        subject: announcement.subject,
-        html: announcement.body
-      }))
+      const info = await verificationResult.then(() => {
+        log.info(`Sending announcement to ${announcement.primaryRecipient}`)
+        return transporter.sendMail({
+          from: config.smtp_from,
+          to: announcement.primaryRecipient,
+          subject: announcement.subject,
+          html: announcement.body
+        })
+      })
       log.info({
         info: `Sent announcement to ${announcement.primaryRecipient}`,
         smtpInfo: info
