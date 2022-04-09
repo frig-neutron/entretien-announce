@@ -12,7 +12,7 @@ import PubsubMessage = google.pubsub.v1.PubsubMessage;
 let applicationFactory: ApplicationFactory = defaultApplicationFactory;
 
 process.on('uncaughtException', function (err) {
-  log.error('Caught exception: ' + err);
+  console.error('Uncaught exception', err);
 });
 
 exports.announcer = async (message: PubsubMessage, context: Context) => {
@@ -28,9 +28,7 @@ exports.announcer = async (message: PubsubMessage, context: Context) => {
 
   try {
     let application: Application = applicationFactory(directory, secrets, secrets)
-    log.info("Application factory built application")
     await application.announce("2021-12")
-    log.info("Exiting function")
     return Promise.resolve()
   } catch (e){
     log.error(e)

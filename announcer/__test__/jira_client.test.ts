@@ -46,6 +46,8 @@ describe("jira client facade", () => {
     const tickets = await jiraClient.ticketsClosed(reportInterval);
     const ticketKeys = tickets.map(t => t.key());
 
+    expect(searchForIssuesUsingJql.mock.calls[0][0]?.startAt).toBe(0)
+    expect(searchForIssuesUsingJql.mock.calls[1][0]?.startAt).toBe(2)
     expect(tickets.length).toBe(3)
     expect(ticketKeys).toStrictEqual(["ISSUE_1", "ISSUE_2", "ISSUE_3"])
   })

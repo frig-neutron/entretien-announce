@@ -31,7 +31,7 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
     return dateTime.toFormat("y-MM-dd")
   }
 
-  async function queryJira(jql: string): Promise<JiraTicket[]> {
+  async function queryJira(jql: string, logOperation: string): Promise<JiraTicket[]> {
     async function jiraResponsePages(): Promise<SearchResults[]> {
       let done = false;
 
@@ -51,27 +51,26 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
         }
 
         const responseSize = searchResults.issues.length
-        log.info(`Response had ${responseSize} issues`)
         const totalIssuesFetched = searchResults.startAt + responseSize
         return totalIssuesFetched >= searchResults.total
       }
 
-      const responses: SearchResults[] = []
+      const pages: SearchResults[] = []
       while (!done) {
-        const currentPage = responses.length
-        const startAt = currentPage * jqlConst.pageSize
+        const startAt = pages.length * jqlConst.pageSize
         const jiraParam = {
           jql: jql, expand: "", startAt: startAt, maxResults: jqlConst.pageSize
         };
 
-        log.info(`Querying jira with ${JSON.stringify(jiraParam)}`)
-        const response = await version2Client.issueSearch.searchForIssuesUsingJql(jiraParam)
+        log.info(`Jira: searching for ${logOperation}, page ${pages.length}: ${JSON.stringify(jiraParam)}`)
+        const pageOfSearchResults = await version2Client.issueSearch.searchForIssuesUsingJql(jiraParam)
+        log.info(`Jira: ${logOperation} page ${pages.length} contains ${pageOfSearchResults.issues?.length} issues`)
 
-        done = areWeDone(response)
-        responses.push(response)
+        done = areWeDone(pageOfSearchResults)
+        pages.push(pageOfSearchResults)
       }
 
-      return responses;
+      return pages;
     }
 
     async function convertResponseToTickets(responses: SearchResults[]) {
@@ -89,40 +88,36 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
       return allDefinedIssues.map(i => proxyJiraJsIssue(i));
     }
 
-    const pageSearchResults = await jiraResponsePages()
-    return await convertResponseToTickets(pageSearchResults);
+    const pagedSearchResults = await jiraResponsePages()
+    return await convertResponseToTickets(pagedSearchResults);
   }
 
   return {
     async allOpenTickets(): Promise<JiraTicket[]> {
-      log.info("Querying jira for all open tickets")
       const jql = [
         `project = ${jqlConst.project} AND `,
         `status not in (${jqlConst.closedStatuses})`
       ].join('')
 
-      const jiraTickets = await queryJira(jql);
-      return jiraTickets;
+      return await queryJira(jql, "open tickets");
     },
     async ticketsCreated(interval: Interval): Promise<JiraTicket[]> {
-      log.info("Querying jira for newly created tickets")
       const jql = [
         `project = ${jqlConst.project} AND `,
         `created >= ${formatDate(interval.start)} AND `,
         `created <  ${formatDate(interval.end)}`
       ].join('')
 
-      return await queryJira(jql);
+      return await queryJira(jql, "newly created tickets");
     },
     async ticketsClosed(interval: Interval): Promise<JiraTicket[]> {
-      log.info("Querying jira for closed tickets")
       const jql = [
         `project = ${jqlConst.project} AND `,
         `status in (${jqlConst.closedStatuses}) AND `,
         `status changed to (${jqlConst.closedStatuses}) DURING (${formatInterval(interval)})`
       ].join('')
 
-      return await queryJira(jql);
+      return await queryJira(jql, "newly closed tickets");
     }
   }
 }

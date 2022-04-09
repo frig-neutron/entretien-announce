@@ -7,7 +7,7 @@ import SMTPTransport from "nodemailer/lib/smtp-transport";
  * Transport adaptor. Probably email but could be pubsub one day.
  */
 export interface Sender {
-  sendAnnouncement(announcement: Announcement): Promise<void>
+  sendAnnouncement(announcement: Announcement): Promise<object>
 }
 
 export interface SmtpConfig {
@@ -18,7 +18,6 @@ export interface SmtpConfig {
 }
 
 const defaultTransporterFactory: (options: SMTPTransport.Options) => Transporter<SMTPTransport.SentMessageInfo> = createTransport
-
 
 export function smtpSender(config: SmtpConfig, transporterFactory = defaultTransporterFactory): Sender {
   const transporter = transporterFactory({
@@ -40,19 +39,14 @@ export function smtpSender(config: SmtpConfig, transporterFactory = defaultTrans
     });
 
   return {
-    async sendAnnouncement(announcement: Announcement): Promise<void> {
-      const info = await verificationResult.then(() => {
-        log.info(`Sending announcement to ${announcement.primaryRecipient}`)
+    async sendAnnouncement(announcement: Announcement): Promise<object> {
+      return await verificationResult.then(() => {
         return transporter.sendMail({
           from: config.smtp_from,
           to: announcement.primaryRecipient,
           subject: announcement.subject,
           html: announcement.body
         })
-      })
-      log.info({
-        info: `Sent announcement to ${announcement.primaryRecipient}`,
-        smtpInfo: info
       })
     }
   }

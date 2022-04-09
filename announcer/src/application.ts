@@ -36,6 +36,7 @@ export function applicationImpl(
       log.info(`Processing ${announcements.length} announcements.`)
       for (const announcement of announcements){
         await sender.sendAnnouncement(announcement).
+        then(log.info).
         catch(e => log.error(`Error sending to ${announcement.primaryRecipient}. ${e}`))
       }
       log.info(`Done. Processed ${announcements.length} announcements.`)
