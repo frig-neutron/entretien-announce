@@ -22,10 +22,7 @@ const announcer: EventFunctionWithCallback = (data: any, context, callback) => {
   log.info({"environment": result})
 
   let secrets = parseSecrets()
-
-  const directory: Recipient[] = [
-    {name: "Daniil", email: "daniil.alliance+test@gmail.com", lang: "en", roles: []}
-  ]
+  const directory: Recipient[] = parseDirectory()
 
   const {now: announcementDate} = data
 
@@ -38,12 +35,20 @@ const announcer: EventFunctionWithCallback = (data: any, context, callback) => {
 interface Secrets extends JiraBasicAuth, SmtpConfig {
 }
 
-function parseSecrets(): Secrets {
-  const rawSecrets = process.env.ANNOUNCER_SECRETS;
+function parseEnvVar(envVarName: string) {
+  const rawSecrets = process.env[envVarName];
   if (rawSecrets)
     return JSON.parse(rawSecrets);
   else
-    throw "ANNOUNCER_SECRETS env var not defined"
+    throw `${envVarName} env var not defined`
+}
+
+function parseSecrets(): Secrets {
+  return parseEnvVar("ANNOUNCER_SECRETS");
+}
+
+function parseDirectory(): Recipient[] {
+  return parseEnvVar("DIRECTORY");
 }
 
 exports.announcer = announcer
