@@ -27,7 +27,7 @@ exports.announcer = (message: PubsubMessage, context: Context) => {
   ]
 
   let application: Application = applicationFactory(directory, secrets, secrets)
-  return application.announce("2021-12")
+  return application.announce("2021-12").then(_ => log.info("Terminating OK"))
 }
 
 interface Secrets extends JiraBasicAuth, SmtpConfig {
