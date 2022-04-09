@@ -17,6 +17,9 @@ export function applicationImpl(
 
   function parseReportInterval(today: string): Interval {
     const thisInstant = DateTime.fromISO(today);
+    if (!thisInstant.isValid){
+      throw today + " is not a valid ISO-8106 date"
+    }
     const startOfThisMonth = thisInstant.set({day: 1, hour: 0, minute: 0, second: 0, millisecond: 0})
     const startOfLastMonth = startOfThisMonth.minus({month: 1})
     return Interval.fromDateTimes(startOfLastMonth, startOfThisMonth)

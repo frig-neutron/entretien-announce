@@ -1,5 +1,4 @@
 import {config as dotenv_config} from "dotenv"
-import {google} from "@google-cloud/pubsub/build/protos/protos";
 import {EventFunctionWithCallback} from "@google-cloud/functions-framework";
 
 import {ApplicationFactory, defaultApplicationFactory, JiraBasicAuth} from "./src/application_factory";

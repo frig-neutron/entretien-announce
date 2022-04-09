@@ -49,4 +49,15 @@ describe("application", () => {
     expect(announcementFactory.createReportAnnouncements).toBeCalledWith(reportModel)
     expect(sender.sendAnnouncement).toBeCalledWith(announcement)
   })
+
+  test("invalid today string", async () => {
+    try {
+      await application.announce("Mooooo...")
+    } catch (e) {
+      expect(e).toBe("Mooooo... is not a valid ISO-8106 date")
+    }
+    expect(jiraClient.ticketsClosed).toBeCalledTimes(0)
+    expect(jiraClient.ticketsCreated).toBeCalledTimes(0)
+    expect(jiraClient.allOpenTickets).toBeCalledTimes(0)
+  })
 });
