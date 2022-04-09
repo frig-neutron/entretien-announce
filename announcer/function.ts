@@ -17,8 +17,8 @@ process.on('uncaughtException', function (err) {
 // https://cloud.google.com/functions/docs/writing/background#function_parameters
 // Absolutely MUST use the 3-param version b/c otherwise there seems to be no way to terminate the function properly.
 // Returning a resolved Promise doesn't cut it - you still get "Finished with status: response error"
-const announcer: EventFunctionWithCallback = (message, context, callback) => {
-  log.info(`Starting with input ${JSON.stringify(message)}`)
+const announcer: EventFunctionWithCallback = (data: any, context, callback) => {
+  log.info(`Starting with input ${JSON.stringify(data)}`)
   const result = dotenv_config()
   log.info({"environment": result})
 
@@ -28,8 +28,10 @@ const announcer: EventFunctionWithCallback = (message, context, callback) => {
     {name: "Daniil", email: "daniil.alliance+test@gmail.com", lang: "en", roles: []}
   ]
 
+  const {now: announcementDate} = data
+
   let application: Application = applicationFactory(directory, secrets, secrets)
-  return application.announce("2021-12").
+  return application.announce(announcementDate).
     then(_ => callback(null,"Terminating OK")).
     catch(e => callback(e, null))
 }
