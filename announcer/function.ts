@@ -15,7 +15,7 @@ process.on('uncaughtException', function (err) {
   log.error('Caught exception: ' + err);
 });
 
-exports.announcer =  (message: PubsubMessage, context: Context) => {
+exports.announcer = async (message: PubsubMessage, context: Context) => {
   log.info(`Starting with input ${JSON.stringify(message)}`)
   const result = dotenv_config()
   log.info({"environment": result})
@@ -29,7 +29,7 @@ exports.announcer =  (message: PubsubMessage, context: Context) => {
   try {
     let application: Application = applicationFactory(directory, secrets, secrets)
     log.info("Application factory built application")
-    application.announce("2021-12")
+    await application.announce("2021-12")
     log.info("Exiting function")
   } catch (e){
     log.error("NOOOO")
