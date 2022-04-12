@@ -1,7 +1,7 @@
 locals {
   # using ternary switch b/c I don't want to use multiple varfiles
   environment = terraform.workspace == "default" ? "prd" : "stg"
-  project_id = "entretien-${local.environment}"
+  project_id  = "entretien-${local.environment}"
 }
 
 resource "google_project" "entretien" {
@@ -18,8 +18,9 @@ data "google_billing_account" "default" {
 
 resource "google_project_service" "enabled_services" {
   for_each = toset([
-    "cloudbuild.googleapis.com",    # support cloud functions
+    "cloudbuild.googleapis.com", # support cloud functions
     "cloudfunctions.googleapis.com",
+    "cloudscheduler.googleapis.com",
     "secretmanager.googleapis.com", # secretmanager
   ])
   project = google_project.entretien.project_id
