@@ -1,9 +1,9 @@
-import {Application, applicationImpl} from "../src/application";
+import {Application, applicationImpl, Clock} from "../src/application";
 import {JiraClient} from "../src/jira_client";
 import {JiraTicket} from "../src/jira_ticket";
-import {mock} from "jest-mock-extended";
+import {DeepMockProxy, mock, mockDeep, mockFn, MockProxy} from "jest-mock-extended";
 
-import {Interval} from "luxon";
+import {DateTime, Interval} from "luxon";
 import {ReportModel, ReportService} from "../src/report_service";
 import {Announcement, AnnouncementFactory} from "../src/announcement_factory";
 import {Sender} from "../src/sender";
@@ -13,13 +13,14 @@ const jiraClient = mock<JiraClient>()
 const reportService = mock<ReportService>()
 const announcementFactory = mock<AnnouncementFactory>()
 const sender = mock<Sender>()
+const clock = mockFn<Clock>()
 
 const application: Application = applicationImpl(
-    jiraClient, reportService, announcementFactory, sender
+    jiraClient, reportService, announcementFactory, sender, clock
 )
 
 describe("application", () => {
-  test("happy_path",  async () => {
+  test("happy_path", async () => {
 
     const closedTicket = mock<JiraTicket>()
     const createdTicket = mock<JiraTicket>()
@@ -50,7 +51,7 @@ describe("application", () => {
     expect(sender.sendAnnouncement).toBeCalledWith(announcement)
   })
 
-  test("invalid today string", async () => {
+  test("reject invalid today string", async () => {
     try {
       await application.announce("Mooooo...")
     } catch (e) {
@@ -59,5 +60,14 @@ describe("application", () => {
     expect(jiraClient.ticketsClosed).toBeCalledTimes(0)
     expect(jiraClient.ticketsCreated).toBeCalledTimes(0)
     expect(jiraClient.allOpenTickets).toBeCalledTimes(0)
+  })
+
+  test("fall back to clock function if today is missing", async () => {
+    clock.mockReturnValue(DateTime.fromISO("1997-08-29"))
+
+    await application.announce(undefined)
+    const reportInterval = Interval.fromISO("1997-07-01/1997-08-01")
+
+    expect(jiraClient.ticketsClosed).toBeCalledWith(reportInterval)
   })
 });
