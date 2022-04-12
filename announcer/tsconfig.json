@@ -1,0 +1,15 @@
+{
+  "include": [
+    "function.ts",
+    "src/*"
+  ],
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "commonjs",
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "es2017"
+  },
+  "moduleResolution": "node12"
+}
