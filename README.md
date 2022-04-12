@@ -40,8 +40,9 @@ Using 2 environments: stg/prd.
 
 Project state is stored in TF workspaces. 
 
-* The production workspace is `default`, 
-* the staging workspace is `stg`
+* The production workspace is `prd`, 
+* The staging workspace is `stg`
+* The default workspace exists, but is unused
 
 Applying terraform plans can be done in one of two ways:
 

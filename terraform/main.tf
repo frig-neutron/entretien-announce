@@ -1,6 +1,6 @@
 locals {
   # using ternary switch b/c I don't want to use multiple varfiles
-  environment = terraform.workspace == "default" ? "prd" : "stg"
+  environment = terraform.workspace == "prd" ? "prd" : "stg"
   project_id  = "entretien-${local.environment}"
 }
 
