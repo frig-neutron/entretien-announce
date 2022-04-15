@@ -5,12 +5,14 @@ Person(entretienStaff, "Entretien Member")
 System(gmail, Gmail)
 System(jira, Jira)
 System_Boundary("gcp", "Google Cloud Platform"){
-  System(gcloudsched, "Google Cloud Scheduler")
-  System(gcf, "Google Cloud Function", "Generate report out of Jira tickets")
+  Container(gcloudsched, "Trigger", "Google Cloud Scheduler", "Publish trigger message")
+  Container(announcer_gcf, "Announcer", "Cloud Function", "Generate Jira ticket reports")
+  Container(mailer_gcf, "Mailer", "Cloud Function", "Mail report to addressee")
 }
 
-Rel(gcloudsched, gcf, "Triggers", "Monthly schedule")
-Rel(gcf, jira, "Query", "Get all changes for the past month")
-Rel(gcf, gmail, "Post", "Send report")
+Rel(gcloudsched, announcer_gcf, "Trigger", "Pubsub")
+Rel(announcer_gcf, jira, "Get all changes for report interval", "HTTP")
+Rel(announcer_gcf, mailer_gcf, "Addressed report", "Pubsub")
+Rel(mailer_gcf, gmail, "mail", "SMTP")
 Rel(gmail, entretienStaff, "Notify")
 @enduml
