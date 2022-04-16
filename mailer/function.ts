@@ -2,7 +2,7 @@ import {config as dotenv_config} from "dotenv"
 import {EventFunctionWithCallback} from "@google-cloud/functions-framework";
 
 import {log} from "./src/logger";
-import {SmtpConfig} from "./src/sender";
+import {SmtpConfig} from "./src/sendmail";
 
 
 process.on('uncaughtException', function (err) {

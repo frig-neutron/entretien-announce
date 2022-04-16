@@ -1,6 +1,6 @@
 import {mockDeep} from "jest-mock-extended";
 import {Transporter, TransportOptions} from "nodemailer";
-import {SmtpConfig, smtpSender} from "../src/sender";
+import {SmtpConfig, smtpSender} from "../src/sendmail";
 import * as SMTPTransport from "nodemailer/lib/smtp-transport";
 
 

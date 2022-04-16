@@ -6,7 +6,7 @@ import {Announcement} from "./announcement";
 /**
  * Transport adaptor. Probably email but could be pubsub one day.
  */
-export interface Sender {
+export interface Sendmail {
   sendAnnouncement(announcement: Announcement): Promise<object>
 }
 
@@ -19,7 +19,7 @@ export interface SmtpConfig {
 
 const defaultTransporterFactory: (options: SMTPTransport.Options) => Transporter<SMTPTransport.SentMessageInfo> = createTransport
 
-export function smtpSender(config: SmtpConfig, transporterFactory = defaultTransporterFactory): Sender {
+export function smtpSender(config: SmtpConfig, transporterFactory = defaultTransporterFactory): Sendmail {
   const transporter = transporterFactory({
     host: config.smtp_host,
     port: 465,
