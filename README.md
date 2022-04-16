@@ -21,6 +21,39 @@ Useful git-crypt commants
     git-crypt unlock 
     git-crypt status 
 
+## Deployment
+
+TBD, yo
+
+## Components
+
+See [C4 container diagram](./doc/c4-container.puml) for a visual reference.
+
+### [Announcer][announcer-code]
+
+Implements the business logic. 
+
+Inputs:
+- Trigger by pubsub message on `announcer_trigger` topic. A Cloud Scheduler Job emits the 
+  triggering message. Under normal operation the message is empty, but can contain [runtime 
+  parameters for special invocation behaviour][announcer-runtime-config].
+- Tickets fetched from Jira instance.
+- Secrets and user directory configured via [environment variables][announcer-invariant-config].
+
+Outputs:
+- Publishes rendered, addressed messages to `sendmail` topic.
+
+### [Mailer][mailer-code]
+
+Takes care of delivering rendered, addressed reports to the recipient.
+
+Inputs:
+- Message content comes from subscription on `sendmail` topic
+- SMTP credentials come from env var injected from GCP `announcer` secret. 
+
+Outputs:
+- Sends email via SMTP server (gmail).
+
 ## Secret storage strategy
 
 Since we're only using one set of production creds (jira, gmail) I'm going to go simple and just
@@ -52,3 +85,8 @@ Applying terraform plans can be done in one of two ways:
 ..or in one shot:
 
     TF_WORKSPACE=stg terraform plan apply
+
+[announcer-code]: ./announcer
+[announcer-invariant-config]: ./announcer/README.md#configuration
+[announcer-runtime-config]: ./announcer/README.md#parameters
+[mailer-code]: ./mailer

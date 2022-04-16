@@ -23,6 +23,15 @@ In both reports, the headings are:
 * Tickets closed during the previous month
 
 ## Operational
+### Parameters
+
+Invocation parameters are supplied via the trigger message.
+Supported parameters are: 
+
+```json
+"TBD :trollface:"
+```
+
 ### Configuration
 
 Configuration done using environment variables.
