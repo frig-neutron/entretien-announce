@@ -1,12 +1,13 @@
 import {Application, applicationImpl, Clock} from "../src/application";
 import {JiraClient} from "../src/jira_client";
 import {JiraTicket} from "../src/jira_ticket";
-import {DeepMockProxy, mock, mockDeep, mockFn, MockProxy} from "jest-mock-extended";
+import {mock, mockFn} from "jest-mock-extended";
 
 import {DateTime, Interval} from "luxon";
 import {ReportModel, ReportService} from "../src/report_service";
-import {Announcement, AnnouncementFactory} from "../src/announcement_factory";
+import {AnnouncementFactory} from "../src/announcement_factory";
 import {Sender} from "../src/sender";
+import {Announcement} from "../src/announcement";
 
 
 const jiraClient = mock<JiraClient>()

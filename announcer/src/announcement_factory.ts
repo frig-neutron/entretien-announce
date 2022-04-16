@@ -8,13 +8,7 @@ import {i18nObject} from './i18n/i18n-util'
 import {Locales, TranslationFunctions} from "./i18n/i18n-types";
 import {JiraTicket} from "./jira_ticket";
 import prettify from "html-prettify";
-
-export interface Announcement {
-  primaryRecipient: string
-  secondaryRecipients: string[]
-  subject: string,
-  body: string
-}
+import {Announcement} from "./announcement";
 
 /**
  * Converts a report to zero or more announcements.
