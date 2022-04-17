@@ -11,10 +11,10 @@ const gcpLogging = new LoggingWinston();
 export const log = winston.createLogger({
   level: 'info',
   transports: [
-    gcpLogging,
+    new winston.transports.Console(),
   ],
   rejectionHandlers: [
-    gcpLogging,
+    new winston.transports.Console(),
   ]
 });
 
