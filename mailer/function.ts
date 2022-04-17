@@ -2,7 +2,7 @@ import {config as dotenv_config} from "dotenv"
 import {EventFunctionWithCallback} from "@google-cloud/functions-framework";
 
 import {log} from "./src/logger";
-import {SmtpConfig} from "./src/sendmail";
+import {SmtpConfig, smtpSender} from "./src/sendmail";
 
 
 process.on('uncaughtException', function (err) {
@@ -27,6 +27,7 @@ const mailer: EventFunctionWithCallback = (data: any, context, callback) => {
 
   const {now: announcementDate} = data
 
+  smtpSender(secrets)
 }
 
 interface Secrets extends SmtpConfig {
