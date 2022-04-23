@@ -34,23 +34,23 @@
     "@types/node": "^14.11.2"
   },
   "scripts": {
+    "clean": "gts clean",
+    "compile": "tsc",
+    "compile-watch": "tsc --watch",
+    "deploy": "./scripts/deploy.sh",
     "deploy-prd": "env=prd ./scripts/deploy.sh",
     "deploy-stg": "env=stg ./scripts/deploy.sh",
-    "clean": "gts clean",
-    "deploy": "./scripts/deploy.sh",
+    "fix": "gts fix",
+    "function": "concurrently npm:compile-watch npm:function-watch",
     "function-start": "functions-framework --target=announcer --signature-type=event --source=build/",
     "function-watch": "nodemon --watch build --exec \"npm run function-start\"",
-    "function": "concurrently npm:compile-watch npm:function-watch",
     "gcp-build": "tsc",
+    "lint": "gts lint",
+    "posttest_disabled": "npm run lint"
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
     "test": "jest",
     "typesafe-i18n": "typesafe-i18n",
     "typesafe-i18n-ci": "typesafe-i18n --no-watch",
-    "lint": "gts lint",
-    "compile": "tsc",
-    "compile-watch": "tsc --watch",
-    "fix": "gts fix",
-    "prepare": "npm run compile",
-    "pretest": "npm run compile",
-    "posttest_disabled": "npm run lint"
   }
 }
