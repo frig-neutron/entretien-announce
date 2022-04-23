@@ -12,6 +12,6 @@
   "include": [
     "function.ts",
     "src/*",
-    "__test_/*"
+    "test/*"
   ]
 }
