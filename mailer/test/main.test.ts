@@ -1,6 +1,7 @@
 import {Announcement} from "../src/announcement";
 
 import Mock = jest.Mock;
+import {mailer} from "../src/main"
 
 describe("mainline", () => {
   // doing node modules to avoid importing before mock (which gets reordered by "organize imports")
@@ -16,9 +17,8 @@ describe("mainline", () => {
       secondaryRecipients: [],
       subject: ""
     }
-    const fn = require("../function")
 
-    fn.mailer(announcement)
+    mailer(announcement, {}, function (){})
 
     expect(senderMock).toBeCalledTimes(1)
   })

@@ -1,8 +1,8 @@
 import {config as dotenv_config} from "dotenv"
 import {EventFunctionWithCallback} from "@google-cloud/functions-framework";
 
-import {log} from "./src/logger";
-import {SmtpConfig, smtpSender} from "./src/sendmail";
+import {log} from "./logger";
+import {SmtpConfig, smtpSender} from "./sendmail";
 
 
 process.on('uncaughtException', function (err) {
@@ -14,7 +14,7 @@ process.on('uncaughtException', function (err) {
 // Returning a resolved Promise doesn't cut it - you still get "Finished with status: response error"
 const mailer: EventFunctionWithCallback = (data: any, context, callback) => {
   log.info(`Starting with data=${JSON.stringify(data)}`)
-  if (typeof data === "string"){
+  if (typeof data === "string") {
     // For local testing. For some reason the functions framework insists on passing the json object `-d data={...}`
     // as a string
     data = JSON.parse(data)
@@ -45,4 +45,4 @@ function parseSecrets(): Secrets {
   return parseEnvVar("ANNOUNCER_SECRETS");
 }
 
-exports.mailer = mailer
+export {mailer}

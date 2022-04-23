@@ -2,6 +2,7 @@
     "name": "mailer",
     "version": "0.0.1",
     "description": "Relay mail from Pubsub to SMTP",
+    "main": "build/main.js",
     "license": "GPL-3.0-only",
     "dependencies": {
         "@google-cloud/functions-framework": "^3.0.0",
