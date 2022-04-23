@@ -27,9 +27,8 @@ const mailer: EventFunctionWithCallback = (data: any, context, callback) => {
 
   let secrets = parseSecrets()
 
-  const {announcement}: {announcement: Announcement} = data
-
   const sender = smtpSender(secrets);
+  sender.sendAnnouncement(<Announcement><unknown>data) //TODO: validate format
 }
 
 export interface Secrets extends SmtpConfig {

@@ -36,7 +36,7 @@
         "deploy-stg": "env=stg ./scripts/deploy.sh",
         "fix": "gts fix",
         "function": "concurrently npm:compile-watch npm:function-watch",
-        "function-start": "functions-framework --target=mailer --signature-type=event --source=build/",
+        "function-start": "node --inspect node_modules/.bin/functions-framework --target=mailer --signature-type=event --source=build/src",
         "function-watch": "nodemon --watch build --exec \"npm run function-start\"",
         "gcp-build": "tsc",
         "lint": "gts lint",
