@@ -25,10 +25,10 @@
     "scripts": {
         "build": "tsc",
         "build-watch": "npm run build && tsc --watch",
-        "deploy-prd": "env=prd ./scripts/deploy.sh",
-        "deploy-stg": "env=stg ./scripts/deploy.sh",
         "clean": "git clean -f -x src __test__ coverage function.js",
         "deploy": "./scripts/deploy.sh",
+        "deploy-prd": "env=prd ./scripts/deploy.sh",
+        "deploy-stg": "env=stg ./scripts/deploy.sh",
         "function": "functions-framework --target=mailer --signature-type=event",
         "gcp-build": "tsc",
         "test": "jest"
