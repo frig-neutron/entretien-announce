@@ -1,15 +1,17 @@
 {
-  "include": [
-    "function.ts",
-    "src/*"
-  ],
+  "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
     "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "module": "commonjs",
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "es2017"
+    "lib": [
+      "es2019", // flatmap support
+      "dom"     // jirajs needs this
+    ],
+    "rootDir": ".",
+    "outDir": "build"
   },
-  "moduleResolution": "node12"
+  "include": [
+    "function.ts",
+    "src/*",
+    "__test_/*"
+  ]
 }

@@ -1,5 +1,5 @@
 # TypeScript
-*.js
+build/
 
 .env
 .DS_Store

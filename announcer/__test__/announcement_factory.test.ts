@@ -95,7 +95,7 @@ describe("Announcement factory", () => {
     ])
 
     const announcements = factory.createReportAnnouncements(report);
-    expect(announcements[0].subject).toEqual("Rapport de billetterie pour décembre 2021")
+    expect(announcements[0].subject).toEqual("Rapport de ticket pour décembre 2021")
   })
 
   test("template rendering", () => {
