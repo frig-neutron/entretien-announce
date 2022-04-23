@@ -46,11 +46,11 @@
     "function-watch": "nodemon --watch build --exec \"npm run function-start\"",
     "gcp-build": "tsc",
     "lint": "gts lint",
-    "posttest_disabled": "npm run lint"
+    "posttest_disabled": "npm run lint",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
     "test": "jest",
     "typesafe-i18n": "typesafe-i18n",
-    "typesafe-i18n-ci": "typesafe-i18n --no-watch",
+    "typesafe-i18n-ci": "typesafe-i18n --no-watch"
   }
 }
