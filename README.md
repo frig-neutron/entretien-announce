@@ -43,7 +43,7 @@ Inputs:
 Outputs:
 - Publishes rendered, addressed messages to `sendmail` topic.
 
-### [Mailer][mailer-code]
+### [Sendmail][sendmail-code]
 
 Takes care of delivering rendered, addressed reports to the recipient.
 
@@ -89,4 +89,4 @@ Applying terraform plans can be done in one of two ways:
 [announcer-code]: ./announcer
 [announcer-invariant-config]: ./announcer/README.md#configuration
 [announcer-runtime-config]: ./announcer/README.md#parameters
-[mailer-code]: ./mailer
+[sendmail-code]: ./sendmail

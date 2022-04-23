@@ -33,7 +33,7 @@ describe("mainline", () => {
     senderFactoryMock.mockReturnValue(sendmail)
 
     // must use require for module import to work
-    const mailer: EventFunctionWithCallback = require("../src").mailer
+    const mailer: EventFunctionWithCallback = require("../src").sendmail
 
     // RUNNER
     mailer(JSON.stringify(announcement), {}, function (){})

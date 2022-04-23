@@ -17,7 +17,7 @@ log.info({"environment": envResult})
 // https://cloud.google.com/functions/docs/writing/background#function_parameters
 // Absolutely MUST use the 3-param version b/c otherwise there seems to be no way to terminate the function properly.
 // Returning a resolved Promise doesn't cut it - you still get "Finished with status: response error"
-const mailer: EventFunctionWithCallback = (data: any, context, callback) => {
+const sendmail: EventFunctionWithCallback = (data: any, context, callback) => {
   log.info(`Starting with data=${JSON.stringify(data)}`)
   if (typeof data === "string") {
     // For local testing. For some reason the functions framework insists on passing the json object `-d data={...}`
@@ -43,7 +43,7 @@ function parseEnvVar(envVarName: string) {
 }
 
 function parseSecrets(): Secrets {
-  return parseEnvVar("ANNOUNCER_SECRETS");
+  return parseEnvVar("SENDMAIL_SECRETS");
 }
 
-export {mailer}
+export {sendmail}

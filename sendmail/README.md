@@ -1,4 +1,4 @@
-# Mailer Function
+# Sendmail Function
 
 This component reads messages from Pubsub and sends them out via SMTP.
 
@@ -17,7 +17,7 @@ the [announcer output message][announcer-readme-output] format.
 
 Configuration done using environment variables.
 
-* `MAILER_SECRETS`: SMTP secret values. Example
+* `SENDMAIL_SECRETS`: SMTP secret values. Example
   ```json
   {
     "smtp_from":"who-the-messages-come-from@gmail.com",
