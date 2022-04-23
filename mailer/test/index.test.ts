@@ -3,7 +3,7 @@ import {Announcement} from "../src/announcement";
 import Mock = jest.Mock;
 import {Sendmail} from "../src/sendmail";
 import {EventFunctionWithCallback} from "@google-cloud/functions-framework";
-import {Secrets} from "../src/main";
+import {Secrets} from "../src";
 
 describe("mainline", () => {
   // doing node modules to avoid importing before mock (which gets reordered by "organize imports")
@@ -30,7 +30,7 @@ describe("mainline", () => {
     process.env["ANNOUNCER_SECRETS"]=JSON.stringify(secrets)
 
     // must use require for module import to work
-    const mailer: EventFunctionWithCallback = require("../src/main").mailer
+    const mailer: EventFunctionWithCallback = require("../src").mailer
 
     mailer(announcement, {}, function (){})
 
