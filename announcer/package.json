@@ -39,7 +39,7 @@
     "deploy-stg": "env=stg ./scripts/deploy.sh",
     "clean": "gts clean",
     "deploy": "./scripts/deploy.sh",
-    "function": "functions-framework --target=announcer --signature-type=event",
+    "function": "functions-framework --target=announcer --signature-type=event --source=build/",
     "gcp-build": "tsc",
     "test": "jest",
     "typesafe-i18n": "typesafe-i18n",
