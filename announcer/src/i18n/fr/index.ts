@@ -10,10 +10,10 @@ const fr: BaseTranslation = {
       value: '{duration:Duration|durationInDays}'
     },
     key: {
-      header: 'Numéro de ticket'
+      header: 'Numéro'
     },
     status: {
-      header: 'Statut du ticket'
+      header: 'Statut'
     },
     summary: {
       header: 'Sommaire',
