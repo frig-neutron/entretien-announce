@@ -1,15 +1,11 @@
 {
-  "include": [
-    "function.ts",
-    "src/*"
-  ],
+  "extends": "./node_modules/gts/tsconfig-google.json",
   "compilerOptions": {
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "module": "commonjs",
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "es2017"
+    "rootDir": ".",
+    "outDir": "build"
   },
-  "moduleResolution": "node12"
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ]
 }
