@@ -3,11 +3,16 @@ import {EventFunctionWithCallback} from "@google-cloud/functions-framework";
 
 import {log} from "./logger";
 import {SmtpConfig, smtpSender} from "./sendmail";
+import {Announcement} from "./announcement";
+import exp from "constants";
 
 
 process.on('uncaughtException', function (err) {
   console.error('Uncaught exception', err);
 });
+
+const envResult = dotenv_config()
+log.info({"environment": envResult})
 
 // https://cloud.google.com/functions/docs/writing/background#function_parameters
 // Absolutely MUST use the 3-param version b/c otherwise there seems to be no way to terminate the function properly.
@@ -20,17 +25,14 @@ const mailer: EventFunctionWithCallback = (data: any, context, callback) => {
     data = JSON.parse(data)
   }
 
-  const result = dotenv_config()
-  log.info({"environment": result})
-
   let secrets = parseSecrets()
 
-  const {now: announcementDate} = data
+  const {announcement}: {announcement: Announcement} = data
 
-  smtpSender(secrets)
+  const sender = smtpSender(secrets);
 }
 
-interface Secrets extends SmtpConfig {
+export interface Secrets extends SmtpConfig {
 }
 
 function parseEnvVar(envVarName: string) {
