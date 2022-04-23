@@ -2,6 +2,7 @@
   "name": "entretien-announcer",
   "version": "0.0.1",
   "description": "Generates monthly Jira reports",
+  "main": "build/function.js",
   "license": "GPL-3.0-only",
   "dependencies": {
     "@google-cloud/functions-framework": "^3.0.0",
