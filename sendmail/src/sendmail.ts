@@ -7,7 +7,7 @@ import {Announcement} from "./announcement";
  * Transport adaptor. Probably email but could be pubsub one day.
  */
 export interface Sendmail {
-  sendAnnouncement(announcement: Announcement): Promise<object>
+  sendAnnouncement(announcement: Announcement): Promise<SMTPTransport.SentMessageInfo>
 }
 
 export interface SmtpConfig {
@@ -39,7 +39,7 @@ export function smtpSender(config: SmtpConfig, transporterFactory = defaultTrans
     });
 
   return {
-    async sendAnnouncement(announcement: Announcement): Promise<object> {
+    async sendAnnouncement(announcement: Announcement): Promise<SMTPTransport.SentMessageInfo> {
       return await verificationResult.then(() => {
         return transporter.sendMail({
           from: config.smtp_from,
