@@ -1,5 +1,5 @@
 {
-    "name": "mailer",
+    "name": "sendmail",
     "version": "0.0.1",
     "description": "Relay mail from Pubsub to SMTP",
     "main": "build/index.js",

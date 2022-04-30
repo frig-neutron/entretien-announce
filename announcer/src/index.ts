@@ -1,11 +1,11 @@
 import {config as dotenv_config} from "dotenv"
 import {EventFunctionWithCallback} from "@google-cloud/functions-framework";
 
-import {ApplicationFactory, defaultApplicationFactory, JiraBasicAuth} from "./src/application_factory";
-import {Application} from "./src/application"
-import {log} from "./src/logger";
-import {SmtpConfig} from "./src/sender";
-import {Recipient} from "./src/announcement_factory";
+import {ApplicationFactory, defaultApplicationFactory, JiraBasicAuth} from "./application_factory";
+import {Application} from "./application"
+import {log} from "./logger";
+import {SmtpConfig} from "./sender";
+import {Recipient} from "./announcement_factory";
 
 let applicationFactory: ApplicationFactory = defaultApplicationFactory;
 

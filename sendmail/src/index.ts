@@ -4,7 +4,6 @@ import {EventFunctionWithCallback} from "@google-cloud/functions-framework";
 import {log} from "./logger";
 import {SmtpConfig, smtpSender} from "./sendmail";
 import {Announcement} from "./announcement";
-import exp from "constants";
 
 
 process.on('uncaughtException', function (err) {

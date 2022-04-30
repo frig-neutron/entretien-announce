@@ -10,7 +10,6 @@
     "outDir": "build"
   },
   "include": [
-    "function.ts",
     "src/*",
     "test/*"
   ]
