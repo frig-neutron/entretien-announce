@@ -4,11 +4,11 @@ Announce Jira ticket activity to groups of users
 
 ## Setting Started
 
-Terraform
+### Terraform
 
     gcloud auth application-default login so terraform works
 
-Git crypt (one time)
+### Git crypt (one time)
 
     git-crypt init
     git-crypt add-gpg-user 22BD951E6D487BFE5371FD432E91B6B62DE72DBC
@@ -20,6 +20,15 @@ Useful git-crypt commants
     git-crypt lock 
     git-crypt unlock 
     git-crypt status 
+
+###NodeJS
+
+Install using [nvm][nvm]. Don't use the OS package manager version.
+
+    nvm install 17
+    nvm use 17
+
+Node-related technical issues described in [node-gotchas][node-gotchas].
 
 ## Deployment
 
@@ -89,4 +98,6 @@ Applying terraform plans can be done in one of two ways:
 [announcer-code]: ./announcer
 [announcer-invariant-config]: ./announcer/README.md#configuration
 [announcer-runtime-config]: ./announcer/README.md#parameters
+[node-gotchas]: ./doc/node-gotchas.md
+[nvm]: https://github.com/nvm-sh/nvm
 [sendmail-code]: ./sendmail
