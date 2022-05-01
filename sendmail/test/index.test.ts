@@ -67,6 +67,30 @@ describe("mainline", () => {
     expect(callback.mock.calls[0][1]).toEqual(null)
   })
 
+  test("fail if secret decoding fails", async () => {
+    secretParser.mockImplementation(_ => { throw "hissy fit" })
+
+    try {
+      await mailer(rawAnnouncementData, {}, callback)
+    } catch (notImportant){
+    }
+
+    expect(callback.mock.calls[0][0]).toEqual("Send to Mr.Croup Failed")
+    expect(callback.mock.calls[0][1]).toEqual(null)
+  })
+
+
+  test("fail if message decoding fails", async () => {
+    announcementParser.mockImplementation(_ => { throw "tantrum" })
+
+    try {
+      await mailer(rawAnnouncementData, {}, callback)
+    } catch (notImportant){
+    }
+
+    expect(callback.mock.calls[0][0]).toEqual("Announcement decoding failed")
+    expect(callback.mock.calls[0][1]).toEqual(null)
+  })
 })
 
 function mockedSenderFactory(): Mock<any, any> {

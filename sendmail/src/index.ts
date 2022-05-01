@@ -17,14 +17,22 @@ log.info({"environment": envResult})
 // https://cloud.google.com/functions/docs/writing/background#function_parameters
 // Absolutely MUST use the 3-param version b/c otherwise there seems to be no way to terminate the function properly.
 // Returning a resolved Promise doesn't cut it - you still get "Finished with status: response error"
-const sendmail: EventFunctionWithCallback = (data: any, context, callback: Function) => {
+const sendmail: EventFunctionWithCallback = async (data: any, context, callback: Function) => {
   log.info(`Starting with data=${JSON.stringify(data)}`)
-  const announcement: Announcement = parseAnnouncement(data)
-  const secrets = parseSecrets(process.env["SENDMAIL_SECRETS"])
-  const sender = smtpSender(secrets);
-  return sender.sendAnnouncement(announcement).
-    then(_ => callback(null, `Send to ${announcement.primaryRecipient} OK`)).
-    catch(_ => callback(`Send to ${announcement.primaryRecipient} Failed`, null))
+  try {
+    const announcement: Announcement = parseAnnouncement(data)
+
+    try {
+      const secrets = parseSecrets(process.env["SENDMAIL_SECRETS"])
+      const sender = smtpSender(secrets);
+      await sender.sendAnnouncement(announcement)
+      callback(null, `Send to ${announcement.primaryRecipient} OK`)
+    } catch (e) {
+      callback(`Send to ${announcement.primaryRecipient} Failed`, null)
+    }
+  } catch (ee) {
+    callback(`Announcement decoding failed`, null)
+  }
 }
 
 export interface Secrets extends SmtpConfig {
