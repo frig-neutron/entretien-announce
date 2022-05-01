@@ -23,7 +23,8 @@ const sendmail: EventFunctionWithCallback = (data: any, context, callback: Funct
   const secrets = parseSecrets(process.env["SENDMAIL_SECRETS"])
   const sender = smtpSender(secrets);
   return sender.sendAnnouncement(announcement).
-    then(_ => callback(null, `Send to ${announcement.primaryRecipient} OK`))
+    then(_ => callback(null, `Send to ${announcement.primaryRecipient} OK`)).
+    catch(_ => callback(`Send to ${announcement.primaryRecipient} Failed`, null))
 }
 
 export interface Secrets extends SmtpConfig {
