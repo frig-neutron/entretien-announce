@@ -1,8 +1,13 @@
 import {Announcement} from "./announcement";
-import exp from "constants";
 import {Secrets} from "./index";
 
-
+/**
+ * Per https://cloud.google.com/functions/docs/writing/background#function_parameters
+ *
+ * @param data depends on the trigger for which the function was registered, for example, Pub/Sub or
+ * Cloud Storage. In the case of direct-triggered functions, triggered using the `gcloud functions call` command,
+ * the event data contains the message you sent directly.
+ */
 export function parseAnnouncement(data: any): Announcement{
   // if (typeof data === "string") {
   //   // For local testing. For some reason the functions framework insists on passing the json object `-d data={...}`
