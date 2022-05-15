@@ -15,15 +15,11 @@ export function parseAnnouncement(data: any): Announcement{
   //   data = JSON.parse(data)
   // }
 
-  return {
-    body: "", primaryRecipient: "", secondaryRecipients: [], subject: ""
-  }
+  return JSON.parse(data)
 }
 
 export function parseSecrets(data: any): Secrets {
-  return {
-    smtp_from: "", smtp_host: "", smtp_password: "", smtp_username: ""
-  }
+  return JSON.parse(data)
 }
 
 /*
