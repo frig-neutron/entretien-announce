@@ -68,13 +68,13 @@ describe("mainline", () => {
   })
 
   test("fail if sending fails", async () => {
-    sendmail.sendAnnouncement.mockReturnValue(Promise.reject())
+    sendmail.sendAnnouncement.mockReturnValue(Promise.reject("u r spam"))
     try {
       await mailer(rawAnnouncementData, {}, callback)
     } catch (notImportant){
     }
 
-    expectCallbackFailureCall("Send to Mr.Croup Failed")
+    expectCallbackFailureCall("Send to Mr.Croup failed because u r spam")
   })
 
   test("fail if secret decoding fails", async () => {
@@ -85,7 +85,7 @@ describe("mainline", () => {
     } catch (notImportant){
     }
 
-    expectCallbackFailureCall("Send to Mr.Croup Failed")
+    expectCallbackFailureCall("Send to Mr.Croup failed because hissy fit")
   })
 
 
@@ -97,7 +97,7 @@ describe("mainline", () => {
     } catch (notImportant){
     }
 
-    expectCallbackFailureCall("Announcement decoding failed")
+    expectCallbackFailureCall("Announcement decoding failed because tantrum")
   })
 })
 
