@@ -42,7 +42,18 @@ describe("mainline", () => {
   announcementParser.mockReturnValue(announcement)
   secretParser.mockReturnValue(secrets)
   senderFactoryMock.mockReturnValue(sendmail)
-  sendmail.sendAnnouncement.mockReturnValue(Promise.resolve(mockDeep()))
+  sendmail.sendAnnouncement.mockReturnValue(Promise.resolve(mockDeep<SMTPTransport.SentMessageInfo>()))
+
+  function die(causeOfDeath: string) {
+    return function (_: any): never {
+      throw causeOfDeath;
+    }
+  }
+
+  function expectCallbackFailureCall(failureMessage: string){
+    expect(callback.mock.calls[0][0]).toEqual(failureMessage)
+    expect(callback.mock.calls[0][1]).toEqual(null)
+  }
 
   test("happy path", async () => {
     await mailer(rawAnnouncementData, {}, callback)
@@ -63,33 +74,30 @@ describe("mainline", () => {
     } catch (notImportant){
     }
 
-    expect(callback.mock.calls[0][0]).toEqual("Send to Mr.Croup Failed")
-    expect(callback.mock.calls[0][1]).toEqual(null)
+    expectCallbackFailureCall("Send to Mr.Croup Failed")
   })
 
   test("fail if secret decoding fails", async () => {
-    secretParser.mockImplementation(_ => { throw "hissy fit" })
+    secretParser.mockImplementation(die("hissy fit"))
 
     try {
       await mailer(rawAnnouncementData, {}, callback)
     } catch (notImportant){
     }
 
-    expect(callback.mock.calls[0][0]).toEqual("Send to Mr.Croup Failed")
-    expect(callback.mock.calls[0][1]).toEqual(null)
+    expectCallbackFailureCall("Send to Mr.Croup Failed")
   })
 
 
   test("fail if message decoding fails", async () => {
-    announcementParser.mockImplementation(_ => { throw "tantrum" })
+    announcementParser.mockImplementation(die( "tantrum" ))
 
     try {
       await mailer(rawAnnouncementData, {}, callback)
     } catch (notImportant){
     }
 
-    expect(callback.mock.calls[0][0]).toEqual("Announcement decoding failed")
-    expect(callback.mock.calls[0][1]).toEqual(null)
+    expectCallbackFailureCall("Announcement decoding failed")
   })
 })
 
