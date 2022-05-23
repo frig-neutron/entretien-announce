@@ -2,7 +2,7 @@
     "name": "sendmail",
     "version": "0.0.1",
     "description": "Relay mail from Pubsub to SMTP",
-    "main": "build/index.js",
+    "main": "build/src/index.js",
     "license": "GPL-3.0-only",
     "dependencies": {
         "@google-cloud/functions-framework": "^3.0.0",
