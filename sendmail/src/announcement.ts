@@ -6,8 +6,8 @@
  * must be manually replicated in {@link announcer/src/announcement.ts}
  */
 export interface Announcement {
-  primaryRecipient: string
-  secondaryRecipients: string[]
+  primary_recipient: string
+  secondary_recipients: string[]
   subject: string,
   body: string
 }

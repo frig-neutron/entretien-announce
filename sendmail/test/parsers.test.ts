@@ -1,7 +1,7 @@
 import {Announcement} from "../src/announcement";
 import {parseAnnouncement, parseSecrets} from "../src/parsers";
 import {Secrets} from "../src";
-import exp from "constants";
+
 
 describe("parsers", () => {
 
@@ -22,20 +22,61 @@ describe("parsers", () => {
 
   describe("announcement parser", () => {
 
-    const okAnnouncement: Announcement = {
-      subject: "flippity floppity flip",
-      body: "a mouse on a möbius strip",
-      primaryRecipient: "Mr.Croup",
-      secondaryRecipients: ["Mr.Vandemar"],
-    }
+    let announce: Announcement;
+
+    beforeEach(() => {
+      announce = {
+        subject: "flippity floppity flip",
+        body: "a mouse on a möbius strip",
+        primary_recipient: "Mr.Croup@below.co.uk",
+        secondary_recipients: ["Mr.Vandemar"],
+      }
+    })
+
+    it.each([
+      "body", "primary_recipient", "subject"
+    ])("error if missing %p", (field) => {
+      expect(parseForIdentity(delProp(announce, field), parseAnnouncement)).toThrow()
+    })
+
+    test("error if invalid primary_recipient", () => {
+      announce.primary_recipient = "nyan"
+      expect(parseForIdentity(announce, parseAnnouncement)).toThrow()
+    })
+
+    test("error if empty subject", () => {
+      announce.subject = ""
+      expect(parseForIdentity(announce, parseAnnouncement)).toThrow()
+    })
+
+    test("error if empty body", () => {
+      announce.body = ""
+      expect(parseForIdentity(announce, parseAnnouncement)).toThrow()
+    })
 
     test("happy path from string", () => {
-      testParsedJsonIdentity(okAnnouncement, parseAnnouncement)
+      testParsedJsonIdentity(announce, parseAnnouncement)
     })
   })
 
-  function testParsedJsonIdentity<T>(reference: T, parser: (_: any) => T){
-    const parsed = parser(JSON.stringify(reference))
+  function delProp<T extends object>(orig: T, prop: string): object {
+    return mkMutant(orig, (c: any) => delete c[prop])
+  }
+
+  function mkMutant<T extends object>(orig: T, mutagen: (_: object) => any): object {
+    const copy: object = {...orig}
+    mutagen(copy)
+    return copy
+  }
+
+  function parseForIdentity<T>(reference: T, parser: (_: any) => T): () => T {
+    return (): T => {
+      return parser(JSON.stringify(reference))
+    }
+  }
+
+  function testParsedJsonIdentity<T>(reference: T, parser: (_: any) => T) {
+    const parsed: T = parseForIdentity(reference, parser)()
     expect(parsed).toEqual(reference)
   }
 })

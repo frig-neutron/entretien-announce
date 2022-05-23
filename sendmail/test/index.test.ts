@@ -18,8 +18,8 @@ describe("mainline", () => {
   const announcement: Announcement = {
     subject: "flippity floppity flip",
     body: "a mouse on a möbius strip",
-    primaryRecipient: "Mr.Croup",
-    secondaryRecipients: ["Mr.Vandemar"],
+    primary_recipient: "Mr.Croup",
+    secondary_recipients: ["Mr.Vandemar"],
   }
 
   const secrets: Secrets = {

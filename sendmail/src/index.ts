@@ -26,9 +26,9 @@ const sendmail: EventFunctionWithCallback = async (data: any, context, callback:
       const secrets = parseSecrets(process.env["SENDMAIL_SECRETS"])
       const sender = smtpSender(secrets);
       await sender.sendAnnouncement(announcement)
-      callback(null, `Send to ${announcement.primaryRecipient} OK`)
+      callback(null, `Send to ${announcement.primary_recipient} OK`)
     } catch (e) {
-      callback(`Send to ${announcement.primaryRecipient} failed because ${e}`, null)
+      callback(`Send to ${announcement.primary_recipient} failed because ${e}`, null)
     }
   } catch (ee) {
     callback(`Announcement decoding failed because ${ee}`, null)

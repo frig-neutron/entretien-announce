@@ -43,7 +43,7 @@ export function smtpSender(config: SmtpConfig, transporterFactory = defaultTrans
       return await verificationResult.then(() => {
         return transporter.sendMail({
           from: config.smtp_from,
-          to: announcement.primaryRecipient,
+          to: announcement.primary_recipient,
           subject: announcement.subject,
           html: announcement.body
         })
