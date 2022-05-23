@@ -12,7 +12,6 @@ process.on('uncaughtException', function (err) {
 });
 
 const envResult = dotenv_config()
-log.info({"environment": envResult})
 
 // https://cloud.google.com/functions/docs/writing/background#function_parameters
 // Absolutely MUST use the 3-param version b/c otherwise there seems to be no way to terminate the function properly.
@@ -31,7 +30,7 @@ const sendmail: EventFunctionWithCallback = async (data: any, context, callback:
       callback(`Send to ${announcement.primary_recipient} failed because ${e}`, null)
     }
   } catch (ee) {
-    callback(`Announcement decoding failed because ${ee}`, null)
+    callback(`Announcement decoding failed because ${JSON.stringify(ee)}`, null)
   }
 }
 

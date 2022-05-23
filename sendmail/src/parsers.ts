@@ -83,8 +83,7 @@ function validate(data: any, schema: Schema): void {
   const dataObj = converToObject(data)
   const valid = validator(dataObj);
   if (!valid) {
-    let errors = validator.errors;
-    throw errors
+    throw validator.errors
   }
 }
 
