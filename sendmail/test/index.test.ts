@@ -51,9 +51,9 @@ describe("mainline", () => {
   }
 
   function expectCallbackFailureCall(failureMessage: string, cause: any){
-    const response = {
+    const response = JSON.stringify({
       message: failureMessage, cause: cause
-    }
+    })
     expect(callback.mock.calls[0][0]).toEqual(response)
     expect(callback.mock.calls[0][1]).toEqual(null)
   }

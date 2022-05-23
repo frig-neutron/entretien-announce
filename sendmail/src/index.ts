@@ -34,11 +34,11 @@ const sendmail: EventFunctionWithCallback = async (data: any, context, callback:
   }
 }
 
-function failureMsg(op: string, e: any): {message: string, cause: any} {
-  return {
+function failureMsg(op: string, e: any): string {
+  return JSON.stringify({
     cause: e,
     message: `${op} failed`
-  }
+  })
 }
 
 export {sendmail}
