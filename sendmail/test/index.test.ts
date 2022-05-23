@@ -9,8 +9,8 @@ import {Secrets} from "../src/parsers";
 describe("mainline", () => {
   const senderFactoryMock = mockedSenderFactory()
   const [
-      announcementParser,
-      secretParser
+    announcementParser,
+    secretParser
   ] = mockedParsers()
 
   const sendmail = mockDeep<Sendmail>()
@@ -32,7 +32,7 @@ describe("mainline", () => {
   const rawAnnouncementData = "i carry a secret message";
   const rawSecrets = "that i must give to you";
 
-  process.env["SENDMAIL_SECRETS"]= rawSecrets
+  process.env["SENDMAIL_SECRETS"] = rawSecrets
 
   // must use require for module import to work
   const mailer: EventFunctionWithCallback = require("../src").sendmail
@@ -50,7 +50,7 @@ describe("mainline", () => {
     }
   }
 
-  function expectCallbackFailureCall(failureMessage: string, cause: any){
+  function expectCallbackFailureCall(failureMessage: string, cause: any) {
     const response = JSON.stringify({
       message: failureMessage, cause: cause
     })
@@ -67,14 +67,14 @@ describe("mainline", () => {
     expect(sendmail.sendAnnouncement.mock.calls[0][0]).toEqual(announcement)
 
     expect(callback.mock.calls[0][0]).toEqual(null)
-    expect(callback.mock.calls[0][1]).toEqual("Send to Mr.Croup OK")
+    expect(callback.mock.calls[0][1]).toEqual(JSON.stringify({"message": "Send to Mr.Croup OK", "detail": null}))
   })
 
   test("fail if sending fails", async () => {
     sendmail.sendAnnouncement.mockReturnValue(Promise.reject("u r spam"))
     try {
       await mailer(rawAnnouncementData, {}, callback)
-    } catch (notImportant){
+    } catch (notImportant) {
     }
 
     expectCallbackFailureCall("Send to Mr.Croup failed", "u r spam")
@@ -85,7 +85,7 @@ describe("mainline", () => {
 
     try {
       await mailer(rawAnnouncementData, {}, callback)
-    } catch (notImportant){
+    } catch (notImportant) {
     }
 
     expectCallbackFailureCall("Send to Mr.Croup failed", "hissy fit")
@@ -93,11 +93,11 @@ describe("mainline", () => {
 
 
   test("fail if message decoding fails", async () => {
-    announcementParser.mockImplementation(die( "tantrum" ))
+    announcementParser.mockImplementation(die("tantrum"))
 
     try {
       await mailer(rawAnnouncementData, {}, callback)
-    } catch (notImportant){
+    } catch (notImportant) {
     }
 
     expectCallbackFailureCall("Announcement decoding failed", "tantrum")
@@ -116,7 +116,7 @@ function mockedParsers(): [Mock<Announcement, any>, Mock<Secrets, any>] {
   jest.mock('../src/parsers')
   const parsers = require("../src/parsers")
   return [
-      <Mock<Announcement>><unknown>parsers.parseAnnouncement,
-      <Mock<Secrets>><unknown>parsers.parseSecrets
+    <Mock<Announcement>><unknown>parsers.parseAnnouncement,
+    <Mock<Secrets>><unknown>parsers.parseSecrets
   ]
 }

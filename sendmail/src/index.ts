@@ -24,8 +24,8 @@ const sendmail: EventFunctionWithCallback = async (data: any, context, callback:
     try {
       const secrets = parseSecrets(process.env["SENDMAIL_SECRETS"])
       const sender = smtpSender(secrets);
-      await sender.sendAnnouncement(announcement)
-      callback(null, `Send to ${announcement.primary_recipient} OK`)
+      const result = await sender.sendAnnouncement(announcement)
+      callback(null, successMsg(`Send to ${announcement.primary_recipient}`, result))
     } catch (e) {
       callback(failureMsg(`Send to ${announcement.primary_recipient}`, e), null)
     }
@@ -36,8 +36,15 @@ const sendmail: EventFunctionWithCallback = async (data: any, context, callback:
 
 function failureMsg(op: string, e: any): string {
   return JSON.stringify({
+    message: `${op} failed`,
     cause: e,
-    message: `${op} failed`
+  })
+}
+
+function successMsg(op: string, detail: any): string {
+  return JSON.stringify({
+    message: `${op} OK`,
+    detail: null
   })
 }
 
