@@ -1,10 +1,10 @@
 import {Announcement} from "../src/announcement";
 import {Sendmail} from "../src/sendmail";
 import {EventFunctionWithCallback} from "@google-cloud/functions-framework";
-import {Secrets} from "../src";
 import {mockDeep, mockFn} from "jest-mock-extended";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import Mock = jest.Mock;
+import {Secrets} from "../src/parsers";
 
 describe("mainline", () => {
   const senderFactoryMock = mockedSenderFactory()
