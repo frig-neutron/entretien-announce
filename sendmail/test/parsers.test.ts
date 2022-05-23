@@ -1,7 +1,5 @@
 import {Announcement} from "../src/announcement";
-import {parseAnnouncement, parseSecrets} from "../src/parsers";
-import {Secrets} from "../src";
-
+import {parseAnnouncement, parseSecrets, Secrets} from "../src/parsers";
 
 describe("parsers", () => {
 
@@ -14,10 +12,34 @@ describe("parsers", () => {
       smtp_username: "werner_bandes"
     }
 
+    it.each([
+      "smtp_from", "smtp_host", "smtp_password", "smtp_username"
+    ])("error if missing %p", (field) => {
+      expect(parseForIdentity(delProp(okSecrets, field), parseSecrets)).toThrow()
+    })
+
+    it.each([
+      "smtp_from", "smtp_host", "smtp_password", "smtp_username"
+    ])("error if null %p", (field) => {
+      const mutant = mkMutant(okSecrets, (c: any) => c[field] = null)
+      expect(parseForIdentity(mutant, parseSecrets)).toThrow()
+    })
+
+    it.each([
+      "smtp_from", "smtp_host", "smtp_password", "smtp_username"
+    ])("error if empty %p", (field) => {
+      const mutant = mkMutant(okSecrets, (c: any) => c[field] = "")
+      expect(parseForIdentity(mutant, parseSecrets)).toThrow()
+    })
+
+    test("error if invalid host name", () => {
+      const mutant = mkMutant(okSecrets, (c: any) => c["smtp_host"] = "!")
+      expect(parseForIdentity(mutant, parseSecrets)).toThrow()
+    })
+
     test("happy path from string", () => {
       testParsedJsonIdentity(okSecrets, parseSecrets)
     })
-
   })
 
   describe("announcement parser", () => {

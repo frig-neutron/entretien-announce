@@ -2,7 +2,7 @@ import {config as dotenv_config} from "dotenv"
 import {EventFunctionWithCallback} from "@google-cloud/functions-framework";
 
 import {log} from "./logger";
-import {SmtpConfig, smtpSender} from "./sendmail";
+import {smtpSender} from "./sendmail";
 import {Announcement} from "./announcement";
 import {parseAnnouncement, parseSecrets} from "./parsers";
 
@@ -33,9 +33,6 @@ const sendmail: EventFunctionWithCallback = async (data: any, context, callback:
   } catch (ee) {
     callback(`Announcement decoding failed because ${ee}`, null)
   }
-}
-
-export interface Secrets extends SmtpConfig {
 }
 
 export {sendmail}

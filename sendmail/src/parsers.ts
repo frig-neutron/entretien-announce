@@ -1,10 +1,7 @@
 import {Announcement} from "./announcement";
-import {Secrets} from "./index"; //TODO: should not depend on mainline
-
 import Ajv, {Schema} from "ajv"
 import addFormats from "ajv-formats"
-
-import Ajv2020 from "ajv/dist/2020";
+import {SmtpConfig} from "./sendmail";
 
 /**
  * Per https://cloud.google.com/functions/docs/writing/background#function_parameters
@@ -41,12 +38,40 @@ export function parseAnnouncement(data: any): Announcement {
       "primary_recipient",
       "subject",
     ],
-    // additionalProperties: false,
   })
   return JSON.parse(data)
 }
 
 export function parseSecrets(data: any): Secrets {
+  validate(data, {
+    $schema: "http://json-schema.org/draft-07/schema#",
+    type: "object",
+    properties: {
+      smtp_from: {
+        type: "string",
+        minLength: 1
+      },
+      smtp_host: {
+        type: "string",
+        minLength: 1,
+        format: "hostname"
+      },
+      smtp_password: {
+        type: "string",
+        minLength: 1
+      },
+      smtp_username: {
+        type: "string",
+        minLength: 1
+      },
+    },
+    required: [
+      "smtp_from",
+      "smtp_host",
+      "smtp_password",
+      "smtp_username",
+    ]
+  })
   return JSON.parse(data)
 }
 
@@ -59,7 +84,6 @@ function validate(data: any, schema: Schema): void {
   const valid = validator(dataObj);
   if (!valid) {
     let errors = validator.errors;
-    console.log(errors)
     throw errors
   }
 }
@@ -72,17 +96,5 @@ function converToObject(data: any) {
   }
 }
 
-/*
-function parseSecrets(): Secrets {
-  return parseEnvVar("SENDMAIL_SECRETS");
+export interface Secrets extends SmtpConfig {
 }
-
-function parseEnvVar(envVarName: string): string {
-  const rawSecrets = "";
-  if (rawSecrets)
-    return rawSecrets;
-  else
-    throw `${envVarName} env var not defined`
-}
-
- */
