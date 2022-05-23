@@ -11,11 +11,6 @@ import {SmtpConfig} from "./sendmail";
  * the event data contains the message you sent directly.
  */
 export function parseAnnouncement(data: any): Announcement {
-  // if (typeof data === "string") {
-  //   // For local testing. For some reason the functions framework insists on passing the json object `-d data={...}`
-  //   // as a string
-  //   data = JSON.parse(data)
-  // }
   validate(data, {
     $schema: "http://json-schema.org/draft-07/schema#",
     type: "object",
@@ -39,7 +34,7 @@ export function parseAnnouncement(data: any): Announcement {
       "subject",
     ],
   })
-  return JSON.parse(data)
+  return convertToObject(data)
 }
 
 export function parseSecrets(data: any): Secrets {
@@ -80,14 +75,16 @@ function validate(data: any, schema: Schema): void {
   addFormats(ajv)
   let validator = ajv.compile(schema);
 
-  const dataObj = converToObject(data)
+  const dataObj = convertToObject(data)
   const valid = validator(dataObj);
   if (!valid) {
     throw validator.errors
   }
 }
 
-function converToObject(data: any) {
+function convertToObject(data: any) {
+  // During local runs, Functions Framework passes the json object `-d data={...}` as a string with no leading "data="
+  // With pubsub though, the data comes in as "Object", pre-parsed.
   if (typeof data === "string") {
     return JSON.parse(data)
   } else {

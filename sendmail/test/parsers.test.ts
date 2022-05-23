@@ -79,6 +79,11 @@ describe("parsers", () => {
     test("happy path from string", () => {
       testParsedJsonIdentity(announce, parseAnnouncement)
     })
+
+    test("happy path pre-parsed", () => {
+      const parsed = parseAnnouncement(announce)
+      expect(parsed).toEqual(announce)
+    })
   })
 
   function delProp<T extends object>(orig: T, prop: string): object {
