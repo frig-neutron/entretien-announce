@@ -74,7 +74,7 @@ describe("mainline", () => {
     } catch (notImportant){
     }
 
-    expectCallbackFailureCall("Send to Mr.Croup failed because u r spam")
+    expectCallbackFailureCall("Send to Mr.Croup failed because \"u r spam\"")
   })
 
   test("fail if secret decoding fails", async () => {
@@ -85,7 +85,7 @@ describe("mainline", () => {
     } catch (notImportant){
     }
 
-    expectCallbackFailureCall("Send to Mr.Croup failed because hissy fit")
+    expectCallbackFailureCall("Send to Mr.Croup failed because \"hissy fit\"")
   })
 
 
@@ -97,7 +97,7 @@ describe("mainline", () => {
     } catch (notImportant){
     }
 
-    expectCallbackFailureCall("Announcement decoding failed because tantrum")
+    expectCallbackFailureCall("Announcement decoding failed because \"tantrum\"")
   })
 })
 

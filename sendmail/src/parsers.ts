@@ -76,7 +76,7 @@ export function parseSecrets(data: any): Secrets {
 }
 
 function validate(data: any, schema: Schema): void {
-  const ajv = new Ajv({verbose: true})
+  const ajv = new Ajv({verbose: true, allErrors: true})
   addFormats(ajv)
   let validator = ajv.compile(schema);
 
