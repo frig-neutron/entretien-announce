@@ -44,7 +44,7 @@ function failureMsg(op: string, e: any): string {
 function successMsg(op: string, detail: any): string {
   return JSON.stringify({
     message: `${op} OK`,
-    detail: null
+    detail: detail
   })
 }
 

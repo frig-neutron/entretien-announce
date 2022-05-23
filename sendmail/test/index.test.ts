@@ -67,7 +67,7 @@ describe("mainline", () => {
     expect(sendmail.sendAnnouncement.mock.calls[0][0]).toEqual(announcement)
 
     expect(callback.mock.calls[0][0]).toEqual(null)
-    expect(callback.mock.calls[0][1]).toEqual(JSON.stringify({"message": "Send to Mr.Croup OK", "detail": null}))
+    expect(callback.mock.calls[0][1]).toEqual(JSON.stringify({"message": "Send to Mr.Croup OK"}))
   })
 
   test("fail if sending fails", async () => {

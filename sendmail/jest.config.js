@@ -21,4 +21,7 @@ module.exports = {
   globals: {
     "ts-jest": {}
   },
+  modulePathIgnorePatterns: [
+      "<rootDir>/build/"
+  ]
 };
