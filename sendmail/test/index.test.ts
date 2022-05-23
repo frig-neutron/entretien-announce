@@ -50,8 +50,11 @@ describe("mainline", () => {
     }
   }
 
-  function expectCallbackFailureCall(failureMessage: string){
-    expect(callback.mock.calls[0][0]).toEqual(failureMessage)
+  function expectCallbackFailureCall(failureMessage: string, cause: any){
+    const response = {
+      message: failureMessage, cause: cause
+    }
+    expect(callback.mock.calls[0][0]).toEqual(response)
     expect(callback.mock.calls[0][1]).toEqual(null)
   }
 
@@ -74,7 +77,7 @@ describe("mainline", () => {
     } catch (notImportant){
     }
 
-    expectCallbackFailureCall("Send to Mr.Croup failed because \"u r spam\"")
+    expectCallbackFailureCall("Send to Mr.Croup failed", "u r spam")
   })
 
   test("fail if secret decoding fails", async () => {
@@ -85,7 +88,7 @@ describe("mainline", () => {
     } catch (notImportant){
     }
 
-    expectCallbackFailureCall("Send to Mr.Croup failed because \"hissy fit\"")
+    expectCallbackFailureCall("Send to Mr.Croup failed", "hissy fit")
   })
 
 
@@ -97,7 +100,7 @@ describe("mainline", () => {
     } catch (notImportant){
     }
 
-    expectCallbackFailureCall("Announcement decoding failed because \"tantrum\"")
+    expectCallbackFailureCall("Announcement decoding failed", "tantrum")
   })
 })
 

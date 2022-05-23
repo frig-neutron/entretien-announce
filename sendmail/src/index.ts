@@ -27,10 +27,17 @@ const sendmail: EventFunctionWithCallback = async (data: any, context, callback:
       await sender.sendAnnouncement(announcement)
       callback(null, `Send to ${announcement.primary_recipient} OK`)
     } catch (e) {
-      callback(`Send to ${announcement.primary_recipient} failed because ${JSON.stringify(e)}`, null)
+      callback(failureMsg(`Send to ${announcement.primary_recipient}`, e), null)
     }
   } catch (ee) {
-    callback(`Announcement decoding failed because ${JSON.stringify(ee)}`, null)
+    callback(failureMsg(`Announcement decoding`, ee), null)
+  }
+}
+
+function failureMsg(op: string, e: any): {message: string, cause: any} {
+  return {
+    cause: e,
+    message: `${op} failed`
   }
 }
 
