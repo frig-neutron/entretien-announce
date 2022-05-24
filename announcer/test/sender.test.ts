@@ -18,7 +18,7 @@ describe("sender", () => {
 
     const sender = smtpSender(config, transporterFactory)
     await sender.sendAnnouncement({
-      body: "moo", primaryRecipient: "cow", secondaryRecipients: ["cows"], subject: "the global industrial food complex"
+      body: "moo", primary_recipient: "cow", secondary_recipients: ["cows"], subject: "the global industrial food complex"
     })
 
     expect(transporter.verify).toBeCalledTimes(1)
@@ -38,7 +38,7 @@ describe("sender", () => {
     const sender = smtpSender(config, transporterFactory)
     const sendAnnouncement = async () => {
       return sender.sendAnnouncement({
-        body: "", primaryRecipient: "", secondaryRecipients: [], subject: ""
+        body: "", primary_recipient: "", secondary_recipients: [], subject: ""
       })
     }
 
@@ -56,7 +56,7 @@ describe("sender", () => {
     const sender = smtpSender(config, transporterFactory)
     const sendAnnouncement = async () => {
       return sender.sendAnnouncement({
-        body: "", primaryRecipient: "", secondaryRecipients: [], subject: ""
+        body: "", primary_recipient: "", secondary_recipients: [], subject: ""
       })
     }
 

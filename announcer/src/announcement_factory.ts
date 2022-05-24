@@ -119,8 +119,8 @@ export function announcementFactoryImpl(directory: Recipient[], config = {
         return {
           body: prettify(root),
           subject: L.subject({interval: report.reportInterval()}),
-          primaryRecipient: recipient.email,
-          secondaryRecipients: []
+          primary_recipient: recipient.email,
+          secondary_recipients: []
         }
       }
 
