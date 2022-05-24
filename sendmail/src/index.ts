@@ -26,8 +26,11 @@ const sendmail: EventFunctionWithCallback = async (data: any, context, callback:
       const sender = smtpSender(secrets);
       const result = await sender.sendAnnouncement(announcement)
       let success = successMsg(`Send to ${announcement.primary_recipient}`, result);
-      log.info(success) // log explicitly b/c callback msg does not make it to StackDriver logs
-      callback(null, success)
+      // log explicitly b/c callback msg does not make it to StackDriver logs
+      // duplicating object b/c log.info injects a "level" which I don't want in callback function
+      // using obj for log.info b/c I want structured output in StackDriver
+      log.info({...success})
+      callback(null, JSON.stringify(success))
     } catch (e) {
       callback(failureMsg(`Send to ${announcement.primary_recipient}`, e), null)
     }
@@ -43,11 +46,11 @@ function failureMsg(op: string, e: any): string {
   })
 }
 
-function successMsg(op: string, detail: any): string {
-  return JSON.stringify({
+function successMsg(op: string, detail: any): object {
+  return {
     message: `${op} OK`,
     detail: detail
-  })
+  }
 }
 
 export {sendmail}
