@@ -25,7 +25,9 @@ const sendmail: EventFunctionWithCallback = async (data: any, context, callback:
       const secrets = parseSecrets(process.env["SENDMAIL_SECRETS"])
       const sender = smtpSender(secrets);
       const result = await sender.sendAnnouncement(announcement)
-      callback(null, successMsg(`Send to ${announcement.primary_recipient}`, result))
+      let success = successMsg(`Send to ${announcement.primary_recipient}`, result);
+      log.info(success) // log explicitly b/c callback msg does not make it to StackDriver logs
+      callback(null, success)
     } catch (e) {
       callback(failureMsg(`Send to ${announcement.primary_recipient}`, e), null)
     }
