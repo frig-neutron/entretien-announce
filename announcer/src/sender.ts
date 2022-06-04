@@ -1,6 +1,3 @@
-import {createTransport, Transporter} from "nodemailer"
-import {log} from "./logger";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
 import {Announcement} from "./announcement";
 import {PubSub} from "@google-cloud/pubsub";
 
@@ -11,19 +8,10 @@ export interface Sender {
   sendAnnouncement(announcement: Announcement): Promise<any>
 }
 
-export interface SmtpConfig {
-  smtp_username: string,
-  smtp_password: string,
-  smtp_host: string,
-  smtp_from: string
-}
-
 // using snake case b/c this is deserialized from input json where I use snakes
 export interface PublishConfig {
   topic_name: string
 }
-
-const defaultTransporterFactory: (options: SMTPTransport.Options) => Transporter<SMTPTransport.SentMessageInfo> = createTransport
 
 const defaultPubsubFactory = () => new PubSub()
 
@@ -32,39 +20,6 @@ export function pubsubSender(cfg: PublishConfig, pubsubFactory = defaultPubsubFa
   return {
     sendAnnouncement(announcement: Announcement): Promise<any> {
       return pubsub.topic(cfg.topic_name).publishMessage({data: JSON.stringify(announcement)})
-    }
-  }
-}
-
-export function smtpSender(config: SmtpConfig, transporterFactory = defaultTransporterFactory): Sender {
-  const transporter = transporterFactory({
-    host: config.smtp_host,
-    port: 465,
-    secure: true,
-    auth: {
-      user: config.smtp_username,
-      pass: config.smtp_password,
-    },
-  });
-
-
-  const verificationResult = transporter.verify().
-    then(_ => log.info("Verified SMTP connection")).
-    catch(e => {
-      log.error(`SMTP verification error ${e}`)
-      throw e // necessary to short-circuit sendMail
-    });
-
-  return {
-    async sendAnnouncement(announcement: Announcement): Promise<object> {
-      return await verificationResult.then(() => {
-        return transporter.sendMail({
-          from: config.smtp_from,
-          to: announcement.primary_recipient,
-          subject: announcement.subject,
-          html: announcement.body
-        })
-      })
     }
   }
 }

@@ -4,7 +4,6 @@ import {EventFunctionWithCallback} from "@google-cloud/functions-framework";
 import {ApplicationFactory, defaultApplicationFactory, JiraBasicAuth} from "./application_factory";
 import {Application} from "./application"
 import {log} from "./logger";
-import {SmtpConfig} from "./sender";
 import {Recipient} from "./announcement_factory";
 
 let applicationFactory: ApplicationFactory = defaultApplicationFactory;
@@ -18,8 +17,8 @@ process.on('uncaughtException', function (err) {
 // Returning a resolved Promise doesn't cut it - you still get "Finished with status: response error"
 const announcer: EventFunctionWithCallback = (data: any, context, callback) => {
   log.info(`Starting with data=${JSON.stringify(data)}`)
-  if (typeof data === "string"){
-    // For local testing. For some reason the functions framework insists on passing the json object `-d data={...}`
+  if (typeof data === "string") {
+    // For local testing. For some reason the Functions Framework insists on passing the json object `-d data={...}`
     // as a string
     data = JSON.parse(data)
   }
@@ -29,32 +28,41 @@ const announcer: EventFunctionWithCallback = (data: any, context, callback) => {
 
   let secrets = parseSecrets()
   const directory: Recipient[] = parseDirectory() // todo: validate structure in all the parsing / test parsing
+  const announcementTopicName = requireEnvVar("ANNOUNCEMENT_TOPIC_NAME")
 
   const {now: announcementDate} = data
 
-  let application: Application = applicationFactory(directory, secrets, secrets)
+  let application: Application = applicationFactory(directory, secrets, {topic_name: announcementTopicName})
   return application.announce(announcementDate).
     then(_ => callback(null,"Terminating OK")).
     catch(e => callback(e, null))
 }
 
-interface Secrets extends JiraBasicAuth, SmtpConfig {
-}
-
-function parseEnvVar(envVarName: string) {
-  const rawSecrets = process.env[envVarName];
-  if (rawSecrets)
-    return JSON.parse(rawSecrets);
-  else
-    throw `${envVarName} env var not defined`
+interface Secrets extends JiraBasicAuth {
 }
 
 function parseSecrets(): Secrets {
-  return parseEnvVar("ANNOUNCER_SECRETS");
+  return parseEnvVarJson("ANNOUNCER_SECRETS");
 }
 
 function parseDirectory(): Recipient[] {
-  return parseEnvVar("DIRECTORY");
+  return parseEnvVarJson("DIRECTORY");
+}
+
+function parseEnvVarJson(envVarName: string) {
+  return JSON.parse(requireEnvVar(envVarName));
+}
+
+function requireEnvVar(envVarName: string): string {
+  const val = process.env[envVarName]
+  if (val) {
+    return val;
+  }
+  dieUndefined(envVarName)
+}
+
+function dieUndefined(envVarName: string) {
+  throw `${envVarName} env var not defined`
 }
 
 exports.announcer = announcer

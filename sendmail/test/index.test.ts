@@ -108,7 +108,7 @@ function mockedSenderFactory(): Mock<any, any> {
   // doing node modules to avoid importing before mock (which gets reordered by "organize imports")
   jest.mock('../src/sendmail')
   const sm = require("../src/sendmail")
-  return <Mock<typeof sm.smtpSender>><unknown>sm.smtpSender
+  return <Mock<typeof sm.pubsub>><unknown>sm.smtpSender
 }
 
 function mockedParsers(): [Mock<Announcement, any>, Mock<Secrets, any>] {
