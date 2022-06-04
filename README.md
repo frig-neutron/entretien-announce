@@ -21,7 +21,7 @@ Useful git-crypt commands
     git-crypt unlock 
     git-crypt status 
 
-###NodeJS
+### NodeJS
 
 Install using [nvm][nvm]. Don't use the OS package manager version.
 
