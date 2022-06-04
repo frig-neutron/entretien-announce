@@ -23,7 +23,16 @@ describe("pubsub sender", () => {
     const res = sender.sendAnnouncement(announcement);
 
     expect(pubsub.topic).toBeCalledWith(topicName)
-    expect(topic.publishMessage.mock.calls[0][0]).toEqual({data: JSON.stringify(announcement)})
+    expect(bufferData(topic.publishMessage.mock.calls[0][0])).toEqual(JSON.stringify(announcement))
     expect(res).resolves.toEqual("Yay!")
   })
 })
+
+function bufferData(arg: any){
+  const {data} = arg
+  if (Buffer.isBuffer(data)){
+    return data.toString()
+  } else {
+    throw "not a buffer"
+  }
+}

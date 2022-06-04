@@ -20,7 +20,8 @@ export function pubsubSender(cfg: PublishConfig, pubsubFactory = defaultPubsubFa
   const pubsub = pubsubFactory(cfg.project_id)
   return {
     sendAnnouncement(announcement: Announcement): Promise<any> {
-      return pubsub.topic(cfg.topic_name).publishMessage({data: JSON.stringify(announcement)})
+      const bufferedAnnouncement = Buffer.from(JSON.stringify(announcement));
+      return pubsub.topic(cfg.topic_name).publishMessage({data: bufferedAnnouncement})
     }
   }
 }
