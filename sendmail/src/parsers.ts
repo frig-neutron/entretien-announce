@@ -11,7 +11,8 @@ import {SmtpConfig} from "./sendmail";
  * the event data contains the message you sent directly.
  */
 export function parseAnnouncement(data: any): Announcement {
-  validate(data, {
+  const decoded = decode(data)
+  validate(decoded, {
     $schema: "http://json-schema.org/draft-07/schema#",
     type: "object",
     properties: {
@@ -34,7 +35,7 @@ export function parseAnnouncement(data: any): Announcement {
       "subject",
     ],
   })
-  return convertToObject(data)
+  return convertToObject(decoded)
 }
 
 export function parseSecrets(data: any): Secrets {
@@ -68,6 +69,23 @@ export function parseSecrets(data: any): Secrets {
     ]
   })
   return JSON.parse(data)
+}
+
+/**
+ * On input support pre-parsed object, json string, and base64-encoded json string.
+ * On output decode to string if base64, pass through if json string or object.
+ * PubSub always encode to base64, but I don't want to require that for other invocation methods.
+ */
+function decode(data: any): string {
+  if (typeof data === "string") {
+    const buf = Buffer.from(data, "base64")
+    const isBase64 = buf.toString("base64") === data
+    return isBase64
+        ? buf.toString("utf-8")
+        : data
+  } else {
+    return data;
+  }
 }
 
 function validate(data: any, schema: Schema): void {
