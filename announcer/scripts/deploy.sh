@@ -22,5 +22,7 @@ gcloud functions deploy announcer --project=$project_id --max-instances=1 \
   --runtime=nodejs16 --trigger-topic=announcer_trigger \
   --service-account=announcer@$project_id.iam.gserviceaccount.com \
   --set-secrets=ANNOUNCER_SECRETS=announcer:latest \
-  --update-env-vars=ANNOUNCEMENT_PUBLISH_CONFIG='{"project_id": "'$project_id'", "topic_name": "sendmail"}' \
+  --update-env-vars=^--^PUBLISH_CONFIG='{"project_id": "'$project_id'", "topic_name": "sendmail"}' \
   --update-env-vars=^--^DIRECTORY="`cat $dirfile`" 
+# the ^--^ cat ears in the vars specify an alternate delimiter, else the json confuses
+# gcp's dict arg parsing (https://cloud.google.com/sdk/gcloud/reference/topic/escaping)
