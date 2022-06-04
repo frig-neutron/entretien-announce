@@ -71,6 +71,13 @@ Configuration done using environment variables.
       {"name": "Charlie", "email": "charlies.email@gmail.com", "lang": "fr", "roles": []},
     ]
     ```
+* `PUBLISH_CONFIG`: GCP pubsub topic name and project
+  ```json
+  {
+    "topic_name":  "...the thing...", 
+    "project_id":  "...the other thing..."
+  }
+  ```
 
 ### Local testing
 

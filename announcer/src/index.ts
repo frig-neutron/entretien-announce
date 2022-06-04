@@ -50,7 +50,7 @@ function parseDirectory(): Recipient[] {
 }
 
 function parsePubsubConfig(): PublishConfig {
-  return parseEnvVarJson("ANNOUNCEMENT_PUBLISH_CONFIG");
+  return parseEnvVarJson("PUBLISH_CONFIG");
 }
 
 function parseEnvVarJson(envVarName: string) {
