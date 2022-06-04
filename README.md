@@ -15,7 +15,7 @@ Announce Jira ticket activity to groups of users
 
 The `.gitattributes` file in the secrets dir makes `git-crypt` crypt
 
-Useful git-crypt commants
+Useful git-crypt commands
 
     git-crypt lock 
     git-crypt unlock 
