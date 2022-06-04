@@ -1,10 +1,36 @@
 import {mockDeep} from "jest-mock-extended";
 import {Transporter, TransportOptions} from "nodemailer";
-import {SmtpConfig, smtpSender} from "../src/sender";
+import {pubsubSender, SmtpConfig, smtpSender} from "../src/sender";
 import * as SMTPTransport from "nodemailer/lib/smtp-transport";
+import {PubSub, Topic} from "@google-cloud/pubsub";
 
+describe("pubsub sender", () => {
 
-describe("sender", () => {
+  test("pubsub send", () => {
+    const pubsub = mockDeep<PubSub>()
+    const topic = mockDeep<Topic>()
+    //@ts-ignore
+    topic.publishMessage.mockResolvedValue("Yay!") //type resolution picks up void overload, therefore ignore
+    pubsub.topic.mockReturnValue(topic)
+
+    const topicName = "idle_chatter"
+    const sender = pubsubSender({topic_name: topicName}, () => pubsub)
+
+    const announcement = {
+      body: "moo",
+      primary_recipient: "cow",
+      secondary_recipients: ["cows"],
+      subject: "the global industrial food complex"
+    };
+    const res = sender.sendAnnouncement(announcement);
+
+    expect(pubsub.topic).toBeCalledWith(topicName)
+    expect(topic.publishMessage.mock.calls[0][0]).toEqual({data: JSON.stringify(announcement)})
+    expect(res).resolves.toEqual("Yay!")
+  })
+})
+
+describe("smtp sender", () => {
 
   const transporter = mockDeep<Transporter<SMTPTransport.SentMessageInfo>>()
   const config: SmtpConfig = {
@@ -18,7 +44,10 @@ describe("sender", () => {
 
     const sender = smtpSender(config, transporterFactory)
     await sender.sendAnnouncement({
-      body: "moo", primary_recipient: "cow", secondary_recipients: ["cows"], subject: "the global industrial food complex"
+      body: "moo",
+      primary_recipient: "cow",
+      secondary_recipients: ["cows"],
+      subject: "the global industrial food complex"
     })
 
     expect(transporter.verify).toBeCalledTimes(1)
