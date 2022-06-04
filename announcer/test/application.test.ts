@@ -71,4 +71,15 @@ describe("application", () => {
 
     expect(jiraClient.ticketsClosed).toBeCalledWith(reportInterval)
   })
+
+  test("reject on failure to send a message", async () => {
+
+    const announcement = mock<Announcement>()
+    announcementFactory.createReportAnnouncements.mockReturnValue([announcement])
+    sender.sendAnnouncement.mockReturnValue(Promise.reject("wrong"))
+
+    const res = application.announce("2038-01-19T12:34:56.789")
+
+    await expect(res).rejects.toThrow(new Error("nope"))
+  })
 });
