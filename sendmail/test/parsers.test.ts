@@ -84,6 +84,12 @@ describe("parsers", () => {
       const parsed = parseAnnouncement(announce)
       expect(parsed).toEqual(announce)
     })
+
+    test("happy path from base64", () => {
+      const base64Announcement = Buffer.from(JSON.stringify(announce)).toString("base64")
+      const parsed = parseAnnouncement(base64Announcement)
+      expect(parsed).toEqual(announce)
+    })
   })
 
   function delProp<T extends object>(orig: T, prop: string): object {
