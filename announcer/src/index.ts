@@ -5,6 +5,7 @@ import {ApplicationFactory, defaultApplicationFactory, JiraBasicAuth} from "./ap
 import {Application} from "./application"
 import {log} from "./logger";
 import {Recipient} from "./announcement_factory";
+import {PublishConfig} from "./sender";
 
 let applicationFactory: ApplicationFactory = defaultApplicationFactory;
 
@@ -26,13 +27,12 @@ const announcer: EventFunctionWithCallback = (data: any, context, callback) => {
   const result = dotenv_config()
   log.info({"environment": result})
 
-  let secrets = parseSecrets()
+  const secrets = parseSecrets()
   const directory: Recipient[] = parseDirectory() // todo: validate structure in all the parsing / test parsing
-  const announcementTopicName = requireEnvVar("ANNOUNCEMENT_TOPIC_NAME")
 
   const {now: announcementDate} = data
 
-  let application: Application = applicationFactory(directory, secrets, {topic_name: announcementTopicName})
+  const application: Application = applicationFactory(directory, secrets, parsePubsubConfig())
   return application.announce(announcementDate).
     then(_ => callback(null,"Terminating OK")).
     catch(e => callback(e, null))
@@ -49,19 +49,24 @@ function parseDirectory(): Recipient[] {
   return parseEnvVarJson("DIRECTORY");
 }
 
+function parsePubsubConfig(): PublishConfig {
+  return parseEnvVarJson("ANNOUNCEMENT_PUBLISH_CONFIG");
+}
+
 function parseEnvVarJson(envVarName: string) {
   return JSON.parse(requireEnvVar(envVarName));
 }
 
 function requireEnvVar(envVarName: string): string {
   const val = process.env[envVarName]
-  if (val) {
+  if (typeof val !== "undefined" && val) {
     return val;
+  } else {
+    dieUndefined(envVarName)
   }
-  dieUndefined(envVarName)
 }
 
-function dieUndefined(envVarName: string) {
+function dieUndefined(envVarName: string): never {
   throw `${envVarName} env var not defined`
 }
 

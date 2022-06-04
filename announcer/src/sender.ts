@@ -10,13 +10,14 @@ export interface Sender {
 
 // using snake case b/c this is deserialized from input json where I use snakes
 export interface PublishConfig {
+  project_id: string
   topic_name: string
 }
 
-const defaultPubsubFactory = () => new PubSub()
+const defaultPubsubFactory = (projectId: string) => new PubSub({projectId})
 
 export function pubsubSender(cfg: PublishConfig, pubsubFactory = defaultPubsubFactory): Sender {
-  const pubsub = pubsubFactory()
+  const pubsub = pubsubFactory(cfg.project_id)
   return {
     sendAnnouncement(announcement: Announcement): Promise<any> {
       return pubsub.topic(cfg.topic_name).publishMessage({data: JSON.stringify(announcement)})

@@ -12,7 +12,7 @@ describe("pubsub sender", () => {
     pubsub.topic.mockReturnValue(topic)
 
     const topicName = "idle_chatter"
-    const sender = pubsubSender({topic_name: topicName}, () => pubsub)
+    const sender = pubsubSender({topic_name: topicName, project_id: "orion"}, () => pubsub)
 
     const announcement = {
       body: "moo",
