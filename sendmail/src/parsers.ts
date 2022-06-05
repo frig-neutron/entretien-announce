@@ -98,7 +98,7 @@ function isValidJson(str: string): boolean {
 }
 
 function decodeBase64(data: string) {
-  return Buffer.from(data, "base64").toString("utf-8");
+  return Buffer.from(data, "base64").toString("ascii");
 }
 
 function validate(data: any, schema: Schema): void {

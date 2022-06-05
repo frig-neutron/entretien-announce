@@ -101,6 +101,8 @@ The source of all that is [true][functions-library]
 
 ### [Calling][functions-local-call]
 
+Convenience script [./scripts/call-local.sh](./scripts/call-local.sh)
+
 `.data` section [event definition][function-trigger-pubsub-event]. 
 
 Example:
@@ -137,6 +139,9 @@ curl localhost:8080 \
 Supported in both `package.json`
 
     npm run function 
+
+To call the function, follow these instructions in the [Calling][functions-local-call] section exactly or 
+you're in for pain. Use the script provided.
 
 #### Option: docker
 
