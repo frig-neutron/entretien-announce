@@ -87,7 +87,9 @@ describe("parsers", () => {
 
     test("happy path from base64", () => {
       const base64Announcement = Buffer.from(JSON.stringify(announce)).toString("base64")
-      const parsed = parseAnnouncement(base64Announcement)
+      // that space negates the base64 detection strategy of checking if "buffer.toString("base64")" == input
+      const base64AnnouncementWithSpace = insertSpace(base64Announcement)
+      const parsed = parseAnnouncement(base64AnnouncementWithSpace)
       expect(parsed).toEqual(announce)
     })
   })
@@ -111,5 +113,10 @@ describe("parsers", () => {
   function testParsedJsonIdentity<T>(reference: T, parser: (_: any) => T) {
     const parsed: T = parseForIdentity(reference, parser)()
     expect(parsed).toEqual(reference)
+  }
+
+  function insertSpace(s: string) {
+    const theMiddle = s.length / 2
+    return s.substring(0, theMiddle) + " " + s.substring(theMiddle)
   }
 })

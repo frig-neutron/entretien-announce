@@ -78,14 +78,27 @@ export function parseSecrets(data: any): Secrets {
  */
 function decode(data: any): string {
   if (typeof data === "string") {
-    const buf = Buffer.from(data, "base64")
-    const isBase64 = buf.toString("base64") === data
-    return isBase64
-        ? buf.toString("utf-8")
-        : data
+    return isValidJson(data)
+      ? data
+      : decodeBase64(data)
   } else {
     return data;
   }
+}
+
+function isValidJson(str: string): boolean {
+  try {
+    JSON.parse(str)
+    console.log("IS JSON")
+    return true
+  } catch (e) {
+    console.log("NOT JSON")
+    return false
+  }
+}
+
+function decodeBase64(data: string) {
+  return Buffer.from(data, "base64").toString("utf-8");
 }
 
 function validate(data: any, schema: Schema): void {
