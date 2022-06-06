@@ -11,7 +11,10 @@ import {SmtpConfig} from "./sendmail";
  * the event data contains the message you sent directly.
  */
 export function parseAnnouncement(data: any): Announcement {
-  const decoded = decode(data)
+  const decoded = isPubsubMessage(data)
+      ? decodePubsubData(data)
+      : decode(data)
+
   validate(decoded, {
     $schema: "http://json-schema.org/draft-07/schema#",
     type: "object",
@@ -78,27 +81,46 @@ export function parseSecrets(data: any): Secrets {
  */
 function decode(data: any): string {
   if (typeof data === "string") {
-    return isValidJson(data)
-      ? data
-      : decodeBase64(data)
+    return isWellFormedJson(data)
+        ? data
+        : decodeBase64(data)
   } else {
     return data;
   }
 }
 
-function isValidJson(str: string): boolean {
+function isPubsubMessage(o: any) {
+  return typeof o === "object"
+      && o["@type"] === "type.googleapis.com/google.pubsub.v1.PubsubMessage"
+}
+
+function decodePubsubData(o: object): string {
+
+  // witches
+  function hasDataProp<O extends {}, P extends PropertyKey>(x: O, prop: P): x is O & Record<P, unknown> {
+    return x.hasOwnProperty('data')
+  }
+
+  if (hasDataProp(o, 'data')) {
+    const {data} = o;
+    if (typeof data === "string") {
+      return Buffer.from(data, "base64").toString("utf-8")
+    }
+  }
+  return ""; //todo: test for appropriate exception (or leave to validator)
+}
+
+function isWellFormedJson(str: string): boolean {
   try {
     JSON.parse(str)
-    console.log("IS JSON")
     return true
   } catch (e) {
-    console.log("NOT JSON")
     return false
   }
 }
 
 function decodeBase64(data: string) {
-  return Buffer.from(data, "base64").toString("ascii");
+  return Buffer.from(data, "base64").toString("utf-8");
 }
 
 function validate(data: any, schema: Schema): void {

@@ -92,6 +92,16 @@ describe("parsers", () => {
       const parsed = parseAnnouncement(base64AnnouncementWithSpace)
       expect(parsed).toEqual(announce)
     })
+
+    test("happy path from PubsubMessage", () => {
+      const base64Announcement: string = Buffer.from(JSON.stringify(announce)).toString("base64")
+      const pubsubMessage = {
+        "@type": "type.googleapis.com/google.pubsub.v1.PubsubMessage",
+        "data": base64Announcement
+      }
+      const parsed = parseAnnouncement(pubsubMessage)
+      expect(parsed).toEqual(announce)
+    })
   })
 
   function delProp<T extends object>(orig: T, prop: string): object {
