@@ -1,53 +1,27 @@
-import {Announcement} from "./announcement_factory";
-import {createTransport, Transporter} from "nodemailer"
-import {log} from "./logger";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
+import {Announcement} from "./announcement";
+import {PubSub} from "@google-cloud/pubsub";
 
 /**
  * Transport adaptor. Probably email but could be pubsub one day.
  */
 export interface Sender {
-  sendAnnouncement(announcement: Announcement): Promise<object>
+  sendAnnouncement(announcement: Announcement): Promise<any>
 }
 
-export interface SmtpConfig {
-  smtp_username: string,
-  smtp_password: string,
-  smtp_host: string,
-  smtp_from: string
+// using snake case b/c this is deserialized from input json where I use snakes
+export interface PublishConfig {
+  project_id: string
+  topic_name: string
 }
 
-const defaultTransporterFactory: (options: SMTPTransport.Options) => Transporter<SMTPTransport.SentMessageInfo> = createTransport
+const defaultPubsubFactory = (projectId: string) => new PubSub({projectId})
 
-export function smtpSender(config: SmtpConfig, transporterFactory = defaultTransporterFactory): Sender {
-  const transporter = transporterFactory({
-    host: config.smtp_host,
-    port: 465,
-    secure: true,
-    auth: {
-      user: config.smtp_username,
-      pass: config.smtp_password,
-    },
-  });
-
-
-  const verificationResult = transporter.verify().
-    then(_ => log.info("Verified SMTP connection")).
-    catch(e => {
-      log.error(`SMTP verification error ${e}`)
-      throw e // necessary to short-circuit sendMail
-    });
-
+export function pubsubSender(cfg: PublishConfig, pubsubFactory = defaultPubsubFactory): Sender {
+  const pubsub = pubsubFactory(cfg.project_id)
   return {
-    async sendAnnouncement(announcement: Announcement): Promise<object> {
-      return await verificationResult.then(() => {
-        return transporter.sendMail({
-          from: config.smtp_from,
-          to: announcement.primaryRecipient,
-          subject: announcement.subject,
-          html: announcement.body
-        })
-      })
+    sendAnnouncement(announcement: Announcement): Promise<any> {
+      const bufferedAnnouncement = Buffer.from(JSON.stringify(announcement));
+      return pubsub.topic(cfg.topic_name).publishMessage({data: bufferedAnnouncement})
     }
   }
 }

@@ -1,4 +1,8 @@
-# value is defined in secret.tfvars, which is encrypted
+# Value is defined in secret.tfvars, which is encrypted.
+#
+# Keeping secrets for all components together for cost reasons
+# (6 free secret versions per billing account, then $0.06 per version. Since stg/prd have separate versions, the free
+# secret allowance is essentially cut in half)
 variable "announcer_secret_data" {
   sensitive = true
   nullable  = false

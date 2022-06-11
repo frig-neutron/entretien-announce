@@ -23,19 +23,40 @@ In both reports, the headings are:
 * Tickets closed during the previous month
 
 ## Operational
+### Parameters
+
+Invocation parameters are supplied via the trigger message.
+Supported parameters are: 
+
+```json5
+{
+  "dry_run": true,   // Publish dry_run announcements (TODO)
+}
+```
+
+### Output
+
+The announcer publishes messages to the `sendmail` topic. The message format is 
+
+```json5
+{
+  "primaryRecipient": "recipient@example.com",
+  "secondaryRecipients": ["bcc_recipient@example.com"],
+  "subject": "...",
+  "body": "...", 
+  "dry_run": true // log but don't send the message (TODO)
+}
+```
+
 ### Configuration
 
 Configuration done using environment variables.
 
-* `ANNOUNCER_SECRETS`: Jira/SMTP secret values. Example
+* `ANNOUNCER_SECRETS`: Jira secret values. Example
   ```json
   {
     "jira_email":"just-another-jira-user@gmail.com",
-    "jira_token":"JIRA_API_TOKEN",
-    "smtp_from":"who-the-messages-come-from@gmail.com",
-    "smtp_host":"smtp.gmail.com",
-    "smtp_password":"GMAIL_APPLICATION_PASSWORD",
-    "smtp_username":"owner-of-the-gmail-account@gmail.com"
+    "jira_token":"JIRA_API_TOKEN"
   }
   ```
 * `DIRECTORY`: List of recipient directory entries. The `role` field will control the amount of
@@ -50,6 +71,13 @@ Configuration done using environment variables.
       {"name": "Charlie", "email": "charlies.email@gmail.com", "lang": "fr", "roles": []},
     ]
     ```
+* `PUBLISH_CONFIG`: GCP pubsub topic name and project
+  ```json
+  {
+    "topic_name":  "...the thing...", 
+    "project_id":  "...the other thing..."
+  }
+  ```
 
 ### Local testing
 

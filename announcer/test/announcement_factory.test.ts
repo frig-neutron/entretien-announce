@@ -76,8 +76,8 @@ describe("Announcement factory", () => {
     const announcements = factory.createReportAnnouncements(report);
 
     expect(announcements.length).toEqual(2)
-    expect(announcements[0].primaryRecipient).toEqual("charlie@bar")
-    expect(announcements[1].primaryRecipient).toEqual("charlotte@baz")
+    expect(announcements[0].primary_recipient).toEqual("charlie@bar")
+    expect(announcements[1].primary_recipient).toEqual("charlotte@baz")
   })
 
   test("check translation en", () => {
