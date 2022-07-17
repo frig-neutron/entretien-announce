@@ -3,7 +3,8 @@
  *
  * ATTN!!!
  * Pending the resolution of https://github.com/frig-neutron/entretien-announce/issues/10 any changes made to this file
- * must be manually replicated in {@link sendmail/src/announcement.ts}
+ * must be manually replicated in {@link sendmail/src/announcement.ts}, and in the intake router of
+ * https://github.com/frig-neutron/entretien-intake
  */
 export interface Announcement {
   primary_recipient: string

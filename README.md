@@ -1,6 +1,22 @@
-# Entretien Announcer
+# Entretien Tools
 
-Announce Jira ticket activity to groups of users
+## Index
+
+- [announcer][announcer_src]: Announce Jira ticket activity to groups of users 
+- [scripts][scripts_src]: Shell things I find useful
+- [sendmail][sendmail_src]: An immodestly named PubSub->Email bridge
+- [terraform][terraform_src]: Where the infra is defined
+
+## Intake and management of maintenance issues
+
+The actual intake happens via a Google Form which kicks off a Google Apps Script. 
+
+- The intake form scripts read the response values, package them up into a payload and fire it 
+  at an HTTP enpoint running a google cloud function. All that code is in 
+  [intake_form][intake_form]
+- The cloud function then reads the form values, constructs a jira ticket and some email 
+  notifications. The jira ticket goes to Jira and the notifications get mailed out. That 
+  function lives in [intake_router][intake_router]
 
 ## Setting Started
 
@@ -38,7 +54,7 @@ TBD, yo
 
 See [C4 container diagram](./doc/c4-container.puml) for a visual reference.
 
-### [Announcer][announcer-code]
+### [Announcer][announcer_src]
 
 Implements the business logic. 
 
@@ -52,7 +68,7 @@ Inputs:
 Outputs:
 - Publishes rendered, addressed messages to `sendmail` topic.
 
-### [Sendmail][sendmail-code]
+### [Sendmail][sendmail_src]
 
 Takes care of delivering rendered, addressed reports to the recipient.
 
@@ -163,14 +179,19 @@ Run in docker
 
 https://cloud.google.com/functions/docs/testing/test-overview
 
-[announcer-code]: ./announcer
 [announcer-invariant-config]: ./announcer/README.md#configuration
 [announcer-runtime-config]: ./announcer/README.md#parameters
+[announcer_src]: ./announcer
 [cloud-event]: https://cloud.google.com/functions/docs/running/calling#cloudevent_functions
+[function-trigger-pubsub-event]: https://cloud.google.com/functions/docs/calling/pubsub#event_structure
 [functions-library]: https://cloud.google.com/functions/docs/running/overview
 [functions-local-call]: https://cloud.google.com/functions/docs/running/calling#background_functions
 [functions-local-run-node]: https://cloud.google.com/functions/docs/running/function-frameworks#per-language_instructions
-[function-trigger-pubsub-event]: https://cloud.google.com/functions/docs/calling/pubsub#event_structure
 [node-gotchas]: ./doc/node-gotchas.md
 [nvm]: https://github.com/nvm-sh/nvm
-[sendmail-code]: ./sendmail
+[scripts_src]: ./scripts
+[sendmail_src]: ./sendmail
+[terraform_src]: ./terraform
+
+[intake_form]: ./intake_form
+[intake_router]: ./intake_router
