@@ -2,21 +2,12 @@
 
 ## Index
 
-- [announcer][announcer_src]: Announce Jira ticket activity to groups of users 
+- [announcer][announcer_src]: Announce Jira ticket activity to groups of users (GCF)
+- [intake_form][intake_form_src]: Google Apps Script automation for new issue intake (GAS)
+- [intake_router][intake_router_src]: Create Jira issues and notify users when intake form is used.
 - [scripts][scripts_src]: Shell things I find useful
-- [sendmail][sendmail_src]: An immodestly named PubSub->Email bridge
+- [sendmail][sendmail_src]: An immodestly named PubSub->Email bridge (GCF)
 - [terraform][terraform_src]: Where the infra is defined
-
-## Intake and management of maintenance issues
-
-The actual intake happens via a Google Form which kicks off a Google Apps Script. 
-
-- The intake form scripts read the response values, package them up into a payload and fire it 
-  at an HTTP enpoint running a google cloud function. All that code is in 
-  [intake_form][intake_form]
-- The cloud function then reads the form values, constructs a jira ticket and some email 
-  notifications. The jira ticket goes to Jira and the notifications get mailed out. That 
-  function lives in [intake_router][intake_router]
 
 ## Setting Started
 
@@ -53,6 +44,17 @@ TBD, yo
 ## Components
 
 See [C4 container diagram](./doc/c4-container.puml) for a visual reference.
+
+### Intake and intake routing
+
+The actual intake happens via a Google Form which kicks off a Google Apps Script.
+
+- The intake form scripts read the response values, package them up into a payload and fire it
+  at an HTTP enpoint running a google cloud function. All that code is in
+  [intake_form][intake_form_src]
+- The cloud function then reads the form values, constructs a jira ticket and some email
+  notifications. The jira ticket goes to Jira and the notifications get mailed out. That
+  function lives in [intake_router][intake_router_src]
 
 ### [Announcer][announcer_src]
 
@@ -187,11 +189,10 @@ https://cloud.google.com/functions/docs/testing/test-overview
 [functions-library]: https://cloud.google.com/functions/docs/running/overview
 [functions-local-call]: https://cloud.google.com/functions/docs/running/calling#background_functions
 [functions-local-run-node]: https://cloud.google.com/functions/docs/running/function-frameworks#per-language_instructions
+[intake_form_src]: ./intake_form
+[intake_router_src]: ./intake_router
 [node-gotchas]: ./doc/node-gotchas.md
 [nvm]: https://github.com/nvm-sh/nvm
 [scripts_src]: ./scripts
 [sendmail_src]: ./sendmail
 [terraform_src]: ./terraform
-
-[intake_form]: ./intake_form
-[intake_router]: ./intake_router
