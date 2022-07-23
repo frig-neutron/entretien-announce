@@ -17,7 +17,8 @@ const envResult = dotenv_config()
 // Returning a resolved Promise doesn't cut it - you still get "Finished with status: response error"
 const intake_router: HttpFunction = async (req: Request, res: Response) => {
   application.use(text())
-  log.info(`Starting with data=${JSON.stringify(req.body)}, headers=${JSON.stringify(req.rawHeaders)}`)
+  const body: Buffer = req.body;
+  log.info(`Starting with data=${body.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
   res.send("in the pipe, five by five")
 }
 
