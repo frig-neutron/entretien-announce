@@ -15,10 +15,10 @@ const envResult = dotenv_config()
 // https://cloud.google.com/functions/docs/writing/background#function_parameters
 // Absolutely MUST use the 3-param version b/c otherwise there seems to be no way to terminate the function properly.
 // Returning a resolved Promise doesn't cut it - you still get "Finished with status: response error"
-const sendmail: HttpFunction = async (req: Request, res: Response) => {
+const intake_router: HttpFunction = async (req: Request, res: Response) => {
   application.use(text())
   log.info(`Starting with data=${JSON.stringify(req.body)}, headers=${JSON.stringify(req.rawHeaders)}`)
 }
 
 
-export {sendmail}
+export {intake_router}
