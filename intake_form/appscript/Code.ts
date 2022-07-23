@@ -57,7 +57,7 @@ class TicketContext {
   }
 }
 
-class FormData {
+interface FormData {
   rowIndex: number
   building: string
   summary: string
@@ -65,28 +65,29 @@ class FormData {
   area: string
   reporter: string
   priority: string
+}
 
-  constructor(rowData: string[], rowIndex: number) {
-    function rowFieldValue(fieldName: string) {
-      return rowData[columnIndex[fieldName]]
-    }
-
-    this.rowIndex = rowIndex
-    this.building = rowFieldValue(responseFieldLabels.building)
-    this.summary = rowFieldValue(responseFieldLabels.element)
-    this.description = rowFieldValue(responseFieldLabels.description)
-    this.area = rowFieldValue(responseFieldLabels.area)
-    this.reporter = rowFieldValue(responseFieldLabels.reportedBy)
-    this.priority = this.mapFormToJiraPriority(rowFieldValue(responseFieldLabels.priority)
-    )
+function unpackFormData(rowData: string[], rowIndex: number): FormData {
+  function rowFieldValue(fieldName: string) {
+    return rowData[columnIndex[fieldName]]
   }
 
-  mapFormToJiraPriority(formPriorityValue: string) {
+  function mapFormToJiraPriority(formPriorityValue: string) {
     if (formPriorityValue.startsWith("Urgent")) {
       return jiraPriorityUrgent
     } else {
       return jiraPriorityMedium
     }
+  }
+
+  return {
+    rowIndex: rowIndex,
+    building: rowFieldValue(responseFieldLabels.building),
+    summary: rowFieldValue(responseFieldLabels.element),
+    description: rowFieldValue(responseFieldLabels.description),
+    area: rowFieldValue(responseFieldLabels.area),
+    reporter: rowFieldValue(responseFieldLabels.reportedBy),
+    priority: mapFormToJiraPriority(rowFieldValue(responseFieldLabels.priority))
   }
 }
 
@@ -105,7 +106,7 @@ function run() {
   let dataRange = responsesSheet.getRange(2, 1, numRows - 1, responsesSheet.getLastColumn())
 
   const rowOffset: number = 2 // 1 for header & 1 for starting count from 1
-  const tickets: TicketContext[] = dataRange.getValues().map((r, i) => new FormData(r, i + rowOffset)).map((f) => new TicketContext(asTicket(f), f))
+  const tickets: TicketContext[] = dataRange.getValues().map((r, i) => unpackFormData(r, i + rowOffset)).map((f) => new TicketContext(asTicket(f), f))
   sendAll(tickets);
 }
 
