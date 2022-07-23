@@ -1,7 +1,6 @@
 import {config as dotenv_config} from "dotenv"
 
 import {log} from "./logger";
-import {smtpSender} from "./sendmail";
 import {Announcement} from "./announcement";
 import {HttpFunction, Request} from "@google-cloud/functions-framework/build/src/functions";
 import {Response, application, json, text} from "express";

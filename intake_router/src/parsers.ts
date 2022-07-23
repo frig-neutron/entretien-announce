@@ -1,7 +1,6 @@
 import {Announcement} from "./announcement";
 import Ajv, {Schema} from "ajv"
 import addFormats from "ajv-formats"
-import {SmtpConfig} from "./sendmail";
 
 /**
  * Per https://cloud.google.com/functions/docs/writing/background#function_parameters
@@ -145,5 +144,5 @@ function convertToObject(data: any) {
   }
 }
 
-export interface Secrets extends SmtpConfig {
+export interface Secrets {
 }
