@@ -18,6 +18,7 @@ const envResult = dotenv_config()
 const intake_router: HttpFunction = async (req: Request, res: Response) => {
   application.use(text())
   log.info(`Starting with data=${JSON.stringify(req.body)}, headers=${JSON.stringify(req.rawHeaders)}`)
+  res.send("in the pipe, five by five")
 }
 
 
