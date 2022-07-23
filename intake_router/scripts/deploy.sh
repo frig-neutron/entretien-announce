@@ -11,4 +11,4 @@ project_id=entretien-$env
 
 gcloud functions deploy intake_router --project=$project_id --max-instances=1 \
   --runtime=nodejs16 --trigger-http \
-  --service-account=intake@$project_id.iam.gserviceaccount.com 
+  --service-account=intake-router@$project_id.iam.gserviceaccount.com 
