@@ -13,27 +13,58 @@ jest.mock("../src/intake-form-data")
 describe("mainline", () => {
   functions.http('intake_router', intake_router);
 
-  const formDataRouterMock = mock<FormDataRouter>()
-  const parseIntakeFormDataMock = jest.mocked(parseIntakeFormData, true)
-  const routerFactory = jest.mocked(formDataRouter, true)
-  routerFactory.mockImplementation(() => {
-    return formDataRouterMock
+  const formData: IntakeFormData = {
+    area: "51", building: "", description: "", priority: "", reporter: "", rowIndex: 0, summary: "" + Math.random()
+  }
 
-  })
+  const server = getTestServer("intake_router")
+
   test("happy path", async () => {
-    const formData: IntakeFormData = {
-      area: "51", building: "", description: "", priority: "", reporter: "", rowIndex: 0, summary: ""
-    }
+    const f = new MockFixture()
     const issueKey = "IssueKey-" + Math.random();
-    formDataRouterMock.route.mockReturnValue(issueKey)
+    f.formDataRouterMock.route.mockResolvedValue(issueKey)
 
-    const decodeGoatAsFormData = (data: any) => data == "goat" ? formData: mock<IntakeFormData>();
-    parseIntakeFormDataMock.mockImplementation(decodeGoatAsFormData)
-
-    const server = getTestServer("intake_router")
+    f.parseGoatAsFormData(formData);
 
     const response = supertest(server).post("/").send("goat");
     await response.expect(200, issueKey)
-    expect(formDataRouterMock.route).toBeCalledWith(expect.objectContaining(formData))
+    expect(f.formDataRouterMock.route).toBeCalledWith(expect.objectContaining(formData))
   })
+
+  test("parse error should return 400", async () => {
+    const f = new MockFixture()
+
+    f.parseIntakeFormDataMock.mockRejectedValue(new Error("invalid"));
+
+    const response = supertest(server).post("/").send("goat");
+    await response.expect(400, "Error: invalid: goat")
+  })
+
+  test("routing error should return 500", async () => {
+    const f = new MockFixture()
+
+    f.parseGoatAsFormData(formData);
+
+    f.formDataRouterMock.route.mockRejectedValue(new Error("no"))
+
+    const response = supertest(server).post("/").send("goat");
+    await response.expect(500, "Error: no")
+  })
+
+  class MockFixture {
+    readonly formDataRouterMock = mock<FormDataRouter>();
+    readonly parseIntakeFormDataMock = jest.mocked(parseIntakeFormData, true);
+    readonly routerFactory = jest.mocked(formDataRouter, true);
+
+    constructor() {
+      this.routerFactory.mockImplementation(() => {
+        return this.formDataRouterMock
+      })
+    }
+
+    parseGoatAsFormData(formData: IntakeFormData) {
+      const decodeGoatAsFormData = async (data: any) => data == "goat" ? formData : mock<IntakeFormData>();
+      this.parseIntakeFormDataMock.mockImplementation(decodeGoatAsFormData)
+    }
+  }
 })

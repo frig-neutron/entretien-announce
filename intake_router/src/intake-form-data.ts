@@ -8,8 +8,8 @@ export interface IntakeFormData {
   priority: string
 }
 
-export function parseIntakeFormData(data: any): IntakeFormData {
-  return {
+export function parseIntakeFormData(data: any): Promise<IntakeFormData> {
+  return Promise.resolve({
     area: "", building: "", description: "", priority: "", reporter: "", rowIndex: 0, summary: ""
-  }
+  })
 }

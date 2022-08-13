@@ -20,11 +20,20 @@ const envResult = dotenv_config()
 // Returning a resolved Promise doesn't cut it - you still get "Finished with status: response error"
 export const intake_router: HttpFunction = async (req: Request, res: Response) => {
   application.use(text())
-  log.info(`Starting with data=${req.rawBody?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
+  const input = req.rawBody;
+  log.info(`Starting with data=${input?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
 
   const fdr = formDataRouter()
-  const parsedFormData = parseIntakeFormData(req.rawBody)
-  const issueKey = fdr.route(parsedFormData)
+  try {
+    const parsedFormData = await parseIntakeFormData(input)
+    try {
+      const issueKey = await fdr.route(parsedFormData);
+      return res.status(200).send(issueKey)
+    } catch (err) {
+      return res.status(500).send(String(err))
+    }
+  } catch (err) {
+    return res.status(400).send(err + ": " + input)
+  }
 
-  res.send(issueKey)
 }

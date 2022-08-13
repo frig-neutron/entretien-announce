@@ -1,13 +1,13 @@
-import { IntakeFormData } from "./intake-form-data";
+import {IntakeFormData} from "./intake-form-data";
 
 export interface FormDataRouter {
-  route(intakeFormData: IntakeFormData): String
+  route(intakeFormData: IntakeFormData): Promise<String>
 }
 
 export function formDataRouter(): FormDataRouter {
   return {
-    route(intakeFormData: IntakeFormData): String {
-      return "";
-    }
-  }
+        async route(intakeFormData: IntakeFormData): Promise<String> {
+          return "";
+        }
+      }
 }
