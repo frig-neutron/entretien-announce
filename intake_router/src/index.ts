@@ -7,6 +7,7 @@ import * as functions from "@google-cloud/functions-framework";
 import {Response, application, json, text} from "express";
 import exp from "constants";
 import {formDataRouter} from "./form-data-router";
+import {parseIntakeFormData} from "./intake-form-data";
 
 process.on('uncaughtException', function (err) {
   console.error('Uncaught exception', err);
@@ -22,15 +23,8 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
   log.info(`Starting with data=${req.rawBody?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
 
   const fdr = formDataRouter()
-  fdr.route({
-    area: "",
-    building: "",
-    description: "",
-    priority: "",
-    reporter: "",
-    rowIndex: 0,
-    summary: ""
-  })
+  const parsedFormData = parseIntakeFormData(req.rawBody)
+  fdr.route(parsedFormData)
 
   res.send("in the pipe, five by five")
 }

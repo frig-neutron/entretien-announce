@@ -7,3 +7,9 @@ export interface IntakeFormData {
   reporter: string
   priority: string
 }
+
+export function parseIntakeFormData(data: any): IntakeFormData {
+  return {
+    area: "", building: "", description: "", priority: "", reporter: "", rowIndex: 0, summary: ""
+  }
+}
