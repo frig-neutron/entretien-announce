@@ -24,13 +24,16 @@ describe("mainline", () => {
     const formData: IntakeFormData = {
       area: "51", building: "", description: "", priority: "", reporter: "", rowIndex: 0, summary: ""
     }
+    const issueKey = "IssueKey-" + Math.random();
+    formDataRouterMock.route.mockReturnValue(issueKey)
 
     const decodeGoatAsFormData = (data: any) => data == "goat" ? formData: mock<IntakeFormData>();
     parseIntakeFormDataMock.mockImplementation(decodeGoatAsFormData)
 
     const server = getTestServer("intake_router")
 
-    await supertest(server).post("/").send("goat").expect(200)
+    const response = supertest(server).post("/").send("goat");
+    await response.expect(200, issueKey)
     expect(formDataRouterMock.route).toBeCalledWith(expect.objectContaining(formData))
   })
 })

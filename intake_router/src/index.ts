@@ -24,7 +24,7 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
 
   const fdr = formDataRouter()
   const parsedFormData = parseIntakeFormData(req.rawBody)
-  fdr.route(parsedFormData)
+  const issueKey = fdr.route(parsedFormData)
 
-  res.send("in the pipe, five by five")
+  res.send(issueKey)
 }
