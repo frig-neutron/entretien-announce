@@ -12,7 +12,7 @@ export interface IntakeFormData {
 }
 
 const intakeFormDataSchema: JTDSchemaType<IntakeFormData> = {
-  properties:  {
+  properties: {
     rowIndex: {
       type: "int32",
     },
@@ -43,16 +43,13 @@ addFormats(ajv)
 export function parseIntakeFormData(data: any): Promise<IntakeFormData> {
 
   function validationError(validator: JTDParser<IntakeFormData>) {
-    return validator.message + " " + validator.position;
+    return validator.message + " at position " + validator.position + " of <" + data + ">"
   }
 
-  function validateToSchema(): Promise<string> {
-    const validator = ajv.compileParser(intakeFormDataSchema);
-    return validator(data)
-        ? Promise.resolve(String(data))
-        : Promise.reject(validationError(validator))
-  }
+  const parser = ajv.compileParser(intakeFormDataSchema);
+  const parseResult = parser(data);
+  return parseResult
+      ? Promise.resolve(parseResult)
+      : Promise.reject(validationError(parser))
 
-  return validateToSchema()
-    .then(JSON.parse)
 }

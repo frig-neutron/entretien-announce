@@ -30,7 +30,9 @@ describe("test form data", () => {
     }
     delete sampleFormCopy[key]
     const serializedWithMissingKey = JSON.stringify(sampleFormCopy);
-    return expectParseFailsWithMessage(serializedWithMissingKey, "missing required properties 120")
+    const errorMessage = "missing required properties at position " + serializedWithMissingKey.length +
+        " of <" + serializedWithMissingKey + ">";
+    return expectParseFailsWithMessage(serializedWithMissingKey, errorMessage)
   })
 
 })
