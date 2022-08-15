@@ -1,4 +1,5 @@
 import {IntakeFormData, parseIntakeFormData} from "../src/intake-form-data";
+import {Buffer} from "buffer";
 
 
 function expectParseFailsWithMessage(serializedForm: string, errorMessage: string) {
@@ -19,12 +20,13 @@ describe("test form data", () => {
     summary: rnd("summary"),
   }
   const rawFormDataEncoding = [
-      JSON.stringify(sampleForm)
+      JSON.stringify(sampleForm),
+      Buffer.from(JSON.stringify(sampleForm))
   ]
-  test.each(rawFormDataEncoding)("parse ok", (rawData: any) => {
+  test.each(rawFormDataEncoding)("parse case %# ok", (rawData: any) => {
     return expect(parseIntakeFormData(rawData)).resolves.toEqual(sampleForm)
   })
-  test.each(Object.keys(sampleForm))("fail validation if property missing", (key: string) => {
+  test.each(Object.keys(sampleForm))("fail validation if property %s missing", (key: string) => {
     const sampleFormCopy: any = {
       ...sampleForm
     }

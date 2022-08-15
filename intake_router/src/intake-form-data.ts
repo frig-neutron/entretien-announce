@@ -47,7 +47,7 @@ export function parseIntakeFormData(data: any): Promise<IntakeFormData> {
   }
 
   const parser = ajv.compileParser(intakeFormDataSchema);
-  const parseResult = parser(data);
+  const parseResult = parser(String(data));
   return parseResult
       ? Promise.resolve(parseResult)
       : Promise.reject(validationError(parser))
