@@ -20,7 +20,6 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
   const input = req.rawBody;
   log.info(`Starting with data=${input?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
 
-
   const fdr = formDataRouter()
   await parseIntakeFormData(input)
         .catch(e => res.status(400).send(e + ": " + input))

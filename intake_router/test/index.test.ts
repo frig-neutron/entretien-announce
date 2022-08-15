@@ -6,7 +6,6 @@ import {mock} from "jest-mock-extended";
 import {IntakeFormData, parseIntakeFormData} from "../src/intake-form-data";
 import {intake_router} from "../src";
 import {FormDataRouter, formDataRouter,} from "../src/form-data-router";
-import {throws} from "assert";
 
 jest.mock("../src/form-data-router")
 jest.mock("../src/intake-form-data")
