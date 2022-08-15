@@ -1,13 +1,10 @@
 import {config as dotenv_config} from "dotenv"
 
 import {log} from "./logger";
-import {Announcement} from "./announcement";
 import {HttpFunction, Request} from "@google-cloud/functions-framework/build/src/functions";
-import * as functions from "@google-cloud/functions-framework";
-import {Response, application, json, text} from "express";
-import exp from "constants";
+import {application, Response, text} from "express";
 import {formDataRouter} from "./form-data-router";
-import {parseIntakeFormData} from "./intake-form-data";
+import {IntakeFormData, parseIntakeFormData} from "./intake-form-data";
 
 process.on('uncaughtException', function (err) {
   console.error('Uncaught exception', err);
@@ -23,17 +20,11 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
   const input = req.rawBody;
   log.info(`Starting with data=${input?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
 
-  const fdr = formDataRouter()
-  try {
-    const parsedFormData = await parseIntakeFormData(input)
-    try {
-      const issueKey = await fdr.route(parsedFormData);
-      return res.status(200).send(issueKey)
-    } catch (err) {
-      return res.status(500).send(String(err))
-    }
-  } catch (err) {
-    return res.status(400).send(err + ": " + input)
-  }
 
+  const fdr = formDataRouter()
+  await parseIntakeFormData(input)
+        .catch(e => res.status(400).send(e + ": " + input))
+        .then(form => fdr.route(form as IntakeFormData))
+        .catch(e => res.status(500).send(String(e)))
+        .then(issueKey => res.status(200).send(issueKey));
 }
