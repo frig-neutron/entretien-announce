@@ -1,8 +1,8 @@
 import {IntakeFormData, parseIntakeFormData} from "../src/intake-form-data";
 
 
-function expectParseFailsWithMessage(serializedWithMissingKey: string, errorMessage: string) {
-  const parseResult = parseIntakeFormData(serializedWithMissingKey);
+function expectParseFailsWithMessage(serializedForm: string, errorMessage: string) {
+  const parseResult = parseIntakeFormData(serializedForm);
   return expect(parseResult).rejects.toEqual(errorMessage);
 }
 
@@ -34,7 +34,20 @@ describe("test form data", () => {
         " of <" + serializedWithMissingKey + ">";
     return expectParseFailsWithMessage(serializedWithMissingKey, errorMessage)
   })
+  test("parse literal garbage", () => {
+    return expectParseFailsWithMessage("literal garbage",
+        "unexpected token l at position 0 of <literal garbage>")
+  })
+  test("forbid additional properties", () => {
+    const sampleFormCopy: any = {
+      ...sampleForm
+    }
+    sampleFormCopy["extraField"] = "WellHelloThere"
+    const serializedWithExtraKey = JSON.stringify(sampleFormCopy);
+    const errorMessage = "property extraField not allowed at position 147 of <" + serializedWithExtraKey + ">";
+    return expectParseFailsWithMessage(serializedWithExtraKey, errorMessage)
 
+  })
 })
 
 function zeroToTen() {
