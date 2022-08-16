@@ -21,9 +21,17 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
   log.info(`Starting with data=${input?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
 
   const fdr = formDataRouter()
+
+  function forwardErrorToClient(e: any) {
+    if (e instanceof TypeError) {
+      res.status(400).send(e + ": " + input)
+    } else {
+      res.status(500).send(String(e))
+    }
+  }
+
   await parseIntakeFormData(input)
-        .catch(e => res.status(400).send(e + ": " + input))
-        .then(form => fdr.route(form as IntakeFormData))
-        .catch(e => res.status(500).send(String(e)))
-        .then(issueKey => res.status(200).send(issueKey));
+    .then(fdr.route)
+    .then(issueKey => res.status(200).send(issueKey))
+    .catch(forwardErrorToClient)
 }

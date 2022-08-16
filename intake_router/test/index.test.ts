@@ -5,7 +5,7 @@ import * as functions from "@google-cloud/functions-framework";
 import {mock} from "jest-mock-extended";
 import {IntakeFormData, parseIntakeFormData} from "../src/intake-form-data";
 import {intake_router} from "../src";
-import {FormDataRouter, formDataRouter,} from "../src/form-data-router";
+import {FormDataRouter, formDataRouter} from "../src/form-data-router";
 
 jest.mock("../src/form-data-router")
 jest.mock("../src/intake-form-data")
@@ -34,10 +34,11 @@ describe("mainline", () => {
   test("parse error should return 400", async () => {
     const f = new MockFixture()
 
-    f.parseIntakeFormDataMock.mockRejectedValue(new Error("invalid"));
+    f.parseIntakeFormDataMock.mockRejectedValue(TypeError("invalid"));
 
     const response = supertest(server).post("/").send("goat");
-    await response.expect(400, "Error: invalid: goat")
+    await response.expect(400, "TypeError: invalid: goat")
+    expect(f.formDataRouterMock.route).toBeCalledTimes(0)
   })
 
   test("routing error should return 500", async () => {

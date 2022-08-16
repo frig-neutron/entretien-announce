@@ -43,7 +43,7 @@ addFormats(ajv)
 export function parseIntakeFormData(data: any): Promise<IntakeFormData> {
 
   function validationError(validator: JTDParser<IntakeFormData>) {
-    return validator.message + " at position " + validator.position + " of <" + data + ">"
+    return TypeError(validator.message + " at position " + validator.position + " of <" + data + ">")
   }
 
   const parser = ajv.compileParser(intakeFormDataSchema);

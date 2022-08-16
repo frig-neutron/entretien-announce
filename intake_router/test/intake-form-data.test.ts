@@ -2,9 +2,9 @@ import {IntakeFormData, parseIntakeFormData} from "../src/intake-form-data";
 import {Buffer} from "buffer";
 
 
-function expectParseFailsWithMessage(serializedForm: string, errorMessage: string) {
+async function expectParseFailsWithMessage(serializedForm: string, errorMessage: string) {
   const parseResult = parseIntakeFormData(serializedForm);
-  return expect(parseResult).rejects.toEqual(errorMessage);
+  await expect(parseResult).rejects.toEqual(TypeError(errorMessage))
 }
 
 describe("test form data", () => {
