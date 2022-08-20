@@ -123,7 +123,7 @@ export function mockJira(resp: Responses) {
   }()
 
   const someTicketParts: Partial<TicketParts> = {}
-  let jira = {
+  const jira = {
     issueKey: issueKey,
     apiToken: "tok-" + Math.random(),
     issueRestUrl: issueRestUrl,
