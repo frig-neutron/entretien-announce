@@ -4,7 +4,8 @@ import {log} from "./logger";
 import {HttpFunction, Request} from "@google-cloud/functions-framework/build/src/functions";
 import {application, Response, text} from "express";
 import {formDataRouter} from "./form-data-router";
-import {IntakeFormData, parseIntakeFormData} from "./intake-form-data";
+import {parseIntakeFormData} from "./intake-form-data";
+import {jiraService} from "./jira-service";
 
 process.on('uncaughtException', function (err) {
   console.error('Uncaught exception', err);
@@ -20,7 +21,7 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
   const input = req.rawBody;
   log.info(`Starting with data=${input?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
 
-  const fdr = formDataRouter()
+  const fdr = formDataRouter(jiraService())
 
   function forwardErrorToClient(e: any) {
     if (e instanceof TypeError) {

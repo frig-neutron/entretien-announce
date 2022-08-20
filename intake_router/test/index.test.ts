@@ -14,7 +14,7 @@ describe("mainline", () => {
   functions.http('intake_router', intake_router);
 
   const formData: IntakeFormData = {
-    area: "51", building: "", description: "", priority: "", reporter: "", rowIndex: 0, summary: "" + Math.random()
+    area: "51", building: "", description: "", priority: "regular", reporter: "", rowIndex: 0, summary: "" + Math.random()
   }
 
   const server = getTestServer("intake_router")

@@ -1,17 +1,26 @@
 import {IntakeFormData} from "../src/intake-form-data";
-import {JiraTicket} from "struct_lalliance/build/src/jira_ticket";
 import {mock} from "jest-mock-extended";
 import {JiraService} from "../src/jira-service";
+import {formDataRouter} from "../src/form-data-router";
 
 
 describe("form data router", () => {
   test("happy path", () => {
 
     const jiraService = mock<JiraService>();
+    const issueKey = "ISSUE-" + Math.random()
+
+    jiraService.createIssue.mockResolvedValue(issueKey)
 
     const formData: IntakeFormData = {
-      area: "", building: "", description: "", priority: "regular", reporter: "", rowIndex: 0, summary: ""
+      area: "" + Math.random(), building: "", description: "", priority: "regular", reporter: "", rowIndex: 0, summary: ""
     }
+
+    const fdr = formDataRouter(jiraService)
+    const resolvedKey = fdr.route(formData);
+
+    expect(jiraService.createIssue).toBeCalledWith(formData);
+    expect(resolvedKey).resolves.toEqual(issueKey)
 
     /**
      * Create Jira ticket
