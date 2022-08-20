@@ -1,7 +1,7 @@
 import {createTransport, Transporter} from "nodemailer"
 import {log} from "./logger";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
-import {Announcement} from "./announcement";
+import {Announcement} from "struct_lalliance/build/src/announcement";
 
 /**
  * Transport adaptor. Probably email but could be pubsub one day.

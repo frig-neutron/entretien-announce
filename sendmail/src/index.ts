@@ -3,8 +3,8 @@ import {EventFunctionWithCallback} from "@google-cloud/functions-framework";
 
 import {log} from "./logger";
 import {smtpSender} from "./sendmail";
-import {Announcement} from "./announcement";
 import {parseAnnouncement, parseSecrets} from "./parsers";
+import {Announcement} from "struct_lalliance/build/src/announcement";
 
 
 process.on('uncaughtException', function (err) {

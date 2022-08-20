@@ -1,5 +1,5 @@
-import {Announcement} from "../src/announcement";
 import {parseAnnouncement, parseSecrets, Secrets} from "../src/parsers";
+import {Announcement} from "struct_lalliance/build/src/announcement";
 
 describe("parsers", () => {
 

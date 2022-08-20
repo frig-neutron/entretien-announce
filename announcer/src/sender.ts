@@ -1,5 +1,5 @@
-import {Announcement} from "./announcement";
 import {PubSub} from "@google-cloud/pubsub";
+import {Announcement} from "struct_lalliance/build/src/announcement";
 
 /**
  * Transport adaptor. Probably email but could be pubsub one day.
