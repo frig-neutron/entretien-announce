@@ -13,7 +13,9 @@
     "outDir": "build"
   },
   "include": [
-    "src/*",
-    "test/*"
+    "src/*.ts",
+    "test/*.ts",
+    "src/**/*.ts",
+    "test/**/*.ts"
   ]
 }
