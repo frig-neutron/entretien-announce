@@ -6,6 +6,8 @@ import {Application} from "./application"
 import {log} from "./logger";
 import {Recipient} from "./announcement_factory";
 import {PublishConfig} from "../lib/pubsub/src/sender";
+import {parsePublishConfig} from "pubsub_lalliance/build/src/sender";
+import {application} from "express";
 
 let applicationFactory: ApplicationFactory = defaultApplicationFactory;
 
@@ -32,8 +34,10 @@ const announcer: EventFunctionWithCallback = (data: any, context, callback) => {
 
   const {now: announcementDate} = data
 
-  const application: Application = applicationFactory(directory, secrets, parsePubsubConfig())
-  return application.announce(announcementDate).
+  const publishConfig: Promise<PublishConfig> = parsePubsubConfigEnv();
+  publishConfig.
+    then(pc => applicationFactory(directory, secrets, pc)).
+    then(application => application.announce(announcementDate)).
     then(_ => callback(null,"Terminating OK")).
     catch(e => callback(e, null))
 }
@@ -49,8 +53,8 @@ function parseDirectory(): Recipient[] {
   return parseEnvVarJson("DIRECTORY");
 }
 
-function parsePubsubConfig(): PublishConfig {
-  return parseEnvVarJson("PUBLISH_CONFIG");
+function parsePubsubConfigEnv(): Promise<PublishConfig> {
+  return parsePublishConfig("PUBLISH_CONFIG");
 }
 
 function parseEnvVarJson(envVarName: string) {
