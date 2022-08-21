@@ -5,7 +5,7 @@ import {ApplicationFactory, defaultApplicationFactory, JiraBasicAuth} from "./ap
 import {Application} from "./application"
 import {log} from "./logger";
 import {Recipient} from "./announcement_factory";
-import {PublishConfig} from "./sender";
+import {PublishConfig} from "../lib/pubsub/src/sender";
 
 let applicationFactory: ApplicationFactory = defaultApplicationFactory;
 

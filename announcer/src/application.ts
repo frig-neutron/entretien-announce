@@ -2,8 +2,8 @@ import {JiraClient} from "./jira_client"
 import {DateTime, Interval} from "luxon";
 import {ReportService} from "./report_service";
 import {AnnouncementFactory} from "./announcement_factory";
-import {Sender} from "./sender";
 import {log} from "./logger";
+import {Sender} from "pubsub_lalliance/build/src/sender";
 
 export type Clock = () => DateTime
 
