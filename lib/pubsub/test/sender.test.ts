@@ -1,5 +1,5 @@
 import {mockDeep} from 'jest-mock-extended'; /* eslint-disable-line node/no-unpublished-import */
-import {PublishConfig, pubsubSender} from '../src/sender';
+import {parsePublishConfig, PublishConfig, pubsubSender} from '../src/sender';
 import {PubSub, Topic} from '@google-cloud/pubsub';
 
 describe('pubsub sender', () => {
@@ -39,6 +39,10 @@ describe('pubsub sender', () => {
       project_id: '🐱' + Math.random(),
       topic_name: '🐕' + Math.random(),
     };
+
+    expect(parsePublishConfig(
+      JSON.stringify(refCfg))
+    ).resolves.toEqual(refCfg)
   });
 });
 

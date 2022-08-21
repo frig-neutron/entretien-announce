@@ -32,8 +32,7 @@ export function pubsubSender(
 }
 
 export function parsePublishConfig(data: any): Promise<PublishConfig> {
-  return Promise.resolve({
-    project_id: '',
-    topic_name: data,
-  });
+  return Promise.resolve(
+    JSON.parse(data)
+  );
 }
