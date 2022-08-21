@@ -1,5 +1,8 @@
 import {PubSub} from '@google-cloud/pubsub';
 import {Announcement} from 'struct_lalliance/build/src/announcement';
+import {JTDSchemaType} from "ajv/dist/types/jtd-schema";
+import Ajv, {JTDParser} from "ajv/dist/jtd";
+import addFormats from "ajv-formats"
 
 /**
  * Transport adaptor. Probably email but could be pubsub one day.
@@ -15,6 +18,19 @@ export interface PublishConfig {
 }
 
 const defaultPubsubFactory = (projectId: string) => new PubSub({projectId});
+const ajv = new Ajv({verbose: true, allErrors: true})
+addFormats(ajv)
+
+const publishConfigSchema: JTDSchemaType<PublishConfig> = {
+  properties: {
+    project_id: {
+      type: "string"
+    },
+    topic_name: {
+      type: "string"
+    }
+  },
+}
 
 export function pubsubSender(
   cfg: PublishConfig,
@@ -32,7 +48,14 @@ export function pubsubSender(
 }
 
 export function parsePublishConfig(data: any): Promise<PublishConfig> {
-  return Promise.resolve(
-    JSON.parse(data)
-  );
+
+  function validationError<T>(validator: JTDParser<T>) {
+    return TypeError(validator.message + " at position " + validator.position + " of <" + data + ">")
+  }
+
+  const parser = ajv.compileParser(publishConfigSchema);
+  const parseResult = parser(String(data));
+  return parseResult
+      ? Promise.resolve(parseResult)
+      : Promise.reject(validationError(parser))
 }
