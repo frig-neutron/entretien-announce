@@ -15,7 +15,7 @@
     "jira.js": "2.11.0",
     "luxon": "^2.3.1",
     "prelude-ts": "^1.0.3",
-    "struct_lalliance": "file:../lib/struct",
+    "struct_lalliance": "file:./lib/struct",
     "typesafe-i18n": "^5.0.1",
     "winston": "^3.6.0"
   },

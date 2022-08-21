@@ -6,6 +6,7 @@ import {application, Response, text} from "express";
 import {formDataRouter} from "./form-data-router";
 import {parseIntakeFormData} from "./intake-form-data";
 import {jiraService} from "./jira-service";
+import {ticketAnnouncer} from "./ticket-announcer";
 
 process.on('uncaughtException', function (err) {
   console.error('Uncaught exception', err);
@@ -21,7 +22,7 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
   const input = req.rawBody;
   log.info(`Starting with data=${input?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
 
-  const fdr = formDataRouter(jiraService())
+  const fdr = formDataRouter(jiraService(), ticketAnnouncer())
 
   function forwardErrorToClient(e: any) {
     if (e instanceof TypeError) {

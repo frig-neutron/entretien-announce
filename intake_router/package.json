@@ -14,7 +14,7 @@
         "express": "^4.17.3",
         "nodemailer": "^6.7.3",
         "prelude-ts": "^1.0.3",
-        "struct_lalliance": "file:../lib/struct",
+        "struct_lalliance": "file:./lib/struct",
         "supertest": "^6.2.4",
         "winston": "^3.6.0"
     },
