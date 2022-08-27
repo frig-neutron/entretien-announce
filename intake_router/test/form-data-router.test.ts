@@ -4,11 +4,11 @@ import {JiraService} from "../src/jira-service";
 import {formDataRouter} from "../src/form-data-router";
 import {TicketAnnouncer} from "../src/ticket-announcer";
 import {Announcement} from "../build/src/announcement";
-import {pubsubSender, Sender} from "pubsub_lalliance/build/src/sender";
+import {Sender} from "pubsub_lalliance/build/src/sender";
 
 
 describe("form data router", () => {
-  test("happy path", () => {
+  test("happy path", async () => {
 
     const jiraService = mock<JiraService>();
     const ticketAnnouncer = mock<TicketAnnouncer>();
@@ -31,12 +31,13 @@ describe("form data router", () => {
         ticketAnnouncer,
         sender
     )
-    const resolvedKey = fdr.route(formData);
+    const resolvedKey = await fdr.route(formData);
 
     expect(jiraService.createIssue).toBeCalledWith(formData);
-    expect(resolvedKey).resolves.toEqual(issueKey)
+    expect(resolvedKey).toEqual(issueKey)
     expect(ticketAnnouncer.emailAnnouncement).toBeCalledWith(formData)
-    expect(sender.sendAnnouncement).toBeCalledWith(emailNotification)
+    // using calls[] instead of toBeCalledWith b/c Array.map passes 3 args - not 1
+    expect((sender.sendAnnouncement.mock.calls)[0][0]).toBe(emailNotification)
 
     /**
      * Create Jira ticket
