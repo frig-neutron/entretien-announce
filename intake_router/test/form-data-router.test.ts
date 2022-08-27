@@ -41,7 +41,7 @@ describe("form data router", () => {
 
     expect(jiraService.createIssue).toBeCalledWith(formData);
     expect(resolvedKey).toEqual(issueKey)
-    expect(ticketAnnouncer.emailAnnouncement).toBeCalledWith(formData)
+    expect(ticketAnnouncer.emailAnnouncement).toBeCalledWith(issueKey, formData)
     // using calls[] instead of toBeCalledWith b/c Array.map passes 3 args - not 1
     expect((publisher.sendAnnouncement.mock.calls)[0][0]).toBe(emailNotification)
 

@@ -15,11 +15,11 @@ export function formDataRouter(
   return {
     async route(intakeFormData: IntakeFormData): Promise<String> {
       const issueKey = await jiraService.createIssue(intakeFormData);
-      const announcements = ticketAnnouncer.emailAnnouncement(intakeFormData);
+      const announcements = ticketAnnouncer.emailAnnouncement(issueKey, intakeFormData);
       const promisesToPublish = announcements.map(pubsubSender.sendAnnouncement);
       return Promise.all(promisesToPublish).
         catch(formatPublishError).
-        then(x => issueKey)
+        then(_ => issueKey)
     }
   }
 }
