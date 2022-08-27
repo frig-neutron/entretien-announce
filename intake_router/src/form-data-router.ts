@@ -16,8 +16,14 @@ export function formDataRouter(
     async route(intakeFormData: IntakeFormData): Promise<String> {
       const issueKey = await jiraService.createIssue(intakeFormData);
       const announcements = ticketAnnouncer.emailAnnouncement(intakeFormData);
-      announcements.map(pubsubSender.sendAnnouncement)
-      return issueKey
+      const promisesToPublish = announcements.map(pubsubSender.sendAnnouncement);
+      return Promise.all(promisesToPublish).
+        catch(formatPublishError).
+        then(x => issueKey)
     }
   }
+}
+
+function formatPublishError(e: Error) {
+  return Promise.reject('Publishing notifications failed because of [' + e + ']');
 }
