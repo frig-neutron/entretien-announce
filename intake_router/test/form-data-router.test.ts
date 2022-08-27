@@ -4,13 +4,15 @@ import {JiraService} from "../src/jira-service";
 import {formDataRouter} from "../src/form-data-router";
 import {TicketAnnouncer} from "../src/ticket-announcer";
 import {Announcement} from "../build/src/announcement";
+import {pubsubSender, Sender} from "pubsub_lalliance/build/src/sender";
 
 
 describe("form data router", () => {
   test("happy path", () => {
 
     const jiraService = mock<JiraService>();
-    const ticketAnnouncer = mock<TicketAnnouncer>()
+    const ticketAnnouncer = mock<TicketAnnouncer>();
+    const sender = mock<Sender>();
     const issueKey = "ISSUE-" + Math.random()
     const emailNotification = mock<Announcement>()
 
@@ -24,12 +26,17 @@ describe("form data router", () => {
       summary: "🐿" + Math.random()
     }
 
-    const fdr = formDataRouter(jiraService, ticketAnnouncer)
+    const fdr = formDataRouter(
+        jiraService,
+        ticketAnnouncer,
+        sender
+    )
     const resolvedKey = fdr.route(formData);
 
-    expect(ticketAnnouncer.emailAnnouncement).toBeCalledWith(formData)
     expect(jiraService.createIssue).toBeCalledWith(formData);
     expect(resolvedKey).resolves.toEqual(issueKey)
+    expect(ticketAnnouncer.emailAnnouncement).toBeCalledWith(formData)
+    expect(sender.sendAnnouncement).toBeCalledWith(emailNotification)
 
     /**
      * Create Jira ticket
