@@ -22,28 +22,21 @@ describe("form data router", () => {
   const issueKey = "ISSUE-" + Math.random()
   const emailNotification = mock<Announcement>()
 
-
-  function newFormDataRouter() {
-    const fdr = formDataRouter(
-        jiraService,
-        ticketAnnouncer,
-        publisher
-    )
-    return fdr;
-  }
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
   test("happy path", async () => {
     jiraService.createIssue.mockResolvedValue(issueKey)
     ticketAnnouncer.emailAnnouncement.mockReturnValue([emailNotification])
 
     const fdr = newFormDataRouter();
-    const resolvedKey = await fdr.route(formData);
+    const result = fdr.route(formData);
 
-    expect(jiraService.createIssue).toBeCalledWith(formData);
-    expect(resolvedKey).toEqual(issueKey)
-    expect(ticketAnnouncer.emailAnnouncement).toBeCalledWith(issueKey, formData)
-    // using calls[] instead of toBeCalledWith b/c Array.map passes 3 args - not 1
-    expect((publisher.sendAnnouncement.mock.calls)[0][0]).toBe(emailNotification)
+    await expect(result).resolves.toEqual(issueKey)
+    await expect(jiraService.createIssue).toBeCalledWith(formData);
+    await expect(ticketAnnouncer.emailAnnouncement).toBeCalledWith(issueKey, formData)
+    await expectTicketNotificationIsPublished();
 
     /**
      * Create Jira ticket
@@ -52,9 +45,18 @@ describe("form data router", () => {
      *  - is ticket urgent?
      *  - which building?
      *  - Render message
-     * Publish messages to pubsub topic
-     *  - did publishing fail?
      */
+  })
+
+  test("email admin if ticket creation fails", async () => {
+    jiraService.createIssue.mockRejectedValue("jira says no")
+    ticketAnnouncer.errorAnnouncement.mockReturnValue([emailNotification])
+
+    const result = newFormDataRouter().route(formData);
+
+    await expect(result).rejects.toEqual("jira says no")
+    await expect(ticketAnnouncer.errorAnnouncement).toBeCalledWith("jira says no", formData)
+    await expectTicketNotificationIsPublished()
   })
 
   test("fail if pubsub publish fails", async () => {
@@ -62,14 +64,22 @@ describe("form data router", () => {
     ticketAnnouncer.emailAnnouncement.mockReturnValue([emailNotification])
     publisher.sendAnnouncement.mockRejectedValue(new Error("nope"))
 
-    const fdr = formDataRouter(
-        jiraService,
-        ticketAnnouncer,
-        publisher
-    )
-
-    const result = fdr.route(formData);
+    const result = newFormDataRouter().route(formData);
 
     await expect(result).rejects.toBe("Publishing notifications failed because of [Error: nope]")
   })
+
+  function newFormDataRouter() {
+    return formDataRouter(
+        jiraService,
+        ticketAnnouncer,
+        publisher
+    );
+  }
+
+  function expectTicketNotificationIsPublished() {
+    // using calls[] instead of toBeCalledWith b/c Array.map passes 3 args - not 1
+    const publisherCalls = publisher.sendAnnouncement.mock.calls;
+    expect(publisherCalls[0][0]).toBe(emailNotification)
+  }
 })
