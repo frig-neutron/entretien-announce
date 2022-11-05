@@ -7,12 +7,13 @@ import {formDataRouter} from "./form-data-router";
 import {parseIntakeFormData} from "./intake-form-data";
 import {jiraService} from "./jira-service";
 import {ticketAnnouncer} from "./ticket-announcer";
+import {parsePublishConfig, pubsubSender, Sender} from "pubsub_lalliance/src/sender";
 
 process.on('uncaughtException', function (err) {
   console.error('Uncaught exception', err);
 });
 
-const envResult = dotenv_config()
+const env = dotenv_config()
 
 // https://cloud.google.com/functions/docs/writing/background#function_parameters
 // Absolutely MUST use the 3-param version b/c otherwise there seems to be no way to terminate the function properly.
@@ -22,7 +23,10 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
   const input = req.rawBody;
   log.info(`Starting with data=${input?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
 
-  const fdr = formDataRouter(jiraService(), ticketAnnouncer())
+  const publishConfig = await parsePublishConfig(process.env["PUBLISH_CONFIG"]);
+  const sender: Sender = pubsubSender(publishConfig)
+
+  const fdr = formDataRouter(jiraService(), ticketAnnouncer(), sender)
 
   function forwardErrorToClient(e: any) {
     if (e instanceof TypeError) {

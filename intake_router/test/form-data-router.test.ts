@@ -3,8 +3,8 @@ import {mock} from "jest-mock-extended";
 import {JiraService} from "../src/jira-service";
 import {formDataRouter} from "../src/form-data-router";
 import {TicketAnnouncer} from "../src/ticket-announcer";
-import {Announcement} from "../build/src/announcement";
-import {Sender} from "pubsub_lalliance/build/src/sender";
+import {Announcement} from "struct_lalliance/src/announcement";
+import {Sender} from "pubsub_lalliance/src/sender";
 
 
 describe("form data router", () => {

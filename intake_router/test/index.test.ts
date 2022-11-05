@@ -4,11 +4,14 @@ import supertest from "supertest";
 import * as functions from "@google-cloud/functions-framework";
 import {mock} from "jest-mock-extended";
 import {IntakeFormData, parseIntakeFormData} from "../src/intake-form-data";
+import {pubsubSender, Sender, parsePublishConfig, PublishConfig} from "pubsub_lalliance/src/sender";
 import {intake_router} from "../src";
 import {FormDataRouter, formDataRouter} from "../src/form-data-router";
+import exp from "constants";
 
 jest.mock("../src/form-data-router")
 jest.mock("../src/intake-form-data")
+jest.mock("pubsub_lalliance/src/sender")
 
 describe("mainline", () => {
   functions.http('intake_router', intake_router);
@@ -17,6 +20,11 @@ describe("mainline", () => {
     area: "51", building: "", description: "", priority: "regular", reporter: "", rowIndex: 0, summary: "" + Math.random()
   }
 
+  const publishConfig: PublishConfig = {
+    project_id: "paperclip", topic_name: "advanced-aeronautics"
+  }
+
+
   const server = getTestServer("intake_router")
 
   test("happy path", async () => {
@@ -24,10 +32,15 @@ describe("mainline", () => {
     const issueKey = "IssueKey-" + Math.random();
     f.formDataRouterMock.route.mockResolvedValue(issueKey)
 
+    process.env["PUBLISH_CONFIG"] = "ram"
+
     f.parseGoatAsFormData(formData);
+    f.parseRamAsPublishConfig(publishConfig)
 
     const response = supertest(server).post("/").send("goat");
     await response.expect(200, issueKey)
+
+    expect(f.senderFactory).toBeCalledWith(publishConfig)
     expect(f.formDataRouterMock.route).toBeCalledWith(expect.objectContaining(formData))
   })
 
@@ -57,15 +70,33 @@ describe("mainline", () => {
     readonly parseIntakeFormDataMock = jest.mocked(parseIntakeFormData, true);
     readonly routerFactory = jest.mocked(formDataRouter, true);
 
+    readonly senderMock = mock<Sender>();
+    readonly parsePublishConfigMock = jest.mocked(parsePublishConfig, true);
+    readonly senderFactory = jest.mocked(pubsubSender, true)
+
     constructor() {
-      this.routerFactory.mockImplementation(() => {
+      this.routerFactory.mockImplementation((jira, tickets, sender) => {
+        if (sender !== this.senderMock) {
+          throw new Error("Wrong sender sent to factory")
+        }
         return this.formDataRouterMock
+      })
+      this.senderFactory.mockImplementation(() => {
+        return this.senderMock;
       })
     }
 
-    parseGoatAsFormData(formData: IntakeFormData) {
-      const decodeGoatAsFormData = async (data: any) => data == "goat" ? formData : mock<IntakeFormData>();
-      this.parseIntakeFormDataMock.mockImplementation(decodeGoatAsFormData)
+    parseGoatAsFormData(formData: IntakeFormData): void {
+      this.mockParsing("goat", formData, this.parseIntakeFormDataMock)
+    }
+
+    parseRamAsPublishConfig(publishConfig: PublishConfig): void {
+      this.mockParsing("ram", publishConfig, this.parsePublishConfigMock)
+    }
+
+    private mockParsing<T>(input: any, parseResult: T, parserMock: jest.MockedFunctionDeep<any>): void {
+      const mockDecoder = async (data: any) => data == input ? parseResult : mock<T>();
+      parserMock.mockImplementation(mockDecoder)
     }
   }
 })
