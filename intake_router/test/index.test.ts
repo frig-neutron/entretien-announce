@@ -4,10 +4,9 @@ import supertest from "supertest";
 import * as functions from "@google-cloud/functions-framework";
 import {mock} from "jest-mock-extended";
 import {IntakeFormData, parseIntakeFormData} from "../src/intake-form-data";
-import {pubsubSender, Sender, parsePublishConfig, PublishConfig} from "pubsub_lalliance/src/sender";
+import {parsePublishConfig, PublishConfig, pubsubSender, Sender} from "pubsub_lalliance/src/sender";
 import {intake_router} from "../src";
 import {FormDataRouter, formDataRouter} from "../src/form-data-router";
-import exp from "constants";
 
 jest.mock("../src/form-data-router")
 jest.mock("../src/intake-form-data")
@@ -42,6 +41,16 @@ describe("mainline", () => {
 
     expect(f.senderFactory).toBeCalledWith(publishConfig)
     expect(f.formDataRouterMock.route).toBeCalledWith(expect.objectContaining(formData))
+  })
+
+  test("parse pubsub config or return 500", async () => {
+    const f = new MockFixture()
+    f.parseRamAsPublishConfig(publishConfig);
+    process.env["PUBLISH_CONFIG"] = "wrong ram"
+
+    const response = supertest(server).post("/").send("goat");
+
+    await response.expect(500, "expected ram but got wrong ram")
   })
 
   test("parse error should return 400", async () => {
@@ -95,7 +104,8 @@ describe("mainline", () => {
     }
 
     private mockParsing<T>(input: any, parseResult: T, parserMock: jest.MockedFunctionDeep<any>): void {
-      const mockDecoder = async (data: any) => data == input ? parseResult : mock<T>();
+      const errorOut: (actual: any) => T = (actual) => { throw new Error("expected " + input + " but got " + actual); };
+      const mockDecoder = async (data: any) => data == input ? parseResult : errorOut(data);
       parserMock.mockImplementation(mockDecoder)
     }
   }
