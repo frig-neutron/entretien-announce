@@ -23,10 +23,11 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
   const input = req.rawBody;
   log.info(`Starting with data=${input?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
 
-  const publishConfig = await parsePublishConfig(process.env["PUBLISH_CONFIG"]);
-  const sender: Sender = pubsubSender(publishConfig)
+  const jira = jiraService();
+  const announcer = ticketAnnouncer();
+  const sender: Sender = pubsubSender(await publishConfig())
 
-  const fdr = formDataRouter(jiraService(), ticketAnnouncer(), sender)
+  const fdr = formDataRouter(jira, announcer, sender)
 
   function forwardErrorToClient(e: any) {
     if (e instanceof TypeError) {
@@ -40,4 +41,8 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
     .then(fdr.route)
     .then(issueKey => res.status(200).send(issueKey))
     .catch(forwardErrorToClient)
+}
+
+function publishConfig() {
+  return parsePublishConfig(process.env["PUBLISH_CONFIG"]);
 }

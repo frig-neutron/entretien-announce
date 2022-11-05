@@ -2,12 +2,10 @@ import {config as dotenv_config} from "dotenv"
 import {EventFunctionWithCallback} from "@google-cloud/functions-framework";
 
 import {ApplicationFactory, defaultApplicationFactory, JiraBasicAuth} from "./application_factory";
-import {Application} from "./application"
 import {log} from "./logger";
 import {Recipient} from "./announcement_factory";
 import {PublishConfig} from "../lib/pubsub/src/sender";
 import {parsePublishConfig} from "pubsub_lalliance/build/src/sender";
-import {application} from "express";
 
 let applicationFactory: ApplicationFactory = defaultApplicationFactory;
 
