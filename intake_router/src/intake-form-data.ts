@@ -20,7 +20,10 @@ const intakeFormDataSchema: JTDSchemaType<IntakeFormData> = {
       type: "string"
     },
     summary: {
-      type: "string"
+      type: "string",
+      metadata: {
+        comment: "aka 'element'"
+      }
     },
     description: {
       type: "string"
