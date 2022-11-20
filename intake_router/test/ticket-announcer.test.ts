@@ -6,26 +6,24 @@ import CustomMatcherResult = jest.CustomMatcherResult;
 expect.extend({
   emailMatches(received: Announcement, expectedEmail: EmailSpec): CustomMatcherResult {
 
-    const submittedBy = expectedEmail.source.reporter
-
     expect(received.primary_recipient).toBe(expectedEmail.to.email)
     expect(received.subject).toBe(expectedEmail.subject)
 
     const bodyRe = (s: string) => expect(received.body).toMatch(new RegExp(s))
 
-    if (expectedEmail.isUrgent) {
-      bodyRe(submittedBy + " has submitted an URGENT maintenance report")
-    } else {
-      bodyRe(submittedBy + " has submitted a maintenance report")
-    }
+    bodyRe(expectedEmail.source.reporter + " has submitted " +
+        (expectedEmail.isUrgent ? "an URGENT" : "a") +
+        " maintenance report")
 
     const jiraSummary = ((f: IntakeFormData) => f.building + " " + f.area + ": " + f.summary)(expectedEmail.source);
 
     bodyRe("^Dear " + expectedEmail.to.name)
-    bodyRe("You are receiving this email because " + expectedEmail.reasonForReceiving)
-    bodyRe(jiraSummary + "\n" + expectedEmail.source.description)
-    bodyRe("Jira ticket https://lalliance.atlassian.net/browse/" + expectedEmail.issueKey
-        + " has been assigned to this report.")
+    bodyRe( "\n" + jiraSummary + "\n" + expectedEmail.source.description)
+    bodyRe("\nYou are receiving this email because " + expectedEmail.reasonForReceiving)
+    bodyRe(
+        "\nJira ticket https://lalliance.atlassian.net/browse/" + expectedEmail.issueKey +
+        " has been assigned to this report."
+    )
 
     return {
       pass: true, message: () => "ummm 🙄"
