@@ -6,7 +6,7 @@ import {application, Response, text} from "express";
 import {formDataRouter} from "./form-data-router";
 import {parseIntakeFormData} from "./intake-form-data";
 import {jiraService} from "./jira-service";
-import {ticketAnnouncer} from "./ticket-announcer";
+import {DirectoryEntry, ticketAnnouncer} from "./ticket-announcer";
 import {parsePublishConfig, pubsubSender, Sender} from "pubsub_lalliance/src/sender";
 
 process.on('uncaughtException', function (err) {
@@ -24,7 +24,7 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
   log.info(`Starting with data=${input?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
 
   const jira = jiraService();
-  const announcer = ticketAnnouncer();
+  const announcer = ticketAnnouncer([]); // TODO: parse
   const sender: Sender = pubsubSender(await publishConfig())
 
   const fdr = formDataRouter(jira, announcer, sender)

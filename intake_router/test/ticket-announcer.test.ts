@@ -17,18 +17,23 @@ describe("ticket announcer", () => {
       summary: "chauffe-eau"
     }
 
-    const announcer = ticketAnnouncer([]);
+    const announcer = ticketAnnouncer([
+      {name: "", email: "", roles: []}
+    ]);
 
-    test("route to BR", () => {
+    it.each([
+      ["3737", "br-thirty-seven@email.com"],
+      // ["3743", "br-forty-three@email.com"]
+    ])("bldg %p routes to BR %p", (building, brEmail) => {
       const announcements = announcer.emailAnnouncement(issueKey, formValues);
       expect(announcements).someEmailMatches({
         to: {
-          email: "br-3737@email.com",
-          name: "BR for 3737"
+          email: brEmail,
+          name: `BR for ${building}`
         },
         subject: "Maintenance report from A. Member",
         source: formValues,
-        reasonForReceiving: "you are a building representative for 3737",
+        reasonForReceiving: `you are a building representative for ${building}`,
         isUrgent: false,
         issueKey: issueKey
       })

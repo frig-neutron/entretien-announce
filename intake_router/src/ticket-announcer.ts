@@ -16,7 +16,7 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
     emailAnnouncement(issueKey: String, form: IntakeFormData): Announcement[] {
       return [
         {
-          primary_recipient: "br-3737@email.com",
+          primary_recipient: "br-thirty-seven@email.com",
           secondary_recipients: [],
           subject: "Maintenance report from A. Member",
           body: "Dear BR for 3737,\n" +
