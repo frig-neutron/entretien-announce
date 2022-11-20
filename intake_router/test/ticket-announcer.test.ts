@@ -17,10 +17,10 @@ describe("ticket announcer", () => {
       summary: "chauffe-eau"
     }
 
-    test("route to BR", () => {
-      const announcer = ticketAnnouncer();
-      const announcements = announcer.emailAnnouncement(issueKey, formValues);
+    const announcer = ticketAnnouncer([]);
 
+    test("route to BR", () => {
+      const announcements = announcer.emailAnnouncement(issueKey, formValues);
       expect(announcements).someEmailMatches({
         to: {
           email: "br-3737@email.com",
@@ -29,6 +29,20 @@ describe("ticket announcer", () => {
         subject: "Maintenance report from A. Member",
         source: formValues,
         reasonForReceiving: "you are a building representative for 3737",
+        isUrgent: false,
+        issueKey: issueKey
+      })
+    })
+    test("route to triage", () => {
+      const announcements = announcer.emailAnnouncement(issueKey, formValues);
+      expect(announcements).someEmailMatches({
+        to: {
+          email: "triage@email.com",
+          name: "Triager"
+        },
+        subject: "Maintenance report from A. Member",
+        source: formValues,
+        reasonForReceiving: "you are a triage responder",
         isUrgent: false,
         issueKey: issueKey
       })
@@ -117,7 +131,7 @@ expect.extend({
 
     const jiraSummary = ((f: IntakeFormData) => f.building + " " + f.area + ": " + f.summary)(expectedEmail.source);
 
-    bodyRe("^Dear " + expectedEmail.to.name)
+    bodyRe("^Dear " + expectedEmail.to.name + ",\n")
     bodyRe("\n" + jiraSummary + "\n" + expectedEmail.source.description)
     bodyRe("\nYou are receiving this email because " + expectedEmail.reasonForReceiving)
     bodyRe(
