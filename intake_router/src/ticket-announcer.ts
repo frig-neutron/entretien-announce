@@ -10,11 +10,11 @@ export interface TicketAnnouncer {
 export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
   const summarizeForJira = (f: IntakeFormData) => f.building + " " + f.area + ": " + f.summary;
 
-  function findBr(form: IntakeFormData): DirectoryEntry {
+  function findBr(form: IntakeFormData): DirectoryEntry[] {
 
     // @ts-ignore - this has to be a runtime error
     const brRoleKey: keyof typeof Role = `BR_${form.building}`;
-    return directory.find(de => de.roles.find(r => r === Role[brRoleKey])) as DirectoryEntry // todo: check for error
+    return directory.filter(de => de.roles.find(r => r === brRoleKey)) // todo: check for error
   }
 
   return {
@@ -37,9 +37,9 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
         }
       }
 
-      const brAnnouncement = render(findBr(form))
+      const brAnnouncement = findBr(form).map(render)
       return [
-        brAnnouncement,
+        ...brAnnouncement,
         {
           primary_recipient: "triage@email.com",
           secondary_recipients: [],
@@ -67,5 +67,5 @@ export enum Role {
 export interface DirectoryEntry {
   name: string,
   email: string,
-  roles: Role[]
+  roles: (keyof typeof Role)[]
 }
