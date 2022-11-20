@@ -1,5 +1,5 @@
 import {IntakeFormData} from "../src/intake-form-data";
-import {ticketAnnouncer} from "../src/ticket-announcer";
+import {Role, ticketAnnouncer} from "../src/ticket-announcer";
 import {Announcement} from "struct_lalliance/build/src/announcement";
 import CustomMatcherResult = jest.CustomMatcherResult;
 
@@ -7,46 +7,52 @@ describe("ticket announcer", () => {
   const issueKey = "PROJ-" + Math.floor(Math.random() * 1000)
   describe("non-urgent", () => {
 
-    const formValues: IntakeFormData = {
-      area: "Sous-sol",
-      building: "3737",
-      description: "L'eau chaude ne marche pas",
-      priority: "regular",
-      reporter: "A. Member",
-      rowIndex: 0,
-      summary: "chauffe-eau"
+    const formValues: () => IntakeFormData = () => {
+      return {
+        area: "Sous-sol",
+        building: "3737",
+        description: "L'eau chaude ne marche pas",
+        priority: "regular",
+        reporter: "A. Member",
+        rowIndex: 0,
+        summary: "chauffe-eau"
+      }
     }
-
     const announcer = ticketAnnouncer([
-      {name: "", email: "", roles: []}
+      {name: "BR for 3737", email: "br-thirty-seven@email.com", roles: [Role.BR_3737]},
+      {name: "BR for 3743", email: "br-forty-three@email.com", roles: [Role.BR_3743]}
     ]);
 
     it.each([
       ["3737", "br-thirty-seven@email.com"],
-      // ["3743", "br-forty-three@email.com"]
+      ["3743", "br-forty-three@email.com"]
     ])("bldg %p routes to BR %p", (building, brEmail) => {
-      const announcements = announcer.emailAnnouncement(issueKey, formValues);
+      const form: IntakeFormData = {
+        ...formValues(),
+        ...{building: building}
+      }
+      const announcements = announcer.emailAnnouncement(issueKey, form);
       expect(announcements).someEmailMatches({
         to: {
           email: brEmail,
           name: `BR for ${building}`
         },
         subject: "Maintenance report from A. Member",
-        source: formValues,
+        source: form,
         reasonForReceiving: `you are a building representative for ${building}`,
         isUrgent: false,
         issueKey: issueKey
       })
     })
     test("route to triage", () => {
-      const announcements = announcer.emailAnnouncement(issueKey, formValues);
+      const announcements = announcer.emailAnnouncement(issueKey, formValues());
       expect(announcements).someEmailMatches({
         to: {
           email: "triage@email.com",
           name: "Triager"
         },
         subject: "Maintenance report from A. Member",
-        source: formValues,
+        source: formValues(),
         reasonForReceiving: "you are a triage responder",
         isUrgent: false,
         issueKey: issueKey
