@@ -23,6 +23,10 @@ describe("mainline", () => {
     project_id: "paperclip", topic_name: "advanced-aeronautics"
   }
 
+  beforeEach(() => {
+    // our mocks know how to handle rams
+    process.env["PUBLISH_CONFIG"] = "ram"
+  })
 
   const server = getTestServer("intake_router")
 
@@ -30,8 +34,6 @@ describe("mainline", () => {
     const f = new MockFixture()
     const issueKey = "IssueKey-" + Math.random();
     f.formDataRouterMock.route.mockResolvedValue(issueKey)
-
-    process.env["PUBLISH_CONFIG"] = "ram"
 
     f.parseGoatAsFormData(formData);
     f.parseRamAsPublishConfig(publishConfig)
@@ -55,7 +57,6 @@ describe("mainline", () => {
 
   test("parse error should return 400", async () => {
     const f = new MockFixture()
-
     f.parseIntakeFormDataMock.mockRejectedValue(TypeError("invalid"));
 
     const response = supertest(server).post("/").send("goat");
@@ -65,9 +66,7 @@ describe("mainline", () => {
 
   test("routing error should return 500", async () => {
     const f = new MockFixture()
-
     f.parseGoatAsFormData(formData);
-
     f.formDataRouterMock.route.mockRejectedValue(new Error("no"))
 
     const response = supertest(server).post("/").send("goat");
@@ -104,7 +103,9 @@ describe("mainline", () => {
     }
 
     private mockParsing<T>(input: any, parseResult: T, parserMock: jest.MockedFunctionDeep<any>): void {
-      const errorOut: (actual: any) => T = (actual) => { throw new Error("expected " + input + " but got " + actual); };
+      const errorOut: (actual: any) => T = (actual) => {
+        throw new Error("expected " + input + " but got " + actual);
+      };
       const mockDecoder = async (data: any) => data == input ? parseResult : errorOut(data);
       parserMock.mockImplementation(mockDecoder)
     }
