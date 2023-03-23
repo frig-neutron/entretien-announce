@@ -1,7 +1,8 @@
 import {IntakeFormData} from "../src/intake-form-data";
-import {Role, ticketAnnouncer} from "../src/ticket-announcer";
+import {ticketAnnouncer} from "../src/ticket-announcer";
 import {Announcement} from "struct_lalliance/build/src/announcement";
 import CustomMatcherResult = jest.CustomMatcherResult;
+import {Role} from "../src/intake-directory";
 
 describe("ticket announcer", () => {
   const seed = Math.floor(Math.random() * 1000);

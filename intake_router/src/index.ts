@@ -6,8 +6,9 @@ import {application, Response, text} from "express";
 import {formDataRouter} from "./form-data-router";
 import {parseIntakeFormData} from "./intake-form-data";
 import {jiraService} from "./jira-service";
-import {DirectoryEntry, ticketAnnouncer} from "./ticket-announcer";
+import {ticketAnnouncer} from "./ticket-announcer";
 import {parsePublishConfig, pubsubSender, Sender} from "pubsub_lalliance/src/sender";
+import {DirectoryEntry} from "./intake-directory";
 
 process.on('uncaughtException', function (err) {
   console.error('Uncaught exception', err);
