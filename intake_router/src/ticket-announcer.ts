@@ -11,11 +11,20 @@ export interface TicketAnnouncer {
 export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
   const summarizeForJira = (f: IntakeFormData) => f.building + " " + f.area + ": " + f.summary;
 
+  function findByRoleKey(brRoleKey: keyof typeof Role) {
+    // todo: check for error
+    return directory.filter(de => de.roles.find(r => r === brRoleKey))
+  }
+
   function findBr(form: IntakeFormData): DirectoryEntry[] {
 
     // @ts-ignore - this has to be a runtime error
     const brRoleKey: keyof typeof Role = `BR_${form.building}`;
-    return directory.filter(de => de.roles.find(r => r === brRoleKey)) // todo: check for error
+    return findByRoleKey(brRoleKey);
+  }
+
+  function findTriage(): DirectoryEntry[] {
+    return findByRoleKey("TRIAGE")
   }
 
   return {
@@ -23,14 +32,14 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
       return [];
     },
     emailAnnouncement(issueKey: String, form: IntakeFormData): Announcement[] {
-      function render(directoryEntry: DirectoryEntry): Announcement {
+      function render(directoryEntry: DirectoryEntry, reasonForReceipt: String): Announcement {
         return {
           primary_recipient: directoryEntry.email,
           secondary_recipients: [],
           subject: "Maintenance report from A. Member",
           body: [`Dear ${directoryEntry.name},`,
             `${form.reporter} has submitted a maintenance report`,
-            `You are receiving this email because you are a building representative for ${form.building}`,
+            reasonForReceipt,
             summarizeForJira(form),
             form.description,
             `Jira ticket https://lalliance.atlassian.net/browse/${issueKey} has been assigned to this report.`,
@@ -38,19 +47,13 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
         }
       }
 
-      const brAnnouncement = findBr(form).map(render)
+      const becauseBr = `You are receiving this email because you are a building representative for ${form.building}`
+      const becauseTr = `You are receiving this email because you are a triage responder`
+      const brAnnouncement = findBr(form).map(d => render(d, becauseBr))
+      const triageAnnouncement = findTriage().map(d => render(d, becauseTr))
       return [
         ...brAnnouncement,
-        {
-          primary_recipient: "triage@email.com",
-          secondary_recipients: [],
-          subject: "Maintenance report from A. Member",
-          body: "Dear Triager,\n" +
-              "A. Member has submitted a maintenance report" +
-              "\nYou are receiving this email because you are a triage responder\n" +
-              summarizeForJira(form) + "\n" + form.description +
-              `\nJira ticket https://lalliance.atlassian.net/browse/${issueKey} has been assigned to this report.`
-        }
+        ...triageAnnouncement
       ];
     }
   }

@@ -21,12 +21,13 @@ describe("ticket announcer", () => {
       }
     }
     const triageEmail = `triage_${seed}@email.com`
+    const triageName = `Triager`
     const announcer = ticketAnnouncer([
       {name: "BR for 3735", email: "br-thirty-five@email.com", roles: ["BR_3735"]},
       {name: "BR for 3735", email: "co-br-thirty-five@email.com", roles: ["BR_3735"]},
       {name: "BR for 3737", email: "br-thirty-seven@email.com", roles: ["BR_3737"]},
       {name: "BR for 3743", email: "br-forty-three@email.com", roles: ["BR_3743"]},
-      {name: "Triage", email: triageEmail, roles: ["TRIAGE"]}
+      {name: triageName, email: triageEmail, roles: ["TRIAGE"]}
     ]);
 
     it.each([
@@ -54,7 +55,7 @@ describe("ticket announcer", () => {
       expect(announcements).someEmailMatches({
         to: {
           email: triageEmail,
-          name: "Triage"
+          name: triageName
         },
         subject: "Maintenance report from A. Member",
         source: formValues(),
