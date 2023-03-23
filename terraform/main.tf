@@ -34,3 +34,11 @@ resource "google_project_iam_binding" "log_writers" {
     "serviceAccount:${google_service_account.announcer.email}"
   ]
 }
+
+resource "google_project_iam_binding" "viewers" {
+  project = local.project_id
+  role    = "roles/viewer"
+  members = [
+    "user:onishik@gmail.com"
+  ]
+}
