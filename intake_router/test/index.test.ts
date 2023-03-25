@@ -109,7 +109,7 @@ describe("mainline", () => {
     readonly parseRoutingDirectoryMock = jest.mocked(parseRoutingDirectory, true)
 
     constructor() {
-      this.announcerFactory.mockImplementation((directory) => {
+      this.announcerFactory.mockImplementation(() => {
         return this.announcerMock
       })
       this.routerFactory.mockImplementation((jira, tickets, sender) => {
