@@ -57,6 +57,16 @@ describe("mainline", () => {
     expect(f.formDataRouterMock.route).toBeCalledWith(expect.objectContaining(formData))
   })
 
+  test("parse routing directory or return 500", async () => {
+    const f = new MockFixture()
+    f.mockRoutingDirectoryParsing("sheep", [sampleDirectory])
+    process.env["DIRECTORY"] = "non-sheep"
+
+    const response = supertest(server).post("/").send("something");
+
+    await response.expect(500, "expected sheep but got non-sheep")
+  })
+
   test("parse pubsub config or return 500", async () => {
     const f = new MockFixture()
     f.mockPublishConfigParsing("ram", publishConfig);
