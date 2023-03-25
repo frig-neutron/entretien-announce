@@ -12,3 +12,7 @@ export interface DirectoryEntry {
   email: string,
   roles: (keyof typeof Role)[]
 }
+
+export function parseRoutingDirectory(data: any): Promise<DirectoryEntry[]> {
+  return Promise.resolve([])
+}

@@ -8,7 +8,7 @@ import {parseIntakeFormData} from "./intake-form-data";
 import {jiraService} from "./jira-service";
 import {ticketAnnouncer} from "./ticket-announcer";
 import {parsePublishConfig, pubsubSender, Sender} from "pubsub_lalliance/src/sender";
-import {DirectoryEntry} from "./intake-directory";
+import {parseRoutingDirectory} from "./intake-directory";
 
 process.on('uncaughtException', function (err) {
   console.error('Uncaught exception', err);
@@ -25,7 +25,7 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
   log.info(`Starting with data=${input?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
 
   const jira = jiraService();
-  const announcer = ticketAnnouncer([]); // TODO: parse
+  const announcer = ticketAnnouncer(await intakeDirectory());
   const sender: Sender = pubsubSender(await publishConfig())
 
   const fdr = formDataRouter(jira, announcer, sender)
@@ -46,4 +46,8 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
 
 function publishConfig() {
   return parsePublishConfig(process.env["PUBLISH_CONFIG"]);
+}
+
+function intakeDirectory() {
+  return parseRoutingDirectory(process.env["DIRECTORY"])
 }

@@ -7,10 +7,11 @@ import {IntakeFormData, parseIntakeFormData} from "../src/intake-form-data";
 import {parsePublishConfig, PublishConfig, pubsubSender, Sender} from "pubsub_lalliance/src/sender";
 import {intake_router} from "../src";
 import {FormDataRouter, formDataRouter} from "../src/form-data-router";
-import {DirectoryEntry} from "../src/intake-directory";
+import {DirectoryEntry, parseRoutingDirectory} from "../src/intake-directory";
 import {ticketAnnouncer, TicketAnnouncer} from "../src/ticket-announcer";
 
 jest.mock("../src/form-data-router")
+jest.mock("../src/intake-directory")
 jest.mock("../src/intake-form-data")
 jest.mock("../src/ticket-announcer")
 jest.mock("pubsub_lalliance/src/sender")
@@ -34,6 +35,7 @@ describe("mainline", () => {
   beforeEach(() => {
     // our mocks know how to handle rams
     process.env["PUBLISH_CONFIG"] = "ram"
+    process.env["DIRECTORY"] = "sheep"
   })
 
   const server = getTestServer("intake_router")
@@ -43,6 +45,7 @@ describe("mainline", () => {
     const issueKey = "IssueKey-" + rnd;
     f.formDataRouterMock.route.mockResolvedValue(issueKey)
 
+    f.mockRoutingDirectoryParsing("sheep", [sampleDirectory])
     f.mockFormDataParsing("goat", formData);
     f.mockPublishConfigParsing("ram", publishConfig);
 
@@ -93,6 +96,7 @@ describe("mainline", () => {
     readonly announcerMock = mock<TicketAnnouncer>()
     readonly senderMock = mock<Sender>();
     readonly parsePublishConfigMock = jest.mocked(parsePublishConfig, true);
+    readonly parseRoutingDirectoryMock = jest.mocked(parseRoutingDirectory, true)
 
     constructor() {
       this.announcerFactory.mockImplementation((directory) => {
@@ -110,6 +114,10 @@ describe("mainline", () => {
       this.senderFactory.mockImplementation(() => {
         return this.senderMock;
       })
+    }
+
+    mockRoutingDirectoryParsing(rawInput: any, routingDirectory: DirectoryEntry[]): void {
+      this.mockParsing(rawInput, routingDirectory, this.parseRoutingDirectoryMock)
     }
 
     mockFormDataParsing(rawInput: any, formData: IntakeFormData): void {
