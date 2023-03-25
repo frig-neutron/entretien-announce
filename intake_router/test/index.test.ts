@@ -7,13 +7,20 @@ import {IntakeFormData, parseIntakeFormData} from "../src/intake-form-data";
 import {parsePublishConfig, PublishConfig, pubsubSender, Sender} from "pubsub_lalliance/src/sender";
 import {intake_router} from "../src";
 import {FormDataRouter, formDataRouter} from "../src/form-data-router";
+import {DirectoryEntry} from "../src/intake-directory";
+import {ticketAnnouncer, TicketAnnouncer} from "../src/ticket-announcer";
 
 jest.mock("../src/form-data-router")
 jest.mock("../src/intake-form-data")
+jest.mock("../src/ticket-announcer")
 jest.mock("pubsub_lalliance/src/sender")
 
 describe("mainline", () => {
   functions.http('intake_router', intake_router);
+
+  const sampleDirectory: DirectoryEntry = {
+    email: "hurdygurdy@thefair", name: "Hurdly Gurdly", roles: []
+  }
 
   const rnd = Math.random();
   const formData: IntakeFormData = {
@@ -42,6 +49,7 @@ describe("mainline", () => {
     const response = supertest(server).post("/").send("goat");
     await response.expect(200, issueKey)
 
+    expect(f.capturedAnnouncerFactoryCallArg()).toEqual([sampleDirectory])
     expect(f.senderFactory).toBeCalledWith(publishConfig)
     expect(f.formDataRouterMock.route).toBeCalledWith(expect.objectContaining(formData))
   })
@@ -75,16 +83,25 @@ describe("mainline", () => {
   })
 
   class MockFixture {
+    // to make functions mockable must mock packages w/ jest.mock just below imports, upstairs
     readonly formDataRouterMock = mock<FormDataRouter>();
     readonly parseIntakeFormDataMock = jest.mocked(parseIntakeFormData, true);
+    readonly announcerFactory = jest.mocked(ticketAnnouncer, true)
     readonly routerFactory = jest.mocked(formDataRouter, true);
-
-    readonly senderMock = mock<Sender>();
-    readonly parsePublishConfigMock = jest.mocked(parsePublishConfig, true);
     readonly senderFactory = jest.mocked(pubsubSender, true)
 
+    readonly announcerMock = mock<TicketAnnouncer>()
+    readonly senderMock = mock<Sender>();
+    readonly parsePublishConfigMock = jest.mocked(parsePublishConfig, true);
+
     constructor() {
+      this.announcerFactory.mockImplementation((directory) => {
+        return this.announcerMock
+      })
       this.routerFactory.mockImplementation((jira, tickets, sender) => {
+        if (tickets !== this.announcerMock) {
+          throw new Error("Wrong announcer sent to factory")
+        }
         if (sender !== this.senderMock) {
           throw new Error("Wrong sender sent to factory")
         }
@@ -101,6 +118,10 @@ describe("mainline", () => {
 
     mockPublishConfigParsing(rawInput: any, publishConfig: PublishConfig): void {
       this.mockParsing(rawInput, publishConfig, this.parsePublishConfigMock)
+    }
+
+    capturedAnnouncerFactoryCallArg(): DirectoryEntry[] {
+      return this.announcerFactory.mock.calls[0][0]
     }
 
     private mockParsing<T>(input: any, parseResult: T, parserMock: jest.MockedFunctionDeep<any>): void {

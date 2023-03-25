@@ -2,6 +2,9 @@ import {IntakeFormData} from "./intake-form-data";
 import {Announcement} from "struct_lalliance/build/src/announcement";
 import {DirectoryEntry, Role} from "./intake-directory";
 
+/**
+ * A factory of Announcement
+ */
 export interface TicketAnnouncer {
   emailAnnouncement(issueKey: String, form: IntakeFormData): Announcement[],
 
