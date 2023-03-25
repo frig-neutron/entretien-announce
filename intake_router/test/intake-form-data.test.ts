@@ -20,8 +20,8 @@ describe("test form data", () => {
     summary: rnd("summary"),
   }
   const rawFormDataEncoding = [
-      JSON.stringify(sampleForm),
-      Buffer.from(JSON.stringify(sampleForm))
+    JSON.stringify(sampleForm),
+    Buffer.from(JSON.stringify(sampleForm))
   ]
   test.each(rawFormDataEncoding)("parse case %# ok", (rawData: any) => {
     return expect(parseIntakeFormData(rawData)).resolves.toEqual(sampleForm)

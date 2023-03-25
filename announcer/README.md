@@ -1,6 +1,6 @@
 # Announcer Function
 
-This component queries jira and produces announcements for a directory of recipients.
+This component queries jira and produces announcements (reports) for a directory of recipients.
 
 The number of announcements == number of recipients.
 

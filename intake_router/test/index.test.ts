@@ -15,8 +15,9 @@ jest.mock("pubsub_lalliance/src/sender")
 describe("mainline", () => {
   functions.http('intake_router', intake_router);
 
+  const rnd = Math.random();
   const formData: IntakeFormData = {
-    area: "51", building: "", description: "", priority: "regular", reporter: "", rowIndex: 0, summary: "" + Math.random()
+    area: "51", building: "", description: "", priority: "regular", reporter: "", rowIndex: 0, summary: "" + rnd
   }
 
   const publishConfig: PublishConfig = {
@@ -32,11 +33,11 @@ describe("mainline", () => {
 
   test("happy path", async () => {
     const f = new MockFixture()
-    const issueKey = "IssueKey-" + Math.random();
+    const issueKey = "IssueKey-" + rnd;
     f.formDataRouterMock.route.mockResolvedValue(issueKey)
 
-    f.parseGoatAsFormData(formData);
-    f.parseRamAsPublishConfig(publishConfig)
+    f.mockFormDataParsing("goat", formData);
+    f.mockPublishConfigParsing("ram", publishConfig);
 
     const response = supertest(server).post("/").send("goat");
     await response.expect(200, issueKey)
@@ -47,10 +48,10 @@ describe("mainline", () => {
 
   test("parse pubsub config or return 500", async () => {
     const f = new MockFixture()
-    f.parseRamAsPublishConfig(publishConfig);
+    f.mockPublishConfigParsing("ram", publishConfig);
     process.env["PUBLISH_CONFIG"] = "wrong ram"
 
-    const response = supertest(server).post("/").send("goat");
+    const response = supertest(server).post("/").send("something");
 
     await response.expect(500, "expected ram but got wrong ram")
   })
@@ -66,7 +67,7 @@ describe("mainline", () => {
 
   test("routing error should return 500", async () => {
     const f = new MockFixture()
-    f.parseGoatAsFormData(formData);
+    f.mockFormDataParsing("goat", formData);
     f.formDataRouterMock.route.mockRejectedValue(new Error("no"))
 
     const response = supertest(server).post("/").send("goat");
@@ -94,12 +95,12 @@ describe("mainline", () => {
       })
     }
 
-    parseGoatAsFormData(formData: IntakeFormData): void {
-      this.mockParsing("goat", formData, this.parseIntakeFormDataMock)
+    mockFormDataParsing(rawInput: any, formData: IntakeFormData): void {
+      this.mockParsing(rawInput, formData, this.parseIntakeFormDataMock)
     }
 
-    parseRamAsPublishConfig(publishConfig: PublishConfig): void {
-      this.mockParsing("ram", publishConfig, this.parsePublishConfigMock)
+    mockPublishConfigParsing(rawInput: any, publishConfig: PublishConfig): void {
+      this.mockParsing(rawInput, publishConfig, this.parsePublishConfigMock)
     }
 
     private mockParsing<T>(input: any, parseResult: T, parserMock: jest.MockedFunctionDeep<any>): void {
