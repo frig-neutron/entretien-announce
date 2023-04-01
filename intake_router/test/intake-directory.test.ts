@@ -20,6 +20,17 @@ describe("intake directory", () => {
     return expect(parseRoutingDirectory(
         JSON.stringify([dir])
     )).resolves.toEqual([dir])
+  })
 
+  test("validate email", () => {
+    const dir: DirectoryEntry = {
+      email: 'not an email' ,
+      name: "drifter",
+      roles: ["TRIAGE"]
+    }
+
+    return expect(parseRoutingDirectory(
+        JSON.stringify([dir])
+    )).rejects.toThrow("email of drifter is invalid: 'not an email'")
   })
 })
