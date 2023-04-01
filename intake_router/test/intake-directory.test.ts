@@ -33,4 +33,10 @@ describe("intake directory", () => {
         JSON.stringify([dir])
     )).rejects.toThrow("email of drifter is invalid: 'not an email'")
   })
+
+  test("borken format", () => {
+    return expect(parseRoutingDirectory(
+        "(┛ಠ_ಠ)┛彡┻━┻"
+    )).rejects.toBe("Bad routing directory: (┛ಠ_ಠ)┛彡┻━┻")
+  })
 })

@@ -57,5 +57,5 @@ export function parseRoutingDirectory(data: any): Promise<DirectoryEntry[]> {
 
   return parseResult
       ? Promise.resolve(parseResult).then(validateDirectory)
-      : Promise.reject();
+      : Promise.reject(`Bad routing directory: ${data}`);
 }
