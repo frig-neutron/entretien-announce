@@ -32,7 +32,7 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
 
   return {
     errorAnnouncement(cause: any, form: IntakeFormData): Announcement[] {
-      return [];
+      return []; //todo: send error to admin
     },
     emailAnnouncement(issueKey: String, form: IntakeFormData): Announcement[] {
       function render(directoryEntry: DirectoryEntry, reasonForReceipt: String): Announcement {
