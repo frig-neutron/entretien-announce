@@ -33,9 +33,9 @@ describe("mainline", () => {
   }
 
   beforeEach(() => {
-    // our mocks know how to handle rams
-    process.env["PUBLISH_CONFIG"] = "ram"
-    process.env["DIRECTORY"] = "sheep"
+    // our mocks know how to handle pubconfs
+    process.env["PUBLISH_CONFIG"] = "pubconf"
+    process.env["DIRECTORY"] = "routing"
   })
 
   const server = getTestServer("intake_router")
@@ -45,11 +45,11 @@ describe("mainline", () => {
     const issueKey = "IssueKey-" + rnd;
     f.formDataRouterMock.route.mockResolvedValue(issueKey)
 
-    f.mockRoutingDirectoryParsing("sheep", [sampleDirectory])
-    f.mockFormDataParsing("goat", formData);
-    f.mockPublishConfigParsing("ram", publishConfig);
+    f.mockRoutingDirectoryParsing("routing", [sampleDirectory])
+    f.mockFormDataParsing("formdata", formData);
+    f.mockPublishConfigParsing("pubconf", publishConfig);
 
-    const response = supertest(server).post("/").send("goat");
+    const response = supertest(server).post("/").send("formdata");
     await response.expect(200, issueKey)
 
     expect(f.capturedAnnouncerFactoryCallArg()).toEqual([sampleDirectory])
@@ -59,39 +59,39 @@ describe("mainline", () => {
 
   test("parse routing directory or return 500", async () => {
     const f = new MockFixture()
-    f.mockRoutingDirectoryParsing("sheep", [sampleDirectory])
-    process.env["DIRECTORY"] = "non-sheep"
+    f.mockRoutingDirectoryParsing("routing", [sampleDirectory])
+    process.env["DIRECTORY"] = "non-routing"
 
     const response = supertest(server).post("/").send("something");
 
-    await response.expect(500, "expected sheep but got non-sheep")
+    await response.expect(500, "expected routing but got non-routing")
   })
 
   test("parse pubsub config or return 500", async () => {
     const f = new MockFixture()
-    f.mockPublishConfigParsing("ram", publishConfig);
-    process.env["PUBLISH_CONFIG"] = "wrong ram"
+    f.mockPublishConfigParsing("pubconf", publishConfig);
+    process.env["PUBLISH_CONFIG"] = "wrong pubconf"
 
     const response = supertest(server).post("/").send("something");
 
-    await response.expect(500, "expected ram but got wrong ram")
+    await response.expect(500, "expected pubconf but got wrong pubconf")
   })
 
-  test("parse error should return 400", async () => {
+  test("form parse error should return 400", async () => {
     const f = new MockFixture()
     f.parseIntakeFormDataMock.mockRejectedValue(TypeError("invalid"));
 
-    const response = supertest(server).post("/").send("goat");
-    await response.expect(400, "TypeError: invalid: goat")
+    const response = supertest(server).post("/").send("formdata");
+    await response.expect(400, "TypeError: invalid: formdata")
     expect(f.formDataRouterMock.route).toBeCalledTimes(0)
   })
 
   test("routing error should return 500", async () => {
     const f = new MockFixture()
-    f.mockFormDataParsing("goat", formData);
+    f.mockFormDataParsing("formdata", formData);
     f.formDataRouterMock.route.mockRejectedValue(new Error("no"))
 
-    const response = supertest(server).post("/").send("goat");
+    const response = supertest(server).post("/").send("formdata");
     await response.expect(500, "Error: no")
   })
 
