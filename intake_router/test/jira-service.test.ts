@@ -31,11 +31,11 @@ describe("jira service", () => {
     const formData: IntakeFormData = {
       area: "Unit 1",
       building: "3740",
-      description: "",
       priority: "regular",
-      reporter: "a. friend",
+      reporter: "A. Friend",
       rowIndex: 0,
-      summary: "Needs love"
+      summary: "Needs love",
+      description: "All out of love, so lost without you"
     }
 
     const createIssueReq: () => CreateIssue = () => {
@@ -45,9 +45,7 @@ describe("jira service", () => {
             key: cfg().intake_project_key
           },
           summary: "3740 Unit 1: Needs love", //todo: test testModePrefix + summarize(formData)",
-          description: "TBD", // "createDescription(formData)",
-          // "customfield_10038": {"id": 10033}, // building
-          // "Area": formData.area,
+          description: "All out of love, so lost without you\n\nReported by A. Friend",
           priority: {name: "TBD"},
           issuetype: {
             name: "Intake"
@@ -62,7 +60,6 @@ describe("jira service", () => {
       const jiraClientFactory: (creds: JiraServiceCfg) => Version2Client = (_) => client;
       const jira = jiraService(cfg(), jiraClientFactory);
 
-
       jira.createIssue(formData)
 
       expect(client.issues.createIssue).toHaveBeenCalledWith(createIssueReq())
@@ -72,8 +69,7 @@ describe("jira service", () => {
       const client = mockDeep<Version2Client>()
 
       const jiraClientFactory: (creds: JiraServiceCfg) => Version2Client = (_) => client;
-      const jira = jiraService({ ...cfg(), test_mode: true}, jiraClientFactory);
-
+      const jira = jiraService({...cfg(), test_mode: true}, jiraClientFactory);
 
       jira.createIssue(formData)
 

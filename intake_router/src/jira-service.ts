@@ -11,14 +11,23 @@ export function jiraService(
 ): JiraService {
   const version2Client = jiraClientFactory(config);
   const converFormToIssue = (form: IntakeFormData): CreateIssue => {
-    const isTest = config.test_mode ? "TEST - " : "";
+    const testPrefix = config.test_mode ? "TEST - " : "";
+
+    function summarize() {
+      return `${form.building} ${form.area}: ${form.summary}`;
+    }
+
+    function createDescription() {
+      return `${form.description}\n\nReported by ${form.reporter}`;
+    }
+
     return {
       fields: {
         project: {
           key: config.intake_project_key
         },
-        summary: isTest + `${form.building} ${form.area}: ${form.summary}`, //"testModePrefix + summarize(formData)",
-        description: "TBD", // "createDescription(formData)",
+        summary: testPrefix + summarize(), //"testModePrefix + summarize(formData)",
+        description: createDescription(), // "createDescription(formData)",
         // "customfield_10038": {"id": 10033}, // building
         // "Area": formData.area,
         priority: {name: "TBD"},
