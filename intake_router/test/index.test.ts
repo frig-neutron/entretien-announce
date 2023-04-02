@@ -87,6 +87,16 @@ describe("mainline", () => {
     await response.expect(500, "expected pubconf but got wrong pubconf")
   })
 
+  test("parse jira creds or return 500", async () => {
+    const f = new MockFixture()
+    f.mockJiraCredsParsing("jcreds", jiraCreds)
+    process.env["JIRA_BASIC_AUTH"] = "wrong jcreds"
+
+    const response = supertest(server).post("/").send("something");
+
+    await response.expect(500, "expected jcreds but got wrong jcreds")
+  })
+
   test("form parse error should return 400", async () => {
     const f = new MockFixture()
     f.parseIntakeFormDataMock.mockRejectedValue(TypeError("invalid"));
