@@ -6,17 +6,18 @@ import {CreateIssue} from "jira.js/out/version2/parameters";
 const ajv = new Ajv({verbose: true, allErrors: true})
 
 export function jiraService(
-    jiraCreds: JiraBasicAuth,
-    jiraClientFactory: (creds: JiraBasicAuth) => Version2Client = jiraV2Client
+    config: JiraServiceCfg,
+    jiraClientFactory: (creds: JiraServiceCfg) => Version2Client = jiraV2Client
 ): JiraService {
-  const version2Client = jiraClientFactory(jiraCreds);
-  const converFormToIssue = (intakeFormData: IntakeFormData): CreateIssue => {
+  const version2Client = jiraClientFactory(config);
+  const converFormToIssue = (form: IntakeFormData): CreateIssue => {
+    const isTest = config.test_mode ? "TEST - " : "";
     return {
       fields: {
         project: {
-          key: "TRIAG"
+          key: config.intake_project_key
         },
-        summary: "TBD", //"testModePrefix + summarize(formData)",
+        summary: isTest + `${form.building} ${form.area}: ${form.summary}`, //"testModePrefix + summarize(formData)",
         description: "TBD", // "createDescription(formData)",
         // "customfield_10038": {"id": 10033}, // building
         // "Area": formData.area,
@@ -43,23 +44,41 @@ export interface JiraService {
   createIssue: (intakeFormData: IntakeFormData) => Promise<String>
 }
 
-export interface JiraBasicAuth {
-  jira_email: string
-  jira_token: string
+export interface JiraServiceCfg {
+  jira_basic_auth: {
+    email: string
+    token: string
+  }
+  jira_host: string
+  intake_project_key: string
+  test_mode: boolean
 }
 
-const jiraBasicAuthSchema: JTDSchemaType<JiraBasicAuth> = {
+const jiraBasicAuthSchema: JTDSchemaType<JiraServiceCfg> = {
   properties: {
-    jira_token: {
+    jira_basic_auth: {
+      properties: {
+        token: {
+          type: "string"
+        },
+        email: {
+          type: "string"
+        }
+      }
+    },
+    jira_host: {
       type: "string"
     },
-    jira_email: {
+    intake_project_key: {
       type: "string"
+    },
+    test_mode: {
+      type: "boolean"
     }
   }
 }
 
-export function parseJiraBasicAuth(data: any): Promise<JiraBasicAuth> {
+export function parseJiraBasicAuth(data: any): Promise<JiraServiceCfg> {
   const parser = ajv.compileParser(jiraBasicAuthSchema);
   const parseResult = parser(String(data))
 
@@ -68,13 +87,13 @@ export function parseJiraBasicAuth(data: any): Promise<JiraBasicAuth> {
       : Promise.reject(Error(`Invalid jira creds: ${data}`))
 }
 
-function jiraV2Client(jiraCreds: JiraBasicAuth): Version2Client {
+function jiraV2Client(config: JiraServiceCfg): Version2Client {
   return new Version2Client({
-    host: "https://lalliance.atlassian.net", // todo: host goes into config
+    host: config.jira_host,
     authentication: {
       basic: {
-        apiToken: jiraCreds.jira_token,
-        email: jiraCreds.jira_email
+        apiToken: config.jira_basic_auth.token,
+        email: config.jira_basic_auth.email
       }
     }
   });

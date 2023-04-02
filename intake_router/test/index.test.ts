@@ -9,7 +9,7 @@ import {intake_router} from "../src";
 import {FormDataRouter, formDataRouter} from "../src/form-data-router";
 import {DirectoryEntry, parseRoutingDirectory} from "../src/intake-directory";
 import {ticketAnnouncer, TicketAnnouncer} from "../src/ticket-announcer";
-import {JiraBasicAuth, jiraService} from "../src/jira-service";
+import {JiraServiceCfg, jiraService} from "../src/jira-service";
 import {parseJiraBasicAuth} from "../src/jira-service";
 
 jest.mock("../src/form-data-router")
@@ -35,8 +35,13 @@ describe("mainline", () => {
     project_id: "paperclip", topic_name: "advanced-aeronautics"
   }
 
-  const jiraCreds: JiraBasicAuth = {
-    jira_email: "eeemail", jira_token: "toukeeen" + rnd
+  const jiraCreds: JiraServiceCfg = {
+    jira_basic_auth: {
+      email: "eeemail", token: "toukeeen" + rnd
+    },
+    jira_host: "http://google.com",
+    intake_project_key: "PAPERCLIP",
+    test_mode: false
   }
 
   beforeEach(() => {
@@ -160,7 +165,7 @@ describe("mainline", () => {
       this.mockParsing(rawInput, publishConfig, this.parsePublishConfigMock)
     }
 
-    mockJiraCredsParsing(rawInput: any, jiraBasicAuth: JiraBasicAuth): void {
+    mockJiraCredsParsing(rawInput: any, jiraBasicAuth: JiraServiceCfg): void {
       this.mockParsing(rawInput, jiraBasicAuth, this.parseJiraBasicAuthMock)
     }
 
