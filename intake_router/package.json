@@ -12,6 +12,7 @@
         "ajv-formats": "^2.1.1",
         "dotenv": "^16.0.0",
         "express": "^4.17.3",
+        "jira.js": "2.11.0",
         "nodemailer": "^6.7.3",
         "prelude-ts": "^1.0.3",
         "pubsub_lalliance": "file:./lib/pubsub",
