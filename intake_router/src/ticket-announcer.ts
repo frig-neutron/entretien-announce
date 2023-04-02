@@ -15,7 +15,6 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
   const summarizeForJira = (f: IntakeFormData) => f.building + " " + f.area + ": " + f.summary;
 
   function findByRoleKey(brRoleKey: keyof typeof Role) {
-    // todo: check for error
     return directory.filter(de => de.roles.find(r => r === brRoleKey))
   }
 
@@ -32,7 +31,7 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
 
   return {
     errorAnnouncement(cause: any, form: IntakeFormData): Announcement[] {
-      return []; //todo: send error to admin
+      return []; //todo: send error to admin (https://github.com/frig-neutron/entretien-intake/issues/22)
     },
     emailAnnouncement(issueKey: String, form: IntakeFormData): Announcement[] {
       function render(directoryEntry: DirectoryEntry, reasonForReceipt: String): Announcement {
