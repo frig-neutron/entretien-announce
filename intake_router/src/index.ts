@@ -24,7 +24,7 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
   const input = req.rawBody;
   log.info(`Starting with data=${input?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
 
-  const jira = jiraService();
+  const jira = jiraService({jira_email: "", jira_token: ""});
   const announcer = ticketAnnouncer(await intakeDirectory());
   const sender: Sender = pubsubSender(await publishConfig())
 
