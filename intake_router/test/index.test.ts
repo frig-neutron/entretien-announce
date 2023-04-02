@@ -9,10 +9,13 @@ import {intake_router} from "../src";
 import {FormDataRouter, formDataRouter} from "../src/form-data-router";
 import {DirectoryEntry, parseRoutingDirectory} from "../src/intake-directory";
 import {ticketAnnouncer, TicketAnnouncer} from "../src/ticket-announcer";
+import {JiraBasicAuth, jiraService} from "../src/jira-service";
+import {parseJiraBasicAuth} from "../src/jira-service";
 
 jest.mock("../src/form-data-router")
 jest.mock("../src/intake-directory")
 jest.mock("../src/intake-form-data")
+jest.mock("../src/jira-service")
 jest.mock("../src/ticket-announcer")
 jest.mock("pubsub_lalliance/src/sender")
 
@@ -32,10 +35,15 @@ describe("mainline", () => {
     project_id: "paperclip", topic_name: "advanced-aeronautics"
   }
 
+  const jiraCreds: JiraBasicAuth = {
+    jira_email: "eeemail", jira_token: "toukeeen" + rnd
+  }
+
   beforeEach(() => {
     // our mocks know how to handle pubconfs
     process.env["PUBLISH_CONFIG"] = "pubconf"
     process.env["DIRECTORY"] = "routing"
+    process.env["JIRA_BASIC_AUTH"] = "jcreds"
   })
 
   const server = getTestServer("intake_router")
@@ -46,6 +54,7 @@ describe("mainline", () => {
     f.formDataRouterMock.route.mockResolvedValue(issueKey)
 
     f.mockRoutingDirectoryParsing("routing", [sampleDirectory])
+    f.mockJiraCredsParsing("jcreds", jiraCreds)
     f.mockFormDataParsing("formdata", formData);
     f.mockPublishConfigParsing("pubconf", publishConfig);
 
@@ -53,6 +62,7 @@ describe("mainline", () => {
     await response.expect(200, issueKey)
 
     expect(f.capturedAnnouncerFactoryCallArg()).toEqual([sampleDirectory])
+    expect(f.jiraServiceFactory).toBeCalledWith(jiraCreds)
     expect(f.senderFactory).toBeCalledWith(publishConfig)
     expect(f.formDataRouterMock.route).toBeCalledWith(expect.objectContaining(formData))
   })
@@ -102,10 +112,12 @@ describe("mainline", () => {
     readonly announcerFactory = jest.mocked(ticketAnnouncer, true)
     readonly routerFactory = jest.mocked(formDataRouter, true);
     readonly senderFactory = jest.mocked(pubsubSender, true)
+    readonly jiraServiceFactory = jest.mocked(jiraService, true)
 
     readonly announcerMock = mock<TicketAnnouncer>()
     readonly senderMock = mock<Sender>();
     readonly parsePublishConfigMock = jest.mocked(parsePublishConfig, true);
+    readonly parseJiraBasicAuthMock = jest.mocked(parseJiraBasicAuth, true);
     readonly parseRoutingDirectoryMock = jest.mocked(parseRoutingDirectory, true)
 
     constructor() {
@@ -136,6 +148,10 @@ describe("mainline", () => {
 
     mockPublishConfigParsing(rawInput: any, publishConfig: PublishConfig): void {
       this.mockParsing(rawInput, publishConfig, this.parsePublishConfigMock)
+    }
+
+    mockJiraCredsParsing(rawInput: any, jiraBasicAuth: JiraBasicAuth): void {
+      this.mockParsing(rawInput, jiraBasicAuth, this.parseJiraBasicAuthMock)
     }
 
     capturedAnnouncerFactoryCallArg(): DirectoryEntry[] {

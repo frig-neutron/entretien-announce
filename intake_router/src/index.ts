@@ -5,7 +5,7 @@ import {HttpFunction, Request} from "@google-cloud/functions-framework/build/src
 import {application, Response, text} from "express";
 import {formDataRouter} from "./form-data-router";
 import {parseIntakeFormData} from "./intake-form-data";
-import {jiraService} from "./jira-service";
+import {jiraService, parseJiraBasicAuth} from "./jira-service";
 import {ticketAnnouncer} from "./ticket-announcer";
 import {parsePublishConfig, pubsubSender, Sender} from "pubsub_lalliance/src/sender";
 import {parseRoutingDirectory} from "./intake-directory";
@@ -24,7 +24,7 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
   const input = req.rawBody;
   log.info(`Starting with data=${input?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
 
-  const jira = jiraService({jira_email: "", jira_token: ""});
+  const jira = jiraService(await jiraCreds());
   const announcer = ticketAnnouncer(await intakeDirectory());
   const sender: Sender = pubsubSender(await publishConfig())
 
@@ -42,6 +42,10 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
     .then(fdr.route)
     .then(issueKey => res.status(200).send(issueKey))
     .catch(forwardErrorToClient)
+}
+
+function jiraCreds() {
+  return parseJiraBasicAuth(process.env["JIRA_BASIC_AUTH"])
 }
 
 function publishConfig() {
