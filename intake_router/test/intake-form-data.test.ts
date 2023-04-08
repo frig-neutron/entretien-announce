@@ -19,9 +19,16 @@ describe("test form data", () => {
     rowIndex: zeroToTen(),
     summary: rnd("summary"),
   }
+  const pubsubEncoding = function (){
+    return {
+      "@type": "type.googleapis.com/google.pubsub.v1.PubsubMessage",
+      "data": Buffer.from(JSON.stringify(sampleForm)).toString("base64")
+    }
+  }()
   const rawFormDataEncoding = [
-    JSON.stringify(sampleForm),
-    Buffer.from(JSON.stringify(sampleForm))
+    // JSON.stringify(sampleForm),
+    // Buffer.from(JSON.stringify(sampleForm)),
+    JSON.stringify(pubsubEncoding)
   ]
   test.each(rawFormDataEncoding)("parse case %# ok", (rawData: any) => {
     return expect(parseIntakeFormData(rawData)).resolves.toEqual(sampleForm)
@@ -38,7 +45,7 @@ describe("test form data", () => {
   })
   test("parse literal garbage", () => {
     return expectParseFailsWithMessage("literal garbage",
-        "unexpected token l at position 0 of <literal garbage>")
+        "<literal garbage> is not JSON")
   })
   test("forbid additional properties", () => {
     const sampleFormCopy: any = {

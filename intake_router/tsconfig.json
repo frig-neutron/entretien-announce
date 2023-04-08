@@ -11,6 +11,8 @@
   },
   "include": [
     "src/*",
-    "test/*"
+    "test/*",
+    "node_modules/pubsub_lalliance/src/*",
+    "node_modules/struct_lalliance/src/*",
   ]
 }

@@ -45,7 +45,7 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
 }
 
 function jiraCreds() {
-  return parseJiraBasicAuth(process.env["JIRA_BASIC_AUTH"])
+  return parseJiraBasicAuth(process.env["JIRA_CONFIG"])
 }
 
 function publishConfig() {
