@@ -38,7 +38,7 @@ describe("jira service", () => {
       description: "All out of love, so lost without you"
     }
 
-    const createIssueReq: () => CreateIssue = () => {
+    const createIssueRequest: () => CreateIssue = () => {
       return {
         fields: {
           project: {
@@ -56,13 +56,19 @@ describe("jira service", () => {
 
     test("create ticket", () => {
       const client = mockDeep<Version2Client>()
+      client.issues.createIssue.mockReturnValue(
+          Promise.resolve({
+            id: "TRIAG" + rnd,
+            key: "TRIAG" + rnd,
+            self: "TRIAG" + rnd,
+          }))
 
       const jiraClientFactory: (creds: JiraServiceCfg) => Version2Client = (_) => client;
       const jira = jiraService(cfg(), jiraClientFactory);
 
       jira.createIssue(formData)
 
-      expect(client.issues.createIssue).toHaveBeenCalledWith(createIssueReq())
+      expect(client.issues.createIssue).toHaveBeenCalledWith(createIssueRequest())
     })
 
     test("test-mode ticket", () => {
@@ -73,7 +79,7 @@ describe("jira service", () => {
 
       jira.createIssue(formData)
 
-      const createIssue = createIssueReq()
+      const createIssue = createIssueRequest()
       createIssue.fields.summary = "TEST - 3740 Unit 1: Needs love"
 
       expect(client.issues.createIssue).toHaveBeenCalledWith(createIssue)
