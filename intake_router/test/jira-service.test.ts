@@ -1,8 +1,9 @@
 import {JiraServiceCfg, jiraService, parseJiraBasicAuth} from "../src/jira-service";
-import {Version2Client} from "jira.js";
+import {Callback, Version2Client} from "jira.js";
 import {IntakeFormData} from "../src/intake-form-data";
 import {mockDeep} from "jest-mock-extended";
 import {CreateIssue} from "jira.js/out/version2/parameters";
+import {CreatedIssue} from "jira.js/out/version2/models";
 
 describe("jira service", () => {
   const rnd = Math.floor(Math.random() * 10000)
@@ -38,6 +39,12 @@ describe("jira service", () => {
       description: "All out of love, so lost without you"
     }
 
+    const createdIssue: CreatedIssue = {
+      id: "",
+      key: "K-" + rnd,
+      self: ""
+    }
+
     const createIssueRequest: () => CreateIssue = () => {
       return {
         fields: {
@@ -54,25 +61,26 @@ describe("jira service", () => {
       }
     }
 
-    test("create ticket", () => {
+    test("create ticket", async () => {
       const client = mockDeep<Version2Client>()
       client.issues.createIssue.mockReturnValue(
-          Promise.resolve({
-            id: "TRIAG" + rnd,
-            key: "TRIAG" + rnd,
-            self: "TRIAG" + rnd,
-          }))
+          Promise.resolve(createdIssue)
+      )
 
       const jiraClientFactory: (creds: JiraServiceCfg) => Version2Client = (_) => client;
       const jira = jiraService(cfg(), jiraClientFactory);
 
-      jira.createIssue(formData)
+      const key = jira.createIssue(formData);
 
-      expect(client.issues.createIssue).toHaveBeenCalledWith(createIssueRequest())
+      await expect(client.issues.createIssue).toHaveBeenCalledWith(createIssueRequest())
+      await expect(key).resolves.toEqual(createdIssue.key)
     })
 
-    test("test-mode ticket", () => {
+    test("test-mode ticket", async () => {
       const client = mockDeep<Version2Client>()
+      client.issues.createIssue.mockReturnValue(
+          Promise.resolve(createdIssue)
+      )
 
       const jiraClientFactory: (creds: JiraServiceCfg) => Version2Client = (_) => client;
       const jira = jiraService({...cfg(), test_mode: true}, jiraClientFactory);
@@ -82,7 +90,7 @@ describe("jira service", () => {
       const createIssue = createIssueRequest()
       createIssue.fields.summary = "TEST - 3740 Unit 1: Needs love"
 
-      expect(client.issues.createIssue).toHaveBeenCalledWith(createIssue)
+      await expect(client.issues.createIssue).toHaveBeenCalledWith(createIssue)
     })
   })
 })

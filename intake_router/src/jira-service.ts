@@ -42,8 +42,8 @@ export function jiraService(
       // TODO: idempotence - replaying the same issue multiple times should not re-create issue
       // probably a good idea to use a hidden field w/ form data hash
 
-      version2Client.issues.createIssue(converFormToIssue(intakeFormData))
-      return Promise.resolve("");
+      const createdIssue = version2Client.issues.createIssue(converFormToIssue(intakeFormData))
+      return createdIssue.then(ci => ci.key);
     }
 
   }
