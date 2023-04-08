@@ -5,6 +5,9 @@ import {CreateIssue} from "jira.js/out/version2/parameters";
 
 const ajv = new Ajv({verbose: true, allErrors: true})
 
+const jiraPriorityUrgent = "Urgent"
+const jiraPriorityMedium = "Medium"
+
 export function jiraService(
     config: JiraServiceCfg,
     jiraClientFactory: (creds: JiraServiceCfg) => Version2Client = jiraV2Client
@@ -21,6 +24,14 @@ export function jiraService(
       return `${form.description}\n\nReported by ${form.reporter}`;
     }
 
+    function jiraPriorityName() {
+      if (form.priority.startsWith("urgent")) {
+        return jiraPriorityUrgent
+      } else {
+        return jiraPriorityMedium
+      }
+    }
+
     return {
       fields: {
         project: {
@@ -30,7 +41,7 @@ export function jiraService(
         description: createDescription(), // "createDescription(formData)",
         // "customfield_10038": {"id": 10033}, // building
         // "Area": formData.area,
-        priority: {name: "TBD"},
+        priority: {name: jiraPriorityName()},
         issuetype: {
           name: "Intake"
         }

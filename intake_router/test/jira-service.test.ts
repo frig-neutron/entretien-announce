@@ -29,15 +29,18 @@ describe("jira service", () => {
     })
   })
   describe("ticket operations", () => {
-    const formData: IntakeFormData = {
-      area: "Unit 1",
-      building: "3740",
-      priority: "regular",
-      reporter: "A. Friend",
-      rowIndex: 0,
-      summary: "Needs love",
-      description: "All out of love, so lost without you"
+    const formData: () => IntakeFormData = () => {
+      return {
+        area: "Unit 1",
+        building: "3740",
+        priority: "regular",
+        reporter: "A. Friend",
+        rowIndex: 0,
+        summary: "Needs love",
+        description: "All out of love, so lost without you"
+      }
     }
+
 
     const createdIssue: CreatedIssue = {
       id: "",
@@ -51,9 +54,9 @@ describe("jira service", () => {
           project: {
             key: cfg().intake_project_key
           },
-          summary: "3740 Unit 1: Needs love", //todo: test testModePrefix + summarize(formData)",
+          summary: "3740 Unit 1: Needs love",
           description: "All out of love, so lost without you\n\nReported by A. Friend",
-          priority: {name: "TBD"},
+          priority: {name: "Medium"},
           issuetype: {
             name: "Intake"
           }
@@ -61,7 +64,7 @@ describe("jira service", () => {
       }
     }
 
-    test("create ticket", async () => {
+    test("create regular priority ticket", async () => {
       const client = mockDeep<Version2Client>()
       client.issues.createIssue.mockReturnValue(
           Promise.resolve(createdIssue)
@@ -70,10 +73,28 @@ describe("jira service", () => {
       const jiraClientFactory: (creds: JiraServiceCfg) => Version2Client = (_) => client;
       const jira = jiraService(cfg(), jiraClientFactory);
 
-      const key = jira.createIssue(formData);
+      const key = jira.createIssue(formData());
 
       await expect(client.issues.createIssue).toHaveBeenCalledWith(createIssueRequest())
       await expect(key).resolves.toEqual(createdIssue.key)
+    })
+
+    test("create urgent priority ticket", async () => {
+      const client = mockDeep<Version2Client>()
+      client.issues.createIssue.mockReturnValue(
+          Promise.resolve(createdIssue)
+      )
+
+      const jiraClientFactory: (creds: JiraServiceCfg) => Version2Client = (_) => client;
+      const jira = jiraService(cfg(), jiraClientFactory);
+
+      const urgentFormSubmission = formData();
+      urgentFormSubmission.priority = "urgent"
+      jira.createIssue(urgentFormSubmission);
+
+      const urgentTicketRequest = createIssueRequest();
+      urgentTicketRequest.fields.priority = {name: "Urgent"}
+      await expect(client.issues.createIssue).toHaveBeenCalledWith(urgentTicketRequest)
     })
 
     test("test-mode ticket", async () => {
@@ -85,7 +106,7 @@ describe("jira service", () => {
       const jiraClientFactory: (creds: JiraServiceCfg) => Version2Client = (_) => client;
       const jira = jiraService({...cfg(), test_mode: true}, jiraClientFactory);
 
-      jira.createIssue(formData)
+      jira.createIssue(formData())
 
       const createIssue = createIssueRequest()
       createIssue.fields.summary = "TEST - 3740 Unit 1: Needs love"
