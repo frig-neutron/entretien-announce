@@ -37,8 +37,8 @@ export function jiraService(
         project: {
           key: config.intake_project_key
         },
-        summary: testPrefix + summarize(), //"testModePrefix + summarize(formData)",
-        description: createDescription(), // "createDescription(formData)",
+        summary: testPrefix + summarize(),
+        description: createDescription(),
         // "customfield_10038": {"id": 10033}, // building
         // "Area": formData.area,
         priority: {name: jiraPriorityName()},
@@ -53,7 +53,8 @@ export function jiraService(
       // TODO: idempotence - replaying the same issue multiple times should not re-create issue
       // probably a good idea to use a hidden field w/ form data hash
 
-      const createdIssue = version2Client.issues.createIssue(converFormToIssue(intakeFormData))
+      const issue: CreateIssue = converFormToIssue(intakeFormData);
+      const createdIssue = version2Client.issues.createIssue(issue)
       return createdIssue.then(ci => ci.key);
     }
 

@@ -1,6 +1,7 @@
 import {IntakeFormData} from "./intake-form-data";
 import {Announcement} from "struct_lalliance/build/src/announcement";
 import {DirectoryEntry, Role} from "./intake-directory";
+import {log} from "./logger";
 
 /**
  * A factory of Announcement
@@ -31,6 +32,7 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
 
   return {
     errorAnnouncement(cause: any, form: IntakeFormData): Announcement[] {
+      log.error(cause)
       return []; //todo: send error to admin (https://github.com/frig-neutron/entretien-intake/issues/22)
     },
     emailAnnouncement(issueKey: String, form: IntakeFormData): Announcement[] {
@@ -38,7 +40,7 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
         return {
           primary_recipient: directoryEntry.email,
           secondary_recipients: [],
-          subject: "Maintenance report from A. Member",
+          subject: "Maintenance report from A. Member", // todo: name of member goes here
           body: [`Dear ${directoryEntry.name},`,
             `${form.reporter} has submitted a maintenance report`,
             reasonForReceipt,
