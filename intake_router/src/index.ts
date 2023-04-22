@@ -1,8 +1,8 @@
 import {config as dotenv_config} from "dotenv"
 
 import {log} from "./logger";
-import {HttpFunction, Request} from "@google-cloud/functions-framework/build/src/functions";
-import {application, Response, text} from "express";
+import * as ff from "@google-cloud/functions-framework";
+import {application, text} from "express";
 import {formDataRouter} from "./form-data-router";
 import {parseIntakeFormData} from "./intake-form-data";
 import {jiraService, parseJiraBasicAuth} from "./jira-service";
@@ -25,7 +25,7 @@ export enum Env {
 // https://cloud.google.com/functions/docs/writing/background#function_parameters
 // Absolutely MUST use the 3-param version b/c otherwise there seems to be no way to terminate the function properly.
 // Returning a resolved Promise doesn't cut it - you still get "Finished with status: response error"
-export const intake_router: HttpFunction = async (req: Request, res: Response) => {
+export const intake_router: ff.HttpFunction = async (req: ff.Request, res: ff.Response) => {
   application.use(text())
   const input = req.rawBody;
   log.info(`Starting with data=${input?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
@@ -66,3 +66,5 @@ function publishConfig() {
 function intakeDirectory() {
   return parseRoutingDirectory(process.env[Env.DIRECTORY])
 }
+
+ff.http("intake_router", intake_router)
