@@ -48,7 +48,7 @@ describe("mainline", () => {
     // our mocks know how to handle pubconfs
     process.env["PUBLISH_CONFIG"] = "pubconf"
     process.env["DIRECTORY"] = "routing"
-    process.env["JIRA_BASIC_AUTH"] = "jcreds"
+    process.env["JIRA_CONFIG"] = "jcreds"
   })
 
   const server = getTestServer("intake_router")
@@ -95,7 +95,7 @@ describe("mainline", () => {
   test("parse jira creds or return 500", async () => {
     const f = new MockFixture()
     f.mockJiraCredsParsing("jcreds", jiraCreds)
-    process.env["JIRA_BASIC_AUTH"] = "wrong jcreds"
+    process.env["JIRA_CONFIG"] = "wrong jcreds"
 
     const response = supertest(server).post("/").send("something");
 

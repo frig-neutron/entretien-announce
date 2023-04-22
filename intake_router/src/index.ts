@@ -45,6 +45,8 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
 }
 
 function jiraCreds() {
+  // TODO: jira config must be secret
+  // todo: take env var names to constants
   return parseJiraBasicAuth(process.env["JIRA_CONFIG"])
 }
 
