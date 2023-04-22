@@ -8,9 +8,10 @@ fi
 set -euo pipefail
 
 project_id=entretien-$env
+cwd=`dirname $0`
 
 gcloud functions deploy intake_router --project=$project_id --max-instances=2 \
   --runtime=nodejs16 --trigger-http --allow-unauthenticated \
-  --env-vars-file="env-$env.yaml" \
+  --env-vars-file="$cwd/env-$env.yaml" \
   --set-secrets=SECRETS=announcer:latest \
   --service-account=intake-router@$project_id.iam.gserviceaccount.com 
