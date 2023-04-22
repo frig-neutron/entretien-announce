@@ -1,14 +1,27 @@
 # Intake router
 
-This component receives notification of maintenance submission events, and
+This component receives notification of maintenance submissions. 
+
+- It is notified by HTTP gia Google Apps Script, so it's NOT a pubsub function. 
+- Don't give it pubsub input.
 
 ## Operational
 
 ### Parameters
 
-Invocation parameters contain the email to send formatted as follows
+The only param is the actual form submission: 
 
-💀 TODO
+```json
+{
+    "area": "apartment",
+    "building": "1234",
+    "priority": "regular",
+    "reporter": "guest",
+    "rowIndex": 666,
+    "summary": "Haunted bathtub",
+    "description": "Blood from shower on occasion. Turning water off and on resolves issue."
+}
+```
 
 ### Configuration
 

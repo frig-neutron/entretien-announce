@@ -9,7 +9,7 @@ export interface IntakeFormData {
   description: string
   area: string
   reporter: string
-  priority: "regular"|"urgent"
+  priority: "regular" | "urgent"
 }
 
 const intakeFormDataSchema: JTDSchemaType<IntakeFormData> = {
