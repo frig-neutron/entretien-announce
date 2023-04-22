@@ -36,11 +36,10 @@ describe("mainline", () => {
   }
 
   const jiraCreds: JiraServiceCfg = {
-    jira_basic_auth: {
-      email: "eeemail", token: "toukeeen" + rnd
-    },
+    jira_email: "eeemail",
+    jira_token: "toukeeen" + rnd,
     jira_host: "http://google.com",
-    intake_project_key: "PAPERCLIP",
+    jira_intake_project_key: "PAPERCLIP",
     test_mode: false
   }
 

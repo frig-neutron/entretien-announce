@@ -35,7 +35,7 @@ export function jiraService(
     return {
       fields: {
         project: {
-          key: config.intake_project_key
+          key: config.jira_intake_project_key
         },
         summary: testPrefix + summarize(),
         description: createDescription(),
@@ -66,37 +66,34 @@ export interface JiraService {
 }
 
 export interface JiraServiceCfg {
-  jira_basic_auth: {
-    email: string
-    token: string
-  }
+  jira_email: string
+  jira_token: string
   jira_host: string
-  intake_project_key: string
+  jira_intake_project_key: string
   test_mode: boolean
 }
 
 const jiraBasicAuthSchema: JTDSchemaType<JiraServiceCfg> = {
   properties: {
-    jira_basic_auth: {
-      properties: {
-        token: {
-          type: "string"
-        },
-        email: {
-          type: "string"
-        }
-      }
+    jira_email: {
+      type: "string"
+    },
+    jira_token: {
+      type: "string"
     },
     jira_host: {
       type: "string"
     },
-    intake_project_key: {
+    jira_intake_project_key: {
       type: "string"
     },
     test_mode: {
       type: "boolean"
     }
-  }
+  },
+  // To stay in gcp free tier w/ secrets, we share secret definitions with other functions
+  // Stuff like SMTP secrets are also defined here.
+  additionalProperties: true
 }
 
 export function parseJiraBasicAuth(data: any): Promise<JiraServiceCfg> {
@@ -113,8 +110,8 @@ function jiraV2Client(config: JiraServiceCfg): Version2Client {
     host: config.jira_host,
     authentication: {
       basic: {
-        apiToken: config.jira_basic_auth.token,
-        email: config.jira_basic_auth.email
+        apiToken: config.jira_token,
+        email: config.jira_email
       }
     }
   });

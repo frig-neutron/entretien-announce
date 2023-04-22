@@ -9,12 +9,11 @@ describe("jira service", () => {
   const rnd = Math.floor(Math.random() * 10000)
   const cfg: () => JiraServiceCfg = () => {
     return {
-      intake_project_key: "PROJ_" + rnd,
+      jira_intake_project_key: "PROJ_" + rnd,
       jira_host: "",
       test_mode: false,
-      jira_basic_auth: {
-        email: "the_cat", token: "on the mat" + rnd
-      }
+      jira_email: "the_cat",
+      jira_token: "on the mat" + rnd
     }
   }
 
@@ -22,6 +21,15 @@ describe("jira service", () => {
     test("parse credentials", async () => {
       const actualCreds = await parseJiraBasicAuth(JSON.stringify(cfg()))
       expect(actualCreds).toEqual(cfg())
+    })
+    test("parse credentials allows extra keys", async () => {
+      const definedKeys = cfg();
+      const aLittleExtra = {
+        somethingMore: "foo",
+        ...definedKeys
+      }
+      const actualCreds = await parseJiraBasicAuth(JSON.stringify(aLittleExtra))
+      expect(actualCreds).toEqual(aLittleExtra)
     })
     test("parse credentials error", async () => {
       const actualCreds = parseJiraBasicAuth("bad format")
@@ -52,7 +60,7 @@ describe("jira service", () => {
       return {
         fields: {
           project: {
-            key: cfg().intake_project_key
+            key: cfg().jira_intake_project_key
           },
           summary: "3740 Unit 1: Needs love",
           description: "All out of love, so lost without you\n\nReported by A. Friend",
