@@ -35,5 +35,8 @@ resource "google_secret_manager_secret_iam_binding" "announcer" {
   project   = google_project.entretien.project_id
   secret_id = google_secret_manager_secret.announcer.id
   role      = "roles/secretmanager.secretAccessor"
-  members   = ["serviceAccount:${google_service_account.announcer.email}"]
+  members   = [
+    google_service_account.announcer.member,
+    google_service_account.intake_router.member
+  ]
 }
