@@ -5,7 +5,7 @@ import * as functions from "@google-cloud/functions-framework";
 import {mock} from "jest-mock-extended";
 import {IntakeFormData, parseIntakeFormData} from "../src/intake-form-data";
 import {parsePublishConfig, PublishConfig, pubsubSender, Sender} from "pubsub_lalliance/src/sender";
-import {Env, intake_router} from "../src";
+import {Env, intake_router} from "../src/function";
 import {FormDataRouter, formDataRouter} from "../src/form-data-router";
 import {DirectoryEntry, parseRoutingDirectory} from "../src/intake-directory";
 import {ticketAnnouncer, TicketAnnouncer} from "../src/ticket-announcer";
