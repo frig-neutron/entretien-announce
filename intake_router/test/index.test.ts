@@ -5,12 +5,11 @@ import * as functions from "@google-cloud/functions-framework";
 import {mock} from "jest-mock-extended";
 import {IntakeFormData, parseIntakeFormData} from "../src/intake-form-data";
 import {parsePublishConfig, PublishConfig, pubsubSender, Sender} from "pubsub_lalliance/src/sender";
-import {intake_router} from "../src";
+import {Env, intake_router} from "../src";
 import {FormDataRouter, formDataRouter} from "../src/form-data-router";
 import {DirectoryEntry, parseRoutingDirectory} from "../src/intake-directory";
 import {ticketAnnouncer, TicketAnnouncer} from "../src/ticket-announcer";
-import {JiraServiceCfg, jiraService} from "../src/jira-service";
-import {parseJiraBasicAuth} from "../src/jira-service";
+import {JiraConfig, jiraService, parseJiraBasicAuth} from "../src/jira-service";
 
 jest.mock("../src/form-data-router")
 jest.mock("../src/intake-directory")
@@ -35,19 +34,24 @@ describe("mainline", () => {
     project_id: "paperclip", topic_name: "advanced-aeronautics"
   }
 
-  const jiraCreds: JiraServiceCfg = {
-    jira_email: "eeemail",
-    jira_token: "toukeeen" + rnd,
-    jira_host: "http://google.com",
-    jira_intake_project_key: "PAPERCLIP",
-    test_mode: false
+  const jiraConfig: JiraConfig = {
+    secrets: {
+      jira_email: "eeemail",
+      jira_token: "toukeeen" + rnd,
+    },
+    options: {
+      jira_host: "http://google.com",
+      jira_intake_project_key: "PAPERCLIP",
+      test_mode: false
+    }
   }
 
   beforeEach(() => {
     // our mocks know how to handle pubconfs
-    process.env["PUBLISH_CONFIG"] = "pubconf"
-    process.env["DIRECTORY"] = "routing"
-    process.env["JIRA_CONFIG"] = "jcreds"
+    process.env[Env.PUBLISH_CONFIG] = "pubconf"
+    process.env[Env.DIRECTORY] = "routing"
+    process.env[Env.SECRETS] = "jcreds"
+    process.env[Env.JIRA_OPTIONS] = "jopts"
   })
 
   const server = getTestServer("intake_router")
@@ -58,7 +62,7 @@ describe("mainline", () => {
     f.formDataRouterMock.route.mockResolvedValue(issueKey)
 
     f.mockRoutingDirectoryParsing("routing", [sampleDirectory])
-    f.mockJiraCredsParsing("jcreds", jiraCreds)
+    f.mockJiraCredsParsing("jcreds", "jopts", jiraConfig)
     f.mockFormDataParsing("formdata", formData);
     f.mockPublishConfigParsing("pubconf", publishConfig);
 
@@ -66,7 +70,7 @@ describe("mainline", () => {
     await response.expect(200, issueKey)
 
     expect(f.capturedAnnouncerFactoryCallArg()).toEqual([sampleDirectory])
-    expect(f.jiraServiceFactory).toBeCalledWith(jiraCreds)
+    expect(f.jiraServiceFactory).toBeCalledWith(jiraConfig)
     expect(f.senderFactory).toBeCalledWith(publishConfig)
     expect(f.formDataRouterMock.route).toBeCalledWith(expect.objectContaining(formData))
   })
@@ -74,7 +78,7 @@ describe("mainline", () => {
   test("parse routing directory or return 500", async () => {
     const f = new MockFixture()
     f.mockRoutingDirectoryParsing("routing", [sampleDirectory])
-    process.env["DIRECTORY"] = "non-routing"
+    process.env[Env.DIRECTORY] = "non-routing"
 
     const response = supertest(server).post("/").send("something");
 
@@ -84,7 +88,7 @@ describe("mainline", () => {
   test("parse pubsub config or return 500", async () => {
     const f = new MockFixture()
     f.mockPublishConfigParsing("pubconf", publishConfig);
-    process.env["PUBLISH_CONFIG"] = "wrong pubconf"
+    process.env[Env.PUBLISH_CONFIG] = "wrong pubconf"
 
     const response = supertest(server).post("/").send("something");
 
@@ -93,12 +97,22 @@ describe("mainline", () => {
 
   test("parse jira creds or return 500", async () => {
     const f = new MockFixture()
-    f.mockJiraCredsParsing("jcreds", jiraCreds)
-    process.env["JIRA_CONFIG"] = "wrong jcreds"
+    f.mockJiraCredsParsing("jcreds", "jopts", jiraConfig)
+    process.env[Env.SECRETS] = "wrong jcreds"
 
     const response = supertest(server).post("/").send("something");
 
     await response.expect(500, "expected jcreds but got wrong jcreds")
+  })
+
+  test("parse jira options or return 500", async () => {
+    const f = new MockFixture()
+    f.mockJiraCredsParsing("jcreds", "jopts", jiraConfig)
+    process.env[Env.JIRA_OPTIONS] = "wrong jopts"
+
+    const response = supertest(server).post("/").send("something");
+
+    await response.expect(500, "expected jcreds but got wrong jopts")
   })
 
   test("form parse error should return 400", async () => {
@@ -164,8 +178,16 @@ describe("mainline", () => {
       this.mockParsing(rawInput, publishConfig, this.parsePublishConfigMock)
     }
 
-    mockJiraCredsParsing(rawInput: any, jiraBasicAuth: JiraServiceCfg): void {
-      this.mockParsing(rawInput, jiraBasicAuth, this.parseJiraBasicAuthMock)
+    mockJiraCredsParsing(rawSecrets: any, rawOptions: any, output: JiraConfig): void {
+      const errorOut: (actual: any) => JiraConfig = (actual) => {
+        throw new Error("expected " + rawSecrets + " but got " + actual);
+      };
+      const mockDecoder = async (s: any, o: any) => {
+        if (s != rawSecrets) return  errorOut(s);
+        if (o != rawOptions) return  errorOut(o);
+        return output
+      }
+      this.parseJiraBasicAuthMock.mockImplementation(mockDecoder)
     }
 
     capturedAnnouncerFactoryCallArg(): DirectoryEntry[] {

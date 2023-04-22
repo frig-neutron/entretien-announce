@@ -1,5 +1,5 @@
-import {JiraServiceCfg, jiraService, parseJiraBasicAuth} from "../src/jira-service";
-import {Callback, Version2Client} from "jira.js";
+import {JiraConfig, jiraService, parseJiraBasicAuth} from "../src/jira-service";
+import {Version2Client} from "jira.js";
 import {IntakeFormData} from "../src/intake-form-data";
 import {mockDeep} from "jest-mock-extended";
 import {CreateIssue} from "jira.js/out/version2/parameters";
@@ -7,33 +7,58 @@ import {CreatedIssue} from "jira.js/out/version2/models";
 
 describe("jira service", () => {
   const rnd = Math.floor(Math.random() * 10000)
-  const cfg: () => JiraServiceCfg = () => {
+
+  const config: () => JiraConfig = () => {
     return {
-      jira_intake_project_key: "PROJ_" + rnd,
-      jira_host: "",
-      test_mode: false,
-      jira_email: "the_cat",
-      jira_token: "on the mat" + rnd
+      secrets: {
+        jira_intake_project_key: "PROJ_" + rnd,
+        jira_host: "",
+        test_mode: false,
+        jira_email: "the_cat",
+        jira_token: "on the mat" + rnd
+      },
+      options: {
+        jira_intake_project_key: "PROJ_" + rnd,
+        jira_host: "",
+        test_mode: false,
+      }
     }
   }
 
   describe("credential parsing", () => {
     test("parse credentials", async () => {
-      const actualCreds = await parseJiraBasicAuth(JSON.stringify(cfg()))
-      expect(actualCreds).toEqual(cfg())
+      const cfg = config()
+      const actualCreds = await parseJiraBasicAuth(
+          JSON.stringify(cfg.secrets),
+          JSON.stringify(cfg.options)
+      )
+      expect(actualCreds).toEqual(config())
     })
     test("parse credentials allows extra keys", async () => {
-      const definedKeys = cfg();
-      const aLittleExtra = {
+      const cfg = config();
+      const aLittleExtraSecrets = {
         somethingMore: "foo",
-        ...definedKeys
+        ...cfg.secrets
       }
-      const actualCreds = await parseJiraBasicAuth(JSON.stringify(aLittleExtra))
-      expect(actualCreds).toEqual(aLittleExtra)
+      const actualCreds = await parseJiraBasicAuth(
+          JSON.stringify(aLittleExtraSecrets),
+          JSON.stringify(cfg.options)
+      )
+      expect(actualCreds.secrets).toEqual(aLittleExtraSecrets)
     })
-    test("parse credentials error", async () => {
-      const actualCreds = parseJiraBasicAuth("bad format")
-      await expect(actualCreds).rejects.toThrow("Invalid jira creds: bad format")
+    test("parse secrets error", async () => {
+      const actualCreds = parseJiraBasicAuth(
+          "bad format",
+          JSON.stringify(config().options)
+      )
+      await expect(actualCreds).rejects.toThrow("Invalid jira secrets: unexpected token b")
+    })
+    test("parse options error", async () => {
+      const actualCreds = parseJiraBasicAuth(
+          JSON.stringify(config().secrets),
+          "options bad"
+      )
+      await expect(actualCreds).rejects.toThrow("Invalid jira options: unexpected token o")
     })
   })
   describe("ticket operations", () => {
@@ -60,7 +85,7 @@ describe("jira service", () => {
       return {
         fields: {
           project: {
-            key: cfg().jira_intake_project_key
+            key: config().options.jira_intake_project_key
           },
           summary: "3740 Unit 1: Needs love",
           description: "All out of love, so lost without you\n\nReported by A. Friend",
@@ -78,8 +103,8 @@ describe("jira service", () => {
           Promise.resolve(createdIssue)
       )
 
-      const jiraClientFactory: (creds: JiraServiceCfg) => Version2Client = (_) => client;
-      const jira = jiraService(cfg(), jiraClientFactory);
+      const jiraClientFactory: (creds: JiraConfig) => Version2Client = (_) => client;
+      const jira = jiraService(config(), jiraClientFactory);
 
       const key = jira.createIssue(formData());
 
@@ -93,8 +118,8 @@ describe("jira service", () => {
           Promise.resolve(createdIssue)
       )
 
-      const jiraClientFactory: (creds: JiraServiceCfg) => Version2Client = (_) => client;
-      const jira = jiraService(cfg(), jiraClientFactory);
+      const jiraClientFactory: (creds: JiraConfig) => Version2Client = (_) => client;
+      const jira = jiraService(config(), jiraClientFactory);
 
       const urgentFormSubmission = formData();
       urgentFormSubmission.priority = "urgent"
@@ -111,8 +136,10 @@ describe("jira service", () => {
           Promise.resolve(createdIssue)
       )
 
-      const jiraClientFactory: (creds: JiraServiceCfg) => Version2Client = (_) => client;
-      const jira = jiraService({...cfg(), test_mode: true}, jiraClientFactory);
+      const jiraClientFactory: (creds: JiraConfig) => Version2Client = (_) => client;
+      const testModeConfig = config();
+      testModeConfig.options.test_mode = true
+      const jira = jiraService(testModeConfig, jiraClientFactory);
 
       jira.createIssue(formData())
 

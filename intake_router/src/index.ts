@@ -14,7 +14,13 @@ process.on('uncaughtException', function (err) {
   console.error('Uncaught exception', err);
 });
 
-const env = dotenv_config()
+const dotEnv = dotenv_config()
+export enum Env {
+  SECRETS = "SECRETS",
+  JIRA_OPTIONS = "JIRA_OPTIONS",
+  PUBLISH_CONFIG = "PUBLISH_CONFIG",
+  DIRECTORY = "DIRECTORY"
+}
 
 // https://cloud.google.com/functions/docs/writing/background#function_parameters
 // Absolutely MUST use the 3-param version b/c otherwise there seems to be no way to terminate the function properly.
@@ -47,13 +53,16 @@ export const intake_router: HttpFunction = async (req: Request, res: Response) =
 function jiraCreds() {
   // TODO: jira config must be secret
   // todo: take env var names to constants
-  return parseJiraBasicAuth(process.env["JIRA_CONFIG"])
+  return parseJiraBasicAuth(
+      process.env[Env.SECRETS],
+      process.env[Env.JIRA_OPTIONS]
+  )
 }
 
 function publishConfig() {
-  return parsePublishConfig(process.env["PUBLISH_CONFIG"]);
+  return parsePublishConfig(process.env[Env.PUBLISH_CONFIG]);
 }
 
 function intakeDirectory() {
-  return parseRoutingDirectory(process.env["DIRECTORY"])
+  return parseRoutingDirectory(process.env[Env.DIRECTORY])
 }

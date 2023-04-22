@@ -1,6 +1,6 @@
 import {IntakeFormData} from "./intake-form-data";
 import {Version2Client} from "jira.js";
-import Ajv, {JTDSchemaType} from "ajv/dist/jtd";
+import Ajv, {JTDParser, JTDSchemaType} from "ajv/dist/jtd";
 import {CreateIssue} from "jira.js/out/version2/parameters";
 
 const ajv = new Ajv({verbose: true, allErrors: true})
@@ -9,12 +9,12 @@ const jiraPriorityUrgent = "Urgent"
 const jiraPriorityMedium = "Medium"
 
 export function jiraService(
-    config: JiraServiceCfg,
-    jiraClientFactory: (creds: JiraServiceCfg) => Version2Client = jiraV2Client
+    config: JiraConfig,
+    jiraClientFactory: (creds: JiraConfig) => Version2Client = jiraV2Client
 ): JiraService {
   const version2Client = jiraClientFactory(config);
   const converFormToIssue = (form: IntakeFormData): CreateIssue => {
-    const testPrefix = config.test_mode ? "TEST - " : "";
+    const testPrefix = config.options.test_mode ? "TEST - " : "";
 
     function summarize() {
       return `${form.building} ${form.area}: ${form.summary}`;
@@ -35,7 +35,7 @@ export function jiraService(
     return {
       fields: {
         project: {
-          key: config.jira_intake_project_key
+          key: config.options.jira_intake_project_key
         },
         summary: testPrefix + summarize(),
         description: createDescription(),
@@ -65,15 +65,23 @@ export interface JiraService {
   createIssue: (intakeFormData: IntakeFormData) => Promise<String>
 }
 
-export interface JiraServiceCfg {
+export interface JiraSecrets {
   jira_email: string
   jira_token: string
+}
+
+export interface JiraOptions {
   jira_host: string
   jira_intake_project_key: string
   test_mode: boolean
 }
 
-const jiraBasicAuthSchema: JTDSchemaType<JiraServiceCfg> = {
+export interface JiraConfig {
+  secrets: JiraSecrets
+  options: JiraOptions
+}
+
+const jiraSecretsSchema: JTDSchemaType<JiraSecrets> = {
   properties: {
     jira_email: {
       type: "string"
@@ -81,6 +89,14 @@ const jiraBasicAuthSchema: JTDSchemaType<JiraServiceCfg> = {
     jira_token: {
       type: "string"
     },
+  },
+  // To stay in gcp free tier w/ secrets, we share secret definitions with other functions
+  // Stuff like SMTP secrets are also defined here.
+  additionalProperties: true
+}
+
+const jiraOptionsSchema: JTDSchemaType<JiraOptions> = {
+  properties: {
     jira_host: {
       type: "string"
     },
@@ -90,28 +106,32 @@ const jiraBasicAuthSchema: JTDSchemaType<JiraServiceCfg> = {
     test_mode: {
       type: "boolean"
     }
-  },
-  // To stay in gcp free tier w/ secrets, we share secret definitions with other functions
-  // Stuff like SMTP secrets are also defined here.
-  additionalProperties: true
+  }
 }
 
-export function parseJiraBasicAuth(data: any): Promise<JiraServiceCfg> {
-  const parser = ajv.compileParser(jiraBasicAuthSchema);
-  const parseResult = parser(String(data))
+export function parseJiraBasicAuth(secrets: any, options: any): Promise<JiraConfig> {
+  const secretsParser = ajv.compileParser(jiraSecretsSchema);
+  const secretsParseResult = secretsParser(String(secrets))
 
-  return parseResult
-      ? Promise.resolve(parseResult)
-      : Promise.reject(Error(`Invalid jira creds: ${data}`))
+  const optionsParser = ajv.compileParser(jiraOptionsSchema)
+  const optionsParseResult = optionsParser(options)
+
+  const errMsg  = (m: string, p: JTDParser<any>) => p.message ? `${m}: ${p.message}` : ""
+  const secretsErr = errMsg("secrets", secretsParser);
+  const optionsErr = errMsg("options", optionsParser);
+
+  return secretsParseResult && optionsParseResult
+      ? Promise.resolve({secrets: secretsParseResult, options: optionsParseResult})
+      : Promise.reject(Error(`Invalid jira ${secretsErr}${optionsErr}`))
 }
 
-function jiraV2Client(config: JiraServiceCfg): Version2Client {
+function jiraV2Client(config: JiraConfig): Version2Client {
   return new Version2Client({
-    host: config.jira_host,
+    host: config.options.jira_host,
     authentication: {
       basic: {
-        apiToken: config.jira_token,
-        email: config.jira_email
+        apiToken: config.secrets.jira_token,
+        email: config.secrets.jira_email
       }
     }
   });
