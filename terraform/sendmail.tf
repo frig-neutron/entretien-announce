@@ -19,7 +19,8 @@ resource "google_pubsub_topic_iam_binding" "sendmail_publisher" {
   topic   = google_pubsub_topic.sendmail.name
   role    = "roles/pubsub.publisher"
   members = [
-    "serviceAccount:${google_service_account.announcer.email}"
+    google_service_account.announcer.member,
+    google_service_account.intake_router.member
   ]
 }
 
