@@ -6,7 +6,7 @@ if [ -z "$env" ]; then
 fi
 
 set -euo pipefail
-scriptdir="`dirname $0`/../scripts"
+scriptdir="../scripts"
 
 . "$scriptdir/_include.sh"
 
