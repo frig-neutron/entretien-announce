@@ -1,5 +1,5 @@
 #!/bin/bash
-# usage: publish_function.sh PROJECT_ID FUNC_NAME
+# usage: publish_function.sh PROJECT_ID
 # output: object path
 
 . "`dirname $0`/_include.sh"
@@ -7,9 +7,7 @@
 require_function_root
 
 project_id=$1
-function_name=$2
-
-dest_path=`gcf_source_path $project_id $function_name`
+dest_path=`gcf_source_path $project_id`
 zip_file=`mktemp`
 
 {

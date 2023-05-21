@@ -4,8 +4,7 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
 fi
 
 function seterr() {
-  set -o e
-  set -o u
+  set -eu -opipefail
 }
 
 function require_function_root() {
@@ -22,8 +21,12 @@ function project_number() {
   gcloud projects describe $1 --format=json | jq -r '.projectNumber'
 }
 
+function gcf_funcname() {
+  seterr
+  < package.json jq -r '.name'
+}
+
 # param: $1 - project name
-# param: $2 - function name
 function gcf_source_path() {
   seterr
   project_number=`project_number $1`
@@ -31,5 +34,7 @@ function gcf_source_path() {
   month=`date +%m`
   date=`date --iso-8601=hours --utc`
   source_hash=`git rev-parse --short HEAD`
-  echo "gs://gcf-sources-$project_number-us-central1/gcf_name=$2/year=$year/month=$month/src_${date}_$source_hash.zip"
+  bucket="gs://gcf-sources-$project_number-us-central1"
+  path="gcf_name=`gcf_funcname`/year=$year/month=$month/src_${date}_$source_hash.zip"
+  echo "$bucket/$path"
 }
