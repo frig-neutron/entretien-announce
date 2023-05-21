@@ -3,6 +3,11 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
     exit 1
 fi
 
+function seterr() {
+  set -o e
+  set -o u
+}
+
 function require_function_root() {
   test -f package.json || {
     echo "package.json not found"
@@ -13,12 +18,14 @@ function require_function_root() {
 
 # param: $1 - project name
 function project_number() {
+  seterr
   gcloud projects describe $1 --format=json | jq -r '.projectNumber'
 }
 
 # param: $1 - project name
 # param: $2 - function name
 function gcf_source_path() {
+  seterr
   project_number=`project_number $1`
   year=`date +%Y`
   month=`date +%m`
