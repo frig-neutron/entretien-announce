@@ -4,7 +4,7 @@ if [[ "${BASH_SOURCE[0]}" = "$0" ]]; then
 fi
 
 function seterr() {
-  set -eu -opipefail
+  set -euo pipefail
 }
 
 function require_function_root() {
