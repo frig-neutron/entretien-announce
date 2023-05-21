@@ -1,24 +1,22 @@
 #!/bin/bash
-
 # usage: publish_function.sh PROJECT_ID FUNC_NAME
 # output: object path
 
-# todo: check if cwd is a cloud function
+. "`dirname $0`/_include.sh"
+
+require_function_root
+
 project_id=$1
 function_name=$2
-project_number=`gcloud projects describe $project_id --format=json | jq -r '.projectNumber'`
-year=`date +%Y`
-month=`date +%m`
-date=`date --iso-8601=seconds --utc`
-dest_path="gs://gcf-sources-$project_number-us-central1/$function_name/year=$year/month=$month/src_$date.zip"
 
-zipfile=`mktemp`
+dest_path=`gcf_source_path $project_id $function_name`
+zip_file=`mktemp`
 
 {
   find -L . \( -name '*.json' -or -name '*.js' -or -name '*.ts' \) -and -not -path '*/node_modules/*' -and -not -path '*/build/*' |
-    zip - -@ > $zipfile
+    zip - -@ > $zip_file
 
-  gsutil cp $zipfile $dest_path 
+  gsutil cp $zip_file $dest_path
 } > /dev/null
 
 echo $dest_path
