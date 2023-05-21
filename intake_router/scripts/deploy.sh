@@ -6,16 +6,19 @@ if [ -z "$env" ]; then
 fi
 
 set -euo pipefail
+scriptdir="`dirname $0`/../scripts"
 
-. "`dirname $0`/../scripts/_include.sh"
+. "$scriptdir/_include.sh"
 
 require_function_root
-
 project_id=entretien-$env
+
+source_path=`$scriptdir/publish_function.sh $project_id`
+
 cwd=`dirname $0`
 
 gcloud functions deploy intake_router --project=$project_id --max-instances=2 \
-  --source="`gcf_source_path $project_id`" \
+  --source="$source_path" \
   --runtime=nodejs16 --trigger-http --allow-unauthenticated \
   --env-vars-file="$cwd/env-$env.yaml" \
   --set-secrets=SECRETS=announcer:latest \
