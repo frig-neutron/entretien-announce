@@ -29,7 +29,7 @@
     "gcp-build": "tsc",
     "lint": "gts lint",
     "posttest": "npm run lint",
-    "prepare": "../scripts/chain_npm_ci.js",
+    "prepare": "node ../scripts/chain_npm_ci.js",
     "pretest": "npm run compile",
     "test": "jest"
   }
