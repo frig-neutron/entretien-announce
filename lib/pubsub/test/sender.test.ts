@@ -40,15 +40,13 @@ describe('pubsub sender', () => {
       topic_name: '🐕' + Math.random(),
     };
 
-    return expect(parsePublishConfig(
-      JSON.stringify(refCfg))
-    ).resolves.toEqual(refCfg)
+    return expect(parsePublishConfig(JSON.stringify(refCfg))).resolves.toEqual(
+      refCfg
+    );
   });
 
   test('parse sender config fail', () => {
-    return expect(parsePublishConfig(
-      "1")
-    ).rejects.toThrow()
+    return expect(parsePublishConfig('1')).rejects.toThrow();
   });
 });
 
