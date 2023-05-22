@@ -1,5 +1,5 @@
 import {IntakeFormData} from "./intake-form-data";
-import {Announcement} from "struct_lalliance/build/src/announcement";
+import {Announcement} from "struct_lalliance/src/announcement";
 import {DirectoryEntry, Role} from "./intake-directory";
 import {log} from "./logger";
 

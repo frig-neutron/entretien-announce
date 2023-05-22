@@ -1,7 +1,7 @@
 import {IntakeFormData} from "./intake-form-data";
 import {JiraService} from "./jira-service";
 import {TicketAnnouncer} from "./ticket-announcer";
-import {Sender} from "pubsub_lalliance/build/src/sender";
+import {Sender} from "pubsub_lalliance/src/sender";
 
 export interface FormDataRouter {
   route(intakeFormData: IntakeFormData): Promise<String>

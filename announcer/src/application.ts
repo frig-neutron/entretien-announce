@@ -3,7 +3,7 @@ import {DateTime, Interval} from "luxon";
 import {ReportService} from "./report_service";
 import {AnnouncementFactory} from "./announcement_factory";
 import {log} from "./logger";
-import {Sender} from "pubsub_lalliance/build/src/sender";
+import {Sender} from "pubsub_lalliance/src/sender";
 
 export type Clock = () => DateTime
 

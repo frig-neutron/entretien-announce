@@ -1,5 +1,5 @@
 import {PubSub} from '@google-cloud/pubsub';
-import {Announcement} from 'struct_lalliance/build/src/announcement';
+import {Announcement} from 'struct_lalliance/src/announcement';
 import {JTDSchemaType} from 'ajv/dist/types/jtd-schema';
 import Ajv, {JTDParser} from 'ajv/dist/jtd';
 import addFormats from 'ajv-formats';

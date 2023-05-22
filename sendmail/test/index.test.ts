@@ -4,7 +4,7 @@ import {mockDeep, mockFn} from "jest-mock-extended";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import Mock = jest.Mock;
 import {Secrets} from "../src/parsers";
-import {Announcement} from "struct_lalliance/build/src/announcement";
+import {Announcement} from "struct_lalliance/src/announcement";
 
 describe("mainline", () => {
   const senderFactoryMock = mockedSenderFactory()

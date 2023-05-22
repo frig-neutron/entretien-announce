@@ -3,7 +3,7 @@ import {jiraClientImpl} from "./jira_client";
 import {reportServiceImpl} from "./report_service";
 import {announcementFactoryImpl, Recipient} from "./announcement_factory";
 import {Version2Client} from "jira.js";
-import {PublishConfig, pubsubSender} from "pubsub_lalliance/build/src/sender";
+import {PublishConfig, pubsubSender} from "pubsub_lalliance/src/sender";
 
 export type ApplicationFactory = (
     directory: Recipient[],
