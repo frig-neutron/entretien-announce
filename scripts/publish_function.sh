@@ -11,7 +11,7 @@ dest_path=`gcf_source_path $project_id`
 zip_file=`mktemp`
 
 {
-  find -L . \( -name '*.json' -or -name '*.js' -or -name '*.ts' \) -and -not -path '*/node_modules/*' -and -not -path '*/build/*' |
+  find -L . -type f -and -not -path '*/node_modules/*' -and -not -path '*/build/*' |
     zip - -@ > $zip_file
 
   gsutil cp $zip_file $dest_path
