@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# executes npm ci if invocation is chained from another module
+# does nothing if executed directly
+
+# shellcheck disable=SC2154
+root_package_name=`< "$npm_config_local_prefix/package.json" jq -r '.name'`
+[ $npm_package_name != $root_package_name ] && npm ci

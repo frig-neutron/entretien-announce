@@ -44,7 +44,6 @@
         "gcp-build": "tsc",
         "lint": "gts lint",
         "posttest_disabled": "npm run lint",
-        "prepare": "npm run compile",
         "pretest": "npm run compile",
         "test": "jest",
         "typesafe-i18n": "typesafe-i18n",
