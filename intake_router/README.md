@@ -18,8 +18,8 @@ The only param is the actual form submission:
     "priority": "regular",
     "reporter": "guest",
     "rowIndex": 666,
-    "summary": "Haunted bathtub",
-    "description": "Blood from shower on occasion. Turning water off and on resolves issue."
+    "summary": "this is test issue",
+    "description": "test description."
 }
 ```
 
