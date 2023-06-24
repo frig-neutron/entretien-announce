@@ -1,5 +1,5 @@
 import {toJira, toJiraTestMode} from "../appscript/Code"
-import {mockJira} from "./mock/jira";
+import {mockJira} from "./mock/http";
 import {mockSheetsApp} from "./mock/sheets";
 
 describe("intake end-to-end", () => {
