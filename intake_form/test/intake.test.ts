@@ -1,6 +1,7 @@
-import {toJira, toJiraTestMode} from "../appscript/Code"
+import {setSendEndpoint, toJira, toJiraTestMode} from "../appscript/Code"
 import {mockJira} from "./mock/http";
 import {mockSheetsApp} from "./mock/sheets";
+import {mockThePropertiesService} from "./mock/properties";
 
 describe("intake end-to-end", () => {
 
@@ -82,6 +83,14 @@ describe("intake end-to-end", () => {
       })
     })
   })
+})
+
+test("property saving function", () => {
+  const props = mockThePropertiesService()
+
+  setSendEndpoint("foo")
+
+  props.assertEndpointHasBeenSetTo("foo")
 })
 
 export type Responses = ReturnType<typeof responses>

@@ -13,6 +13,7 @@ let columnIndex: { [k: string]: number }
 let jiraBasicAuthToken: string
 const jiraPriorityUrgent = "urgent"
 const jiraPriorityRegular = "regular"
+const functionEndpontConfigKey = "FUNCTION_ENDPOINT"
 
 const responseFieldLabels: { [label: string]: string } = {
   building: "Bâtiment",
@@ -182,4 +183,12 @@ function mark(ticketRowIndex: number, columnIndex: number, value: any) {
   logSheet.getRange(ticketRowIndex, columnIndex).setValue(value)
 }
 
-export {toJira, toJiraTestMode, responseFieldLabels}
+/**
+ * Configure script with function endpoint. This is an administrative function, intended
+ * to be called from CLASP during deployment.
+ */
+function setSendEndpoint(url: string){
+  PropertiesService.getScriptProperties().setProperty(functionEndpontConfigKey, url)
+}
+
+export {toJira, toJiraTestMode, setSendEndpoint, responseFieldLabels, functionEndpontConfigKey}
