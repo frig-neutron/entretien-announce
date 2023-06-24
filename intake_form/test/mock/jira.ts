@@ -1,19 +1,14 @@
-import {responseFieldLabels} from "../../appscript/Code";
+import {FormData, responseFieldLabels} from "../../appscript/Code";
 import {Responses} from "../intake.test";
 import {mock} from "jest-mock-extended";
 import UrlFetchApp = GoogleAppsScript.URL_Fetch.UrlFetchApp;
 import HTTPResponse = GoogleAppsScript.URL_Fetch.HTTPResponse;
-import Folder = GoogleAppsScript.Drive.Folder;
-import File = GoogleAppsScript.Drive.File;
 import CustomMatcherResult = jest.CustomMatcherResult;
-import DriveApp = GoogleAppsScript.Drive.DriveApp;
-import FolderIterator = GoogleAppsScript.Drive.FolderIterator;
-import Blob = GoogleAppsScript.Base.Blob;
 
 declare var global: typeof globalThis; // can't use @types/node
 
 interface TicketMatchers {
-  filesJiraTicket(ticketParts: TicketParts): CustomMatcherResult,
+  filesJiraTicket(formData: FormData): CustomMatcherResult,
 }
 
 declare global {
@@ -24,14 +19,12 @@ declare global {
   }
 }
 
-function extendJestWithJiraMatcher(resp: Responses, apiToken: string) {
+function extendJestWithJiraMatcher(resp: Responses) {
 
   expect.extend({
-    filesJiraTicket(received, ticketParts: TicketParts) {
+    filesJiraTicket(received, formData: FormData) {
       const [url, options] = received
       const payload = JSON.parse(options.payload)
-      const submittedBy = resp.responseValue(responseFieldLabels.reportedBy)
-      const description = resp.responseValue(responseFieldLabels.description)
 
       expect(url).toEqual("https://lalliance.atlassian.net/rest/api/latest/issue")
       expect(options).toMatchObject({
@@ -41,24 +34,9 @@ function extendJestWithJiraMatcher(resp: Responses, apiToken: string) {
         headers: {
           "contentType": "application/json",
           "Accept": "application/json",
-          "authorization": "Basic " + apiToken
         }
       })
-      expect(payload).toMatchObject({
-        fields: {
-          project: {
-            key: 'TRIAG'
-          },
-          issuetype: {
-            name: 'Intake'
-          },
-          summary: ticketParts.summary,
-          description: `${description}\n\nReported by ${submittedBy}`,
-          priority: {
-            name: ticketParts.isUrgent ? "Urgent" : "Medium"
-          }
-        }
-      })
+      expect(payload).toMatchObject(formData)
       return {
         pass: true,
         message: () => "I ain't nothing to say to you"
@@ -67,21 +45,14 @@ function extendJestWithJiraMatcher(resp: Responses, apiToken: string) {
   })
 }
 
-export type TicketParts = {
-  isUrgent: boolean,
-  summary: string
-}
 
-function mockTheUrlFetchApp(issueKey: string, issueRestUrl: string) {
+function mockTheUrlFetchApp(issueKey: string) {
   return mock<UrlFetchApp>({
     fetch: jest.fn((): HTTPResponse => {
 
       return mock<HTTPResponse>({
             getContentText() {
-              return JSON.stringify({
-                key: issueKey,
-                self: issueRestUrl,
-              })
+              return issueKey
             }
           }
       )
@@ -89,73 +60,19 @@ function mockTheUrlFetchApp(issueKey: string, issueRestUrl: string) {
   });
 }
 
-function mockDriveApp(apiToken: string) {
-  return mock<DriveApp>({
-    getRootFolder: () => mock<Folder>({
-      getFoldersByName: (folderName: string) => mock<GoogleAppsScript.Drive.FolderIterator>(
-          folderName !== "jira"
-              ? mock<FolderIterator>() // todo: should probably throw exception here
-              : iter<Folder>(mock<Folder>({
-                getFilesByName: (fileName: string) => iter<File>(
-                    mock<File>({
-                      getBlob: () => mock<Blob>({
-                        getDataAsString: () => fileName === "jira-basic-auth-token" ? apiToken : "WRONG TOKEN"
-                      })
-                    })
-                )
-              }))
-      )
-    })
-  })
-}
-
 export function mockJira(resp: Responses) {
-  const restUrlBase = "https://lalliance.atlassian.net/mockrest/";
   const issueKey = "ISSUE-" + Math.random()
-  const issueRestUrl = restUrlBase + issueKey
-  const urlFetchApp = mockTheUrlFetchApp(issueKey, issueRestUrl);
-  const summaryLine = function () {
-    const building = resp.responseValue(responseFieldLabels.building)
-    const area = resp.responseValue(responseFieldLabels.area)
-    const shortSummary = resp.responseValue(responseFieldLabels.element)
+  const urlFetchApp = mockTheUrlFetchApp(issueKey);
 
-    return building + " " + area + ": " + shortSummary
-  }()
-
-  const someTicketParts: Partial<TicketParts> = {}
-  const jira = {
+  const ticketRouterMocks = {
     issueKey: issueKey,
-    apiToken: "tok-" + Math.random(),
-    issueRestUrl: issueRestUrl,
-    summaryLine: summaryLine,
-    assertTicketCreated(t: Partial<TicketParts>) {
-
-      expect(urlFetchApp.fetch.mock.calls[0]).filesJiraTicket({
-        isUrgent: t.isUrgent!,
-        summary: summaryLine,
-        ...t // override summary if provided in arg
-      })
+    assertTicketCreated(t: FormData) {
+      expect(urlFetchApp.fetch.mock.calls[0]).filesJiraTicket(t)
     },
-    someTicketParts: someTicketParts
   };
 
   // noinspection JSUnusedLocalSymbols
   global.UrlFetchApp = urlFetchApp
-  global.DriveApp = mockDriveApp(jira.apiToken)
-  extendJestWithJiraMatcher(resp, jira.apiToken)
-  return jira
+  extendJestWithJiraMatcher(resp)
+  return ticketRouterMocks
 }
-
-
-type GenericIterator<F extends File | Folder> = {
-  getContinuationToken(): string,
-  hasNext(): boolean,
-  next(): F
-}
-
-// wrap value in fake iterator. Returns the same value over and over and over and over....
-const iter = <F extends File | Folder>(value: F): GenericIterator<F> => ({
-  next: () => value,
-  hasNext: () => true,
-  getContinuationToken: () => ""
-})

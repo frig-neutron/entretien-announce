@@ -1,6 +1,5 @@
 import {toJira, toJiraTestMode} from "../appscript/Code"
 import {mockJira} from "./mock/jira";
-import {mockMailApp} from "./mock/mail";
 import {mockSheetsApp} from "./mock/sheets";
 
 describe("intake end-to-end", () => {
@@ -12,99 +11,46 @@ describe("intake end-to-end", () => {
       "3737",
       "Sous-sol",
       "Urgent (à régler dans les prochaines 24 heures / to be repaired in the next 24 hours)",
-      "Diego Briceño",
+      "A. Member",
       "chauffe-eau"
     ])
 
-    test("End to end, urgent", () => {
+    test("urgent", () => {
       const sheets = mockSheetsApp(responseValues)
       const jira = mockJira(responseValues);
-      const mailApp = mockMailApp(responseValues)
-
 
       const timestampLike = /....-..-..T..:..:..\....Z/;
 
       toJira(null);
 
-      sheets.logSheet.assertJiraUrlSetTo(jira.issueRestUrl)
       sheets.logSheet.assertJiraIssueKeySetTo(jira.issueKey)
       sheets.logSheet.assertProcessTimestampMatches(timestampLike)
 
-      jira.assertTicketCreated({isUrgent: true})
-      mailApp.assertAllMailSent(
-          {
-            to: 'yassaoubangoura@yahoo.fr',
-            subject: 'URGENT maintenance report from Diego Briceño',
-            bodyParts: {
-              recipientName: "Moussa",
-              reasonForReceiving: "you are a building representative for 3737",
-              isUrgent: true,
-              ...jira
-            }
-          },
-          {
-            to: 'mgutkowska2+intake@gmail.com',
-            subject: 'URGENT maintenance report from Diego Briceño',
-            bodyParts: {
-              recipientName: "Monica",
-              reasonForReceiving: "you are an Urgence-level responder",
-              isUrgent: true,
-              ...jira
-            }
-          },
-          {
-            to: 'shkosi@hotmail.com',
-            subject: 'URGENT maintenance report from Diego Briceño',
-            bodyParts: {
-              recipientName: "Kosai",
-              reasonForReceiving: "you are a triage responder",
-              isUrgent: true,
-              ...jira
-            }
-          }
-      )
+      jira.assertTicketCreated({
+        area: "Sous-sol",
+        building: "3737",
+        description: "L'eau chaude ne marche pas",
+        priority: "urgent",
+        reporter: "A. Member",
+        rowIndex: 2,
+        summary: "chauffe-eau"
+      })
     })
     test("Test-mode", () => {
       mockSheetsApp(responseValues)
       const jira = mockJira(responseValues);
-      const mailApp = mockMailApp(responseValues)
 
       toJiraTestMode("");
 
       jira.assertTicketCreated({
-        isUrgent: true,
-        summary: "TEST - " + jira.summaryLine
+        area: "Sous-sol",
+        building: "3737",
+        description: "TEST - L'eau chaude ne marche pas",
+        priority: "urgent",
+        reporter: "A. Member",
+        rowIndex: 2,
+        summary: "TEST - chauffe-eau"
       })
-
-      mailApp.assertAllMailSent(
-          {
-            to: 'frig.neutron+yassaoubangoura@gmail.com',
-            subject: 'TEST - URGENT maintenance report from Diego Briceño',
-            bodyParts: {
-              recipientName: "Moussa",
-              reasonForReceiving: "you are a building representative for 3737",
-              isUrgent: true,
-              ...jira
-            }
-          }, {
-            to: 'frig.neutron+mgutkowska2+intake@gmail.com',
-            subject: 'TEST - URGENT maintenance report from Diego Briceño',
-            bodyParts: {
-              recipientName: "Monica",
-              reasonForReceiving: "you are an Urgence-level responder",
-              isUrgent: true,
-              ...jira
-            }
-          }, {
-            to: 'frig.neutron+shkosi@gmail.com',
-            subject: 'TEST - URGENT maintenance report from Diego Briceño',
-            bodyParts: {
-              recipientName: "Kosai",
-              reasonForReceiving: "you are a triage responder",
-              isUrgent: true,
-              ...jira
-            }
-          })
     })
   })
 
@@ -115,40 +61,25 @@ describe("intake end-to-end", () => {
       "3737",
       "Sous-sol",
       "Régulier (ça peut être régler dans plus de 24 heures / can be solved in more that 24 hours)",
-      "Diego Briceño",
+      "A. Member",
       "chauffe-eau"
     ])
 
     test("End to end, non-urgent", () => {
       mockSheetsApp(responseValues)
       const jira = mockJira(responseValues);
-      const mailApp = mockMailApp(responseValues)
 
       toJira(null);
 
-      jira.assertTicketCreated({isUrgent: false})
-
-      mailApp.assertAllMailSent({
-            to: 'yassaoubangoura@yahoo.fr',
-            subject: 'Maintenance report from Diego Briceño',
-            bodyParts: {
-              recipientName: "Moussa",
-              reasonForReceiving: "you are a building representative for 3737",
-              isUrgent: false,
-              ...jira
-            }
-          },
-          {
-            to: 'shkosi@hotmail.com',
-            subject: 'Maintenance report from Diego Briceño',
-            bodyParts: {
-              recipientName: "Kosai",
-              reasonForReceiving: "you are a triage responder",
-              isUrgent: false,
-              ...jira
-            }
-          }
-      )
+      jira.assertTicketCreated({
+        area: "Sous-sol",
+        building: "3737",
+        description: "L'eau chaude ne marche pas",
+        priority: "regular",
+        reporter: "A. Member",
+        rowIndex: 2,
+        summary: "chauffe-eau"
+      })
     })
   })
 })

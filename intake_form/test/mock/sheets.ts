@@ -46,9 +46,6 @@ export function mockSheetsApp(responseValues: Responses) {
             }
         )
       },
-      assertJiraUrlSetTo(url: string) {
-        expect(issueLinkRange.setValue.mock.calls[0][0]).toEqual(url)
-      },
       assertJiraIssueKeySetTo(issueKey: string) {
         expect(issueKeyRange.setValue.mock.calls[0][0]).toEqual(issueKey)
       },
