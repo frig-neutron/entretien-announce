@@ -61,7 +61,8 @@ export interface FormData {
   description: string
   area: string
   reporter: string
-  priority: string
+  priority: "regular" | "urgent"
+  mode: "production" | "test" | "noop"
 }
 
 // ENTRY POINT
@@ -105,7 +106,8 @@ function unpackFormData(rowData: string[], rowIndex: number): FormData {
     description: testModePrefix + rowFieldValue(responseFieldLabels.description),
     area: rowFieldValue(responseFieldLabels.area),
     reporter: rowFieldValue(responseFieldLabels.reportedBy),
-    priority: mapFormToJiraPriority(rowFieldValue(responseFieldLabels.priority))
+    priority: mapFormToJiraPriority(rowFieldValue(responseFieldLabels.priority)),
+    mode: inTestMode ? "test" : "production"
   }
 }
 

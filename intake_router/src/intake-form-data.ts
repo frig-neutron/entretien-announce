@@ -10,6 +10,7 @@ export interface IntakeFormData {
   area: string
   reporter: string
   priority: "regular" | "urgent"
+  mode: "production" | "test" | "noop"
 }
 
 const intakeFormDataSchema: JTDSchemaType<IntakeFormData> = {
@@ -37,6 +38,9 @@ const intakeFormDataSchema: JTDSchemaType<IntakeFormData> = {
     },
     priority: {
       enum: ["regular", "urgent"]
+    },
+    mode: {
+      enum: ["production", "test", "noop"]
     }
   },
 }

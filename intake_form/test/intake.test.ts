@@ -34,7 +34,8 @@ describe("intake end-to-end", () => {
         priority: "urgent",
         reporter: "A. Member",
         rowIndex: 2,
-        summary: "chauffe-eau"
+        summary: "chauffe-eau",
+        mode: "production"
       })
     })
     test("Test-mode", () => {
@@ -50,7 +51,8 @@ describe("intake end-to-end", () => {
         priority: "urgent",
         reporter: "A. Member",
         rowIndex: 2,
-        summary: "TEST - chauffe-eau"
+        summary: "TEST - chauffe-eau",
+        mode: "test"
       })
     })
   })
@@ -79,7 +81,8 @@ describe("intake end-to-end", () => {
         priority: "regular",
         reporter: "A. Member",
         rowIndex: 2,
-        summary: "chauffe-eau"
+        summary: "chauffe-eau",
+        mode: "production"
       })
     })
   })

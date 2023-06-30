@@ -62,17 +62,20 @@ describe("jira service", () => {
     })
   })
   describe("ticket operations", () => {
-    const formData: () => IntakeFormData = () => {
-      return {
-        area: "Unit 1",
-        building: "3740",
-        priority: "regular",
-        reporter: "A. Friend",
-        rowIndex: 0,
-        summary: "Needs love",
-        description: "All out of love, so lost without you"
-      }
-    }
+    const formData: (formCustomizer: (d: IntakeFormData) => IntakeFormData) => IntakeFormData =
+        formCustomizer => {
+          return formCustomizer({
+                area: "Unit 1",
+                building: "3740",
+                priority: "regular",
+                reporter: "A. Friend",
+                rowIndex: 0,
+                summary: "Needs love",
+                description: "All out of love, so lost without you",
+                mode: "production"
+              }
+          )
+        }
 
 
     const createdIssue: CreatedIssue = {
@@ -106,7 +109,7 @@ describe("jira service", () => {
       const jiraClientFactory: (creds: JiraConfig) => Version2Client = (_) => client;
       const jira = jiraService(config(), jiraClientFactory);
 
-      const key = jira.createIssue(formData());
+      const key = jira.createIssue(formData(x => ({...x, mode: "production"})));
 
       await expect(client.issues.createIssue).toHaveBeenCalledWith(createIssueRequest())
       await expect(key).resolves.toEqual(createdIssue.key)
@@ -121,9 +124,11 @@ describe("jira service", () => {
       const jiraClientFactory: (creds: JiraConfig) => Version2Client = (_) => client;
       const jira = jiraService(config(), jiraClientFactory);
 
-      const urgentFormSubmission = formData();
-      urgentFormSubmission.priority = "urgent"
-      jira.createIssue(urgentFormSubmission);
+      const urgentFormSubmission = formData(x => ({...x,
+        priority: "urgent",
+        mode: "production",
+      }));
+      await jira.createIssue(urgentFormSubmission);
 
       const urgentTicketRequest = createIssueRequest();
       urgentTicketRequest.fields.priority = {name: "Urgent"}
@@ -141,7 +146,7 @@ describe("jira service", () => {
       testModeConfig.options.test_mode = true
       const jira = jiraService(testModeConfig, jiraClientFactory);
 
-      jira.createIssue(formData())
+      await jira.createIssue(formData(x => ({...x, mode: "test"})))
 
       const createIssue = createIssueRequest()
       createIssue.fields.summary = "TEST - 3740 Unit 1: Needs love"

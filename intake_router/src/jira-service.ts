@@ -14,7 +14,7 @@ export function jiraService(
 ): JiraService {
   const version2Client = jiraClientFactory(config);
   const converFormToIssue = (form: IntakeFormData): CreateIssue => {
-    const testPrefix = config.options.test_mode ? "TEST - " : "";
+    const testPrefix = form.mode === "test" ? "TEST - " : "";
 
     function summarize() {
       return `${form.building} ${form.area}: ${form.summary}`;
