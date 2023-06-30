@@ -73,7 +73,6 @@ export interface JiraSecrets {
 export interface JiraOptions {
   jira_host: string
   jira_intake_project_key: string
-  test_mode: boolean
 }
 
 export interface JiraConfig {
@@ -103,9 +102,6 @@ const jiraOptionsSchema: JTDSchemaType<JiraOptions> = {
     jira_intake_project_key: {
       type: "string"
     },
-    test_mode: {
-      type: "boolean"
-    }
   }
 }
 

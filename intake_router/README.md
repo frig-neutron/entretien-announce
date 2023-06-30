@@ -1,15 +1,15 @@
 # Intake router
 
-This component receives notification of maintenance submissions. 
+This component receives notification of maintenance submissions.
 
-- It is notified by HTTP gia Google Apps Script, so it's NOT a pubsub function. 
+- It is notified by HTTP via Google Apps Script, so it's NOT a pubsub function.
 - Don't give it pubsub input.
 
 ## Operational
 
 ### Parameters
 
-The only param is the actual form submission: 
+The only param is the actual form submission:
 
 ```json
 {
@@ -19,9 +19,16 @@ The only param is the actual form submission:
     "reporter": "guest",
     "rowIndex": 666,
     "summary": "this is test issue",
-    "description": "test description."
+    "description": "test description.",
+    "mode": "noop"
 }
 ```
+
+The `mode` field is a configuration option. It can take the values 
+- `production`: work normally. Create tickets, send notifications.
+- `test`: Prepend "TEST" to most strings. Supports manual integration testing.
+- `noop`: Don't talk to Jira. Log ticket content instead of filing them. 
+      Supports screwing around w/o cluttering up jira.
 
 ### Configuration
 
@@ -38,10 +45,11 @@ triage: # always notified so they can manage jira tickets
 urgence: # triggered whenever the "urgent" flag is set on the form
   - urgent_responder@alliance.ca
 ```
-There's this concept of "priority" which doesn't affect anythign about the routing, but _does_ 
-affect email rendering. If a person is both a "Building rep" and an "Urgent" responder then how do 
-you address them in the notification and which email do you choose to send? To resolve the 
-question, I'm treating priority as descending from top to bottom - that is roles listed lower 
+
+There's this concept of "priority" which doesn't affect anythign about the routing, but _does_
+affect email rendering. If a person is both a "Building rep" and an "Urgent" responder then how do
+you address them in the notification and which email do you choose to send? To resolve the
+question, I'm treating priority as descending from top to bottom - that is roles listed lower
 down override roles listed above.
 
 `DIRECTORY`: contact details
@@ -51,8 +59,8 @@ down override roles listed above.
 - { email: urgent_responder@alliance.ca, name: A. Responder, lang: fr }
 ```
 
-The directory is used to look up the username of the recipient of a ticket notification. 
-In frig-neutron/entretien-intake/issues/20 this will be useful to locate the email of the ticket 
+The directory is used to look up the username of the recipient of a ticket notification.
+In frig-neutron/entretien-intake/issues/20 this will be useful to locate the email of the ticket
 submitter.
 
 ### Local testing

@@ -13,14 +13,12 @@ describe("jira service", () => {
       secrets: {
         jira_intake_project_key: "PROJ_" + rnd,
         jira_host: "",
-        test_mode: false,
         jira_email: "the_cat",
         jira_token: "on the mat" + rnd
       },
       options: {
         jira_intake_project_key: "PROJ_" + rnd,
         jira_host: "",
-        test_mode: false,
       }
     }
   }
@@ -143,7 +141,6 @@ describe("jira service", () => {
 
       const jiraClientFactory: (creds: JiraConfig) => Version2Client = (_) => client;
       const testModeConfig = config();
-      testModeConfig.options.test_mode = true
       const jira = jiraService(testModeConfig, jiraClientFactory);
 
       await jira.createIssue(formData(x => ({...x, mode: "test"})))
