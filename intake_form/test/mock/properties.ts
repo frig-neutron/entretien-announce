@@ -5,8 +5,11 @@ import {functionEndpontConfigKey} from "../../appscript/Code";
 
 declare var global: typeof globalThis; // can't use @types/node
 
-export function mockThePropertiesService() {
+export function mockConfigurationViaThePropertiesService(functionEndpoint: string) {
   const props = mock<Properties>()
+  props.getProperty.mockImplementation(key => {
+    return key === functionEndpontConfigKey ? functionEndpoint : null
+  })
   const propertiesService = mock<PropertiesService>({
         getScriptProperties: jest.fn((): Properties => props)
       }
@@ -15,8 +18,8 @@ export function mockThePropertiesService() {
 
   return {
     propertiesService: propertiesService,
-    assertEndpointHasBeenSetTo: (expectedEndpoint: string) => {
-      expect(props.setProperty).toBeCalledWith(functionEndpontConfigKey, expectedEndpoint)
+    assertEndpointHasBeenSet: () => {
+      expect(props.setProperty).toBeCalledWith(functionEndpontConfigKey, functionEndpoint)
     }
   }
 }

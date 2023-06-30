@@ -4,6 +4,7 @@ import {mock} from "jest-mock-extended";
 import UrlFetchApp = GoogleAppsScript.URL_Fetch.UrlFetchApp;
 import HTTPResponse = GoogleAppsScript.URL_Fetch.HTTPResponse;
 import CustomMatcherResult = jest.CustomMatcherResult;
+import {mockConfigurationViaThePropertiesService} from "./properties";
 
 declare var global: typeof globalThis; // can't use @types/node
 
@@ -19,14 +20,14 @@ declare global {
   }
 }
 
-function extendJestWithJiraMatcher(resp: Responses) {
+function extendJestWithJiraMatcher(resp: Responses, functionEndpoint: string) {
 
   expect.extend({
     filesJiraTicket(received, formData: FormData) {
       const [url, options] = received
       const payload = JSON.parse(options.payload)
 
-      expect(url).toEqual("https://lalliance.atlassian.net/rest/api/latest/issue")
+      expect(url).toEqual(functionEndpoint)
       expect(options).toMatchObject({
         // todo: seems redundant to have multiple content type specs. retest.
         "contentType": "application/json",
@@ -62,6 +63,7 @@ function mockTheUrlFetchApp(issueKey: string) {
 
 export function mockJira(resp: Responses) {
   const issueKey = "ISSUE-" + Math.random()
+  const functionEndpoint = "http://endpoint_" + Math.random()
   const urlFetchApp = mockTheUrlFetchApp(issueKey);
 
   const ticketRouterMocks = {
@@ -73,6 +75,7 @@ export function mockJira(resp: Responses) {
 
   // noinspection JSUnusedLocalSymbols
   global.UrlFetchApp = urlFetchApp
-  extendJestWithJiraMatcher(resp)
+  mockConfigurationViaThePropertiesService(functionEndpoint)
+  extendJestWithJiraMatcher(resp, functionEndpoint)
   return ticketRouterMocks
 }

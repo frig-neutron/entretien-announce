@@ -153,7 +153,10 @@ function notAlreadySent(ticketRowIndex: number) {
 
 function sendOne(ticketContext: TicketContext): HTTPResponse {
   const payload: string = JSON.stringify(ticketContext.formData);
-  const url = "https://lalliance.atlassian.net/rest/api/latest/issue"
+  const url = PropertiesService.getScriptProperties().getProperty(functionEndpontConfigKey)
+  if (!url) {
+    throw "Ticket endpoint URL not found"
+  }
   const headers: HttpHeaders = {
     "contentType": "application/json",
     "Accept": "application/json",
