@@ -1,5 +1,5 @@
 import {setSendEndpoint, toJira, toJiraTestMode} from "../appscript/Code"
-import {mockJira} from "./mock/http";
+import {mockUrlFetchApp} from "./mock/http";
 import {mockSheetsApp} from "./mock/sheets";
 import {mockConfigurationViaThePropertiesService} from "./mock/properties";
 
@@ -18,16 +18,16 @@ describe("intake end-to-end", () => {
 
     test("urgent", () => {
       const sheets = mockSheetsApp(responseValues)
-      const jira = mockJira(responseValues);
+      const urlFetch = mockUrlFetchApp(responseValues);
 
       const timestampLike = /....-..-..T..:..:..\....Z/;
 
       toJira(null);
 
-      sheets.logSheet.assertJiraIssueKeySetTo(jira.issueKey)
+      sheets.logSheet.assertJiraIssueKeySetTo(urlFetch.issueKey)
       sheets.logSheet.assertProcessTimestampMatches(timestampLike)
 
-      jira.assertTicketCreated({
+      urlFetch.assertTicketCreated({
         area: "Sous-sol",
         building: "3737",
         description: "L'eau chaude ne marche pas",
@@ -39,11 +39,11 @@ describe("intake end-to-end", () => {
     })
     test("Test-mode", () => {
       mockSheetsApp(responseValues)
-      const jira = mockJira(responseValues);
+      const urlFetch = mockUrlFetchApp(responseValues);
 
       toJiraTestMode("");
 
-      jira.assertTicketCreated({
+      urlFetch.assertTicketCreated({
         area: "Sous-sol",
         building: "3737",
         description: "TEST - L'eau chaude ne marche pas",
@@ -68,11 +68,11 @@ describe("intake end-to-end", () => {
 
     test("End to end, non-urgent", () => {
       mockSheetsApp(responseValues)
-      const jira = mockJira(responseValues);
+      const urlFetch = mockUrlFetchApp(responseValues);
 
       toJira(null);
 
-      jira.assertTicketCreated({
+      urlFetch.assertTicketCreated({
         area: "Sous-sol",
         building: "3737",
         description: "L'eau chaude ne marche pas",

@@ -61,12 +61,12 @@ function mockTheUrlFetchApp(issueKey: string) {
   });
 }
 
-export function mockJira(resp: Responses) {
+export function mockUrlFetchApp(resp: Responses) {
   const issueKey = "ISSUE-" + Math.random()
   const functionEndpoint = "http://endpoint_" + Math.random()
   const urlFetchApp = mockTheUrlFetchApp(issueKey);
 
-  const ticketRouterMocks = {
+  const urlFetchAppInteractions = {
     issueKey: issueKey,
     assertTicketCreated(t: FormData) {
       expect(urlFetchApp.fetch.mock.calls[0]).filesJiraTicket(t)
@@ -77,5 +77,5 @@ export function mockJira(resp: Responses) {
   global.UrlFetchApp = urlFetchApp
   mockConfigurationViaThePropertiesService(functionEndpoint)
   extendJestWithJiraMatcher(resp, functionEndpoint)
-  return ticketRouterMocks
+  return urlFetchAppInteractions
 }
