@@ -2,6 +2,7 @@ import {IntakeFormData} from "./intake-form-data";
 import {Version2Client} from "jira.js";
 import Ajv, {JTDParser, JTDSchemaType} from "ajv/dist/jtd";
 import {CreateIssue} from "jira.js/out/version2/parameters";
+import {log} from "./logger"
 
 const ajv = new Ajv({verbose: true, allErrors: true})
 
@@ -54,10 +55,14 @@ export function jiraService(
       // probably a good idea to use a hidden field w/ form data hash
 
       const issue: CreateIssue = converFormToIssue(intakeFormData);
-      const createdIssue = version2Client.issues.createIssue(issue)
-      return createdIssue.then(ci => ci.key);
+      if (intakeFormData.mode !== "noop") {
+        const createdIssue = version2Client.issues.createIssue(issue)
+        return createdIssue.then(ci => ci.key);
+      } else {
+        log.info(issue)
+        return Promise.resolve("dry-run")
+      }
     }
-
   }
 }
 
@@ -112,7 +117,7 @@ export function parseJiraBasicAuth(secrets: any, options: any): Promise<JiraConf
   const optionsParser = ajv.compileParser(jiraOptionsSchema)
   const optionsParseResult = optionsParser(options)
 
-  const errMsg  = (m: string, p: JTDParser<any>) => p.message ? `${m}: ${p.message}` : ""
+  const errMsg = (m: string, p: JTDParser<any>) => p.message ? `${m}: ${p.message}` : ""
   const secretsErr = errMsg("secrets", secretsParser);
   const optionsErr = errMsg("options", optionsParser);
 

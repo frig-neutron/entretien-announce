@@ -4,6 +4,7 @@ import {IntakeFormData} from "../src/intake-form-data";
 import {mockDeep} from "jest-mock-extended";
 import {CreateIssue} from "jira.js/out/version2/parameters";
 import {CreatedIssue} from "jira.js/out/version2/models";
+import {log} from "../src/logger"
 
 describe("jira service", () => {
   const rnd = Math.floor(Math.random() * 10000)
@@ -122,7 +123,8 @@ describe("jira service", () => {
       const jiraClientFactory: (creds: JiraConfig) => Version2Client = (_) => client;
       const jira = jiraService(config(), jiraClientFactory);
 
-      const urgentFormSubmission = formData(x => ({...x,
+      const urgentFormSubmission = formData(x => ({
+        ...x,
         priority: "urgent",
         mode: "production",
       }));
@@ -140,8 +142,7 @@ describe("jira service", () => {
       )
 
       const jiraClientFactory: (creds: JiraConfig) => Version2Client = (_) => client;
-      const testModeConfig = config();
-      const jira = jiraService(testModeConfig, jiraClientFactory);
+      const jira = jiraService(config(), jiraClientFactory);
 
       await jira.createIssue(formData(x => ({...x, mode: "test"})))
 
@@ -149,6 +150,36 @@ describe("jira service", () => {
       createIssue.fields.summary = "TEST - 3740 Unit 1: Needs love"
 
       await expect(client.issues.createIssue).toHaveBeenCalledWith(createIssue)
+    })
+
+    test("dry run", async () => {
+      jest.spyOn(log, "info")
+      const client = mockDeep<Version2Client>()
+      const jiraClientFactory: (creds: JiraConfig) => Version2Client = (_) => client;
+      const jira = jiraService(config(), jiraClientFactory);
+
+      const issueKey = await jira.createIssue(formData(x => ({...x, mode: "noop"})))
+
+      expect(client.issues.createIssue).toHaveBeenCalledTimes(0)
+      expect(issueKey).toEqual("dry-run")
+      expect(log.info).toHaveBeenCalledTimes(1)
+
+      const message = log.info.mock.calls[0][0]
+      expect(message).toMatchObject({
+        "fields":
+            {
+              "description": "All out of love, so lost without you\n" +
+                  "\n" +
+                  "Reported by A. Friend",
+              "issuetype": {
+                "name": "Intake",
+              },
+              "priority": {
+                "name": "Medium",
+              },
+              "summary": "3740 Unit 1: Needs love"
+            }
+      })
     })
   })
 })
