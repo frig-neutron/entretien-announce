@@ -18,6 +18,7 @@ describe("test form data", () => {
     reporter: rnd("skunk"),
     rowIndex: zeroToTen(),
     summary: rnd("summary"),
+    mode: "noop"
   }
   const pubsubEncoding = function (){
     return {
@@ -53,7 +54,7 @@ describe("test form data", () => {
     }
     sampleFormCopy["extraField"] = "WellHelloThere"
     const serializedWithExtraKey = JSON.stringify(sampleFormCopy);
-    const errorMessage = "property extraField not allowed at position 148 of <" + serializedWithExtraKey + ">";
+    const errorMessage = "property extraField not allowed at position 162 of <" + serializedWithExtraKey + ">";
     return expectParseFailsWithMessage(serializedWithExtraKey, errorMessage)
 
   })

@@ -12,7 +12,8 @@ describe("form data router", () => {
     area: "" + Math.random(), building: "",
     description: "🦜" + Math.random(),
     priority: "regular", reporter: "", rowIndex: 0,
-    summary: "🐿" + Math.random()
+    summary: "🐿" + Math.random(),
+    mode: "production"
   }
 
   const jiraService = mock<JiraService>();

@@ -27,7 +27,14 @@ describe("mainline", () => {
 
   const rnd = Math.random();
   const formData: IntakeFormData = {
-    area: "51", building: "", description: "", priority: "regular", reporter: "", rowIndex: 0, summary: "" + rnd
+    area: "51",
+    building: "",
+    description: "",
+    priority: "regular",
+    reporter: "",
+    rowIndex: 0,
+    summary: "" + rnd,
+    mode: "noop"
   }
 
   const publishConfig: PublishConfig = {
@@ -41,8 +48,7 @@ describe("mainline", () => {
     },
     options: {
       jira_host: "http://google.com",
-      jira_intake_project_key: "PAPERCLIP",
-      test_mode: false
+      jira_intake_project_key: "PAPERCLIP"
     }
   }
 
@@ -183,8 +189,8 @@ describe("mainline", () => {
         throw new Error("expected " + rawSecrets + " but got " + actual);
       };
       const mockDecoder = async (s: any, o: any) => {
-        if (s != rawSecrets) return  errorOut(s);
-        if (o != rawOptions) return  errorOut(o);
+        if (s != rawSecrets) return errorOut(s);
+        if (o != rawOptions) return errorOut(o);
         return output
       }
       this.parseJiraBasicAuthMock.mockImplementation(mockDecoder)

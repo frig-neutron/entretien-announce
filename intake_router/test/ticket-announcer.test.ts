@@ -16,7 +16,8 @@ describe("ticket announcer", () => {
         priority: "regular",
         reporter: "A. Member",
         rowIndex: 0,
-        summary: "chauffe-eau"
+        summary: "chauffe-eau",
+        mode: "production"
       }
     }
     const triageEmail = `triage_${seed}@email.com`
