@@ -8,20 +8,19 @@ Scripts that handle conversion of maintenance intake form responses into Jira ti
  - run `ENV=[stg|prd) ./scripts/deploy.sh`
  - configure the `FUNCTION_ENDPOINT` key to point the HTTP endpoint
    - by hand: `⚙️ Project Settings` > `Script Properties` > `Add script property`
-   - by code: call `setSendEndpoint(url)` w/ clasp CLI (bork atm)
+   - by code: call `setSendEndpoint(url)` w/ clasp CLI (*FIXME: bork atm*)
+ - set the `MODE` key to either of 
+   - `production`: normal operations. Sends email, creates jira tickets.
+   - `test`: prefixes all Jira tickets with `TEST - `
+   - `noop`: don't create Jira tickets. Still send email, though. 
 
-## "Staging" environment
+## Manual Testing
 
-We only have one Jira instance, so there's no real staging environment. What passes for staging 
-around here is an alternate "test mode" entry point on the script which causes it to
-- prepend `TEST - ` to the Jira ticket and 
-- redirect all email to my email address.
+Testing can be done on a [staging sheet](#staging). 
 
-Jira tickets will still appear in the public Jira repository, albeit with a `TEST - ` prefix. 
-These have to be manually cleaned up.
-
-It would be nice if the staging mode deployment would actually deploy an alternate role 
-directory, but perhaps that is too much to ask.
+Using the staging sheet allows to you talk to the staging router function, which is deployed 
+with a dummy email directory (to avoid bothering the neighbours). We only have one Jira instance,
+so the "staging environment" doesn't fully isolate the users. That's where the `noop` mode comes in.
 
 ## Addresses of sheets
 ### Production
