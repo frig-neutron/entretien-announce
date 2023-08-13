@@ -5,7 +5,7 @@ import {functionEndpointConfigKey, modeConfigKey} from "../../appscript/Code";
 
 declare var global: typeof globalThis; // can't use @types/node
 
-const mockedConfigKeys: {[key: string]: string} = {}
+const mockedConfigKeys: {[key: string]: any} = {}
 
 const mockProps = mock<Properties>()
 mockProps.getProperty.mockImplementation(key => {
@@ -29,6 +29,6 @@ export function mockPropertiesServiceFunctionEndpoint(functionEndpoint: string) 
   }
 }
 
-export function mockPropertiesServiceModeKey(mode: string){
+export function mockPropertiesServiceModeKey(mode: any){
   mockedConfigKeys[modeConfigKey] = mode
 }

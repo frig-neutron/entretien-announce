@@ -107,6 +107,17 @@ describe("intake end-to-end", () => {
       })
     })
   })
+
+  describe("validation", () => {
+    test("invalid mode", () => {
+      mockPropertiesServiceModeKey("INVALID")
+      expect(() => toJira(null)).toThrow("invalid mode: INVALID")
+    })
+    test("null mode", () => {
+      mockPropertiesServiceModeKey(undefined)
+      expect(() => toJira(null)).toThrow("invalid mode: undefined")
+    })
+  })
 })
 
 test("property saving function", () => {
