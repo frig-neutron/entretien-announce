@@ -161,8 +161,8 @@ expect.extend({
 
     const jiraSummary = ((f: IntakeFormData) => f.building + " " + f.area + ": " + f.summary)(expectedEmail.source);
 
-    bodyRe("^Dear " + expectedEmail.to.name + ",\n")
-    bodyRe("\n" + jiraSummary + "\n" + expectedEmail.source.description)
+    bodyRe("^Dear " + expectedEmail.to.name + ", <br />\n")
+    bodyRe("<br />\n" + jiraSummary + " <br />\n" + expectedEmail.source.description)
     bodyRe("\nYou are receiving this email because " + expectedEmail.reasonForReceiving)
     bodyRe(
         "\nJira ticket https://lalliance.atlassian.net/browse/" + expectedEmail.issueKey +

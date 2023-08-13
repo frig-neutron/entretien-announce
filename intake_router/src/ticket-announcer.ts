@@ -47,7 +47,7 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
             summarizeForJira(form),
             form.description,
             `Jira ticket https://lalliance.atlassian.net/browse/${issueKey} has been assigned to this report.`,
-          ].join("\n")
+          ].join(" <br />\n")
         }
       }
 
