@@ -13,7 +13,8 @@ let columnIndex: { [k: string]: number }
 let jiraBasicAuthToken: string
 const jiraPriorityUrgent = "urgent"
 const jiraPriorityRegular = "regular"
-const functionEndpontConfigKey = "FUNCTION_ENDPOINT"
+const functionEndpointConfigKey = "FUNCTION_ENDPOINT"
+const modeConfigKey = "MODE"
 
 const responseFieldLabels: { [label: string]: string } = {
   building: "Bâtiment",
@@ -68,8 +69,8 @@ export interface FormData {
 // ENTRY POINT
 // noinspection JSUnusedLocalSymbols
 function toJira(e: any) {
-  inTestMode = false
-  testModePrefix = ""
+  inTestMode = validatedMode() !== "production"
+  testModePrefix = inTestMode ? "TEST - " : ""
   run();
 }
 
@@ -79,9 +80,7 @@ function run() {
   let dataRange = responsesSheet.getRange(2, 1, numRows - 1, responsesSheet.getLastColumn())
 
   const rowOffset: number = 2 // 1 for header & 1 for starting count from 1
-  const tickets: TicketContext[] = dataRange.getValues().
-    map((r, i) => unpackFormData(r, i + rowOffset)).
-    map((f) => new TicketContext(f))
+  const tickets: TicketContext[] = dataRange.getValues().map((r, i) => unpackFormData(r, i + rowOffset)).map((f) => new TicketContext(f))
 
   sendAll(tickets);
 }
@@ -99,6 +98,7 @@ function unpackFormData(rowData: string[], rowIndex: number): FormData {
     }
   }
 
+
   return {
     rowIndex: rowIndex,
     building: rowFieldValue(responseFieldLabels.building),
@@ -107,16 +107,19 @@ function unpackFormData(rowData: string[], rowIndex: number): FormData {
     area: rowFieldValue(responseFieldLabels.area),
     reporter: rowFieldValue(responseFieldLabels.reportedBy),
     priority: mapFormToJiraPriority(rowFieldValue(responseFieldLabels.priority)),
-    mode: inTestMode ? "test" : "production"
+    mode: validatedMode()
   }
 }
 
-// ENTRY POINT FOR TEST MODE
-// noinspection JSUnusedLocalSymbols
-function toJiraTestMode(e: any) {
-  inTestMode = true
-  testModePrefix = "TEST - "
-  run()
+function validatedMode(): FormData['mode'] {
+  const maybeMode = PropertiesService.getScriptProperties().getProperty(modeConfigKey)
+
+  if ('production' == maybeMode
+      || 'test' == maybeMode
+      || 'noop' == maybeMode) {
+    return <FormData['mode']>maybeMode
+  }
+  throw Error("invalid mode: " + maybeMode);
 }
 
 function indexResponseFields(): { [k: string]: number } {
@@ -155,7 +158,7 @@ function notAlreadySent(ticketRowIndex: number) {
 
 function sendOne(ticketContext: TicketContext): HTTPResponse {
   const payload: string = JSON.stringify(ticketContext.formData);
-  const url = PropertiesService.getScriptProperties().getProperty(functionEndpontConfigKey)
+  const url = PropertiesService.getScriptProperties().getProperty(functionEndpointConfigKey)
   if (!url) {
     throw "Ticket endpoint URL not found"
   }
@@ -192,8 +195,8 @@ function mark(ticketRowIndex: number, columnIndex: number, value: any) {
  * Configure script with function endpoint. This is an administrative function, intended
  * to be called from CLASP during deployment.
  */
-function setSendEndpoint(url: string){
-  PropertiesService.getScriptProperties().setProperty(functionEndpontConfigKey, url)
+function setSendEndpoint(url: string) {
+  PropertiesService.getScriptProperties().setProperty(functionEndpointConfigKey, url)
 }
 
-export {toJira, toJiraTestMode, setSendEndpoint, responseFieldLabels, functionEndpontConfigKey}
+export {toJira, setSendEndpoint, responseFieldLabels, functionEndpointConfigKey, modeConfigKey}

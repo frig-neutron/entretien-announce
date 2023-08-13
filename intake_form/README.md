@@ -12,7 +12,7 @@ Scripts that handle conversion of maintenance intake form responses into Jira ti
  - set the `MODE` key to either of 
    - `production`: normal operations. Sends email, creates jira tickets.
    - `test`: prefixes all Jira tickets with `TEST - `
-   - `noop`: don't create Jira tickets. Still send email, though. 
+   - `noop`: don't create Jira tickets. Keep the `TEST - ` prefix. Still send email. 
 
 ## Manual Testing
 

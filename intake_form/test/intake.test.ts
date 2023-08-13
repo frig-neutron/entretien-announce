@@ -1,7 +1,7 @@
-import {setSendEndpoint, toJira, toJiraTestMode} from "../appscript/Code"
+import {setSendEndpoint, toJira} from "../appscript/Code"
 import {mockUrlFetchApp} from "./mock/http";
 import {mockSheetsApp} from "./mock/sheets";
-import {mockConfigurationViaThePropertiesService} from "./mock/properties";
+import {mockPropertiesServiceFunctionEndpoint, mockPropertiesServiceModeKey} from "./mock/properties";
 
 describe("intake end-to-end", () => {
 
@@ -17,6 +17,7 @@ describe("intake end-to-end", () => {
     ])
 
     test("urgent", () => {
+      mockPropertiesServiceModeKey("production")
       const sheets = mockSheetsApp(responseValues)
       const urlFetch = mockUrlFetchApp(responseValues);
 
@@ -40,9 +41,10 @@ describe("intake end-to-end", () => {
     })
     test("Test-mode", () => {
       mockSheetsApp(responseValues)
+      mockPropertiesServiceModeKey("test")
       const urlFetch = mockUrlFetchApp(responseValues);
 
-      toJiraTestMode("");
+      toJira("");
 
       urlFetch.assertTicketCreated({
         area: "Sous-sol",
@@ -53,6 +55,24 @@ describe("intake end-to-end", () => {
         rowIndex: 2,
         summary: "TEST - chauffe-eau",
         mode: "test"
+      })
+    })
+    test("Noop-mode", () => {
+      mockSheetsApp(responseValues)
+      mockPropertiesServiceModeKey("noop")
+      const urlFetch = mockUrlFetchApp(responseValues);
+
+      toJira("");
+
+      urlFetch.assertTicketCreated({
+        area: "Sous-sol",
+        building: "3737",
+        description: "TEST - L'eau chaude ne marche pas",
+        priority: "urgent",
+        reporter: "A. Member",
+        rowIndex: 2,
+        summary: "TEST - chauffe-eau",
+        mode: "noop"
       })
     })
   })
@@ -69,6 +89,7 @@ describe("intake end-to-end", () => {
     ])
 
     test("End to end, non-urgent", () => {
+      mockPropertiesServiceModeKey("production")
       mockSheetsApp(responseValues)
       const urlFetch = mockUrlFetchApp(responseValues);
 
@@ -89,7 +110,7 @@ describe("intake end-to-end", () => {
 })
 
 test("property saving function", () => {
-  const props = mockConfigurationViaThePropertiesService("foo")
+  const props = mockPropertiesServiceFunctionEndpoint("foo")
 
   setSendEndpoint("foo")
 

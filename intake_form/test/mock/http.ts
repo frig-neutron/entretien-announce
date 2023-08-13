@@ -4,7 +4,7 @@ import {mock} from "jest-mock-extended";
 import UrlFetchApp = GoogleAppsScript.URL_Fetch.UrlFetchApp;
 import HTTPResponse = GoogleAppsScript.URL_Fetch.HTTPResponse;
 import CustomMatcherResult = jest.CustomMatcherResult;
-import {mockConfigurationViaThePropertiesService} from "./properties";
+import {mockPropertiesServiceFunctionEndpoint} from "./properties";
 
 declare var global: typeof globalThis; // can't use @types/node
 
@@ -75,7 +75,7 @@ export function mockUrlFetchApp(resp: Responses) {
 
   // noinspection JSUnusedLocalSymbols
   global.UrlFetchApp = urlFetchApp
-  mockConfigurationViaThePropertiesService(functionEndpoint)
+  mockPropertiesServiceFunctionEndpoint(functionEndpoint)
   extendJestWithJiraMatcher(resp, functionEndpoint)
   return urlFetchAppInteractions
 }
