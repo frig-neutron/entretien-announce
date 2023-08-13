@@ -42,10 +42,13 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
           secondary_recipients: [],
           subject: "Maintenance report from A. Member", // todo: name of member goes here
           body: [`Dear ${directoryEntry.name},`,
+            '',
             `${form.reporter} has submitted a maintenance report`,
+            '   ------------------ ',
             reasonForReceipt,
             summarizeForJira(form),
             form.description,
+            '   ------------------ ',
             `Jira ticket https://lalliance.atlassian.net/browse/${issueKey} has been assigned to this report.`,
           ].join(" <br />\n")
         }
