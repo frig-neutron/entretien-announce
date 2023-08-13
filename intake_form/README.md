@@ -5,7 +5,7 @@ Scripts that handle conversion of maintenance intake form responses into Jira ti
 ## Setup
  - Install `yarn`
  - `make init`
- - run `ENV=[stg|prd) ./scripts/deploy.sh`
+ - run `ENV=[stg|prd) ./deploy/deploy.sh`
  - configure the `FUNCTION_ENDPOINT` key to point the HTTP endpoint
    - by hand: `⚙️ Project Settings` > `Script Properties` > `Add script property`
    - by code: call `setSendEndpoint(url)` w/ clasp CLI (*FIXME: bork atm*)
