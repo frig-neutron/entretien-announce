@@ -85,9 +85,9 @@ function run() {
   sendAll(tickets);
 }
 
-function unpackFormData(rowData: string[], rowIndex: number): FormData {
-  function rowFieldValue(fieldName: string) {
-    return rowData[columnIndex[fieldName]]
+function unpackFormData(rowData: any[], rowIndex: number): FormData {
+  function rowFieldValue(fieldName: string): string {
+    return String(rowData[columnIndex[fieldName]])
   }
 
   function mapFormToJiraPriority(formPriorityValue: string) {
@@ -97,7 +97,6 @@ function unpackFormData(rowData: string[], rowIndex: number): FormData {
       return jiraPriorityRegular
     }
   }
-
 
   return {
     rowIndex: rowIndex,

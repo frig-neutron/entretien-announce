@@ -108,7 +108,7 @@ describe("intake end-to-end", () => {
     })
   })
 
-  describe("validation", () => {
+  describe("invocation validation", () => {
     test("invalid mode", () => {
       mockPropertiesServiceModeKey("INVALID")
       expect(() => toJira(null)).toThrow("invalid mode: INVALID")
@@ -116,6 +116,29 @@ describe("intake end-to-end", () => {
     test("null mode", () => {
       mockPropertiesServiceModeKey(undefined)
       expect(() => toJira(null)).toThrow("invalid mode: undefined")
+    })
+    test("numbers should be converted to strings", () => {
+      // GSheets gets numerical values as numbers, but the downstream expects everything to be a string
+      const responseValues = responses([
+        0, 1, 2, 3, "something", 5, 6 // numerical responses can only happen on bldg, but I'm testing everywhere
+      ])
+      mockPropertiesServiceModeKey("production")
+      mockSheetsApp(responseValues)
+
+      const urlFetch = mockUrlFetchApp(responseValues);
+
+      toJira(null);
+
+      urlFetch.assertTicketCreated({
+        area: "3",
+        building: "2",
+        description: "1",
+        priority: "regular",
+        reporter: "5",
+        rowIndex: 2,
+        summary: "6",
+        mode: "production"
+      })
     })
   })
 })
@@ -130,7 +153,7 @@ test("property saving function", () => {
 
 export type Responses = ReturnType<typeof responses>
 
-function responses(rowValues: string[]) {
+function responses(rowValues: any[]) {
   const responseColumns = ["Timestamp", "Description", "Bâtiment", "Zone", "Priorité", "Rapporté par", "Elément"]
 
   return {
