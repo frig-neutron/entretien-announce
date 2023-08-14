@@ -65,12 +65,15 @@ Configuration done using environment variables.
     * Jira users will get full detail, since they can go into jira themselves and just get the
       information. The reports will contain link to Jira, which they can access
     * "Member" users will get privacy-preserving aggregates at building granularity.
-    ```json 
-    [
-      {"name": "Daniil", "email": "daniils.email@gmail.com", "lang": "en", "roles": []},
-      {"name": "Charlie", "email": "charlies.email@gmail.com", "lang": "fr", "roles": []},
-    ]
-    ```
+* In the [intake-router][intake-router] the role determines if someone is a BR, urgent responder,
+  or a triage agent.
+
+  ```json 
+  [
+  {"name": "Daniil", "email": "daniils.email@gmail.com", "lang": "en", "roles": []},
+  {"name": "Charlie", "email": "charlies.email@gmail.com", "lang": "fr", "roles": []},
+  ]
+  ```
 * `PUBLISH_CONFIG`: GCP pubsub topic name and project
   ```json
   {

@@ -58,6 +58,7 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
       const becauseTr = `You are receiving this email because you are a triage responder`
       const brAnnouncement = findBr(form).map(d => render(d, becauseBr))
       const triageAnnouncement = findTriage().map(d => render(d, becauseTr))
+      // TODO: urgence announcement
       return [
         ...brAnnouncement,
         ...triageAnnouncement

@@ -24,44 +24,65 @@ The only param is the actual form submission:
 }
 ```
 
-The `mode` field is a configuration option. It can take the values 
+The `mode` field is a configuration option. It can take the values
+
 - `production`: work normally. Create tickets, send notifications.
 - `test`: Prepend "TEST" to most strings. Supports manual integration testing.
-- `noop`: Don't talk to Jira. Log ticket content instead of filing them. 
-      Supports screwing around w/o cluttering up jira.
+- `noop`: Don't talk to Jira. Log ticket content instead of filing them.
+  Supports screwing around w/o cluttering up jira.
 
 ### Configuration
 
 Configuration done using environment variables.
+todo: validate how this affects [announcer][announcer]
+* `SECRETS`: Injected from GCP secret manager. Shares a secret with the other functions.
+  ```json5
+  // Caveat: since the secret is shared, there could be other keys
+  {
+      jira_email: "string",
+      jira_token: "string"
+  }
+  ```
 
-`ROUTES`: who to send mail to and why?
+* `JIRA_OPTIONS`: The less secret parts of Jira config. Not sure why I decided to split this
+  from the main secrets.
+  ```json5
+  {
+    jira_host: "https://my-jira.atlassian.net",
+    jira_intake_project_key: "PROJ" 
+  }
+  ```
 
-```yaml
-"3735": # building identifer for locating building reps
-  - justin@gmx.de
-  - other.justin@also.here
-triage: # always notified so they can manage jira tickets
-  - triager_person@elsewhere.ca
-urgence: # triggered whenever the "urgent" flag is set on the form
-  - urgent_responder@alliance.ca
-```
+* `PUBLISH_CONFIG`: where to send emails
+  ```json
+  {
+      "topic_name": "email topic",
+      "project_id": "gcp project containing topic"
+  }
+  ```
 
-There's this concept of "priority" which doesn't affect anythign about the routing, but _does_
+* `DIRECTORY` - coop members. Almost same format as [monthly report function][announcer].
+
+  The directory is used to look up the username of the recipient of a ticket notification.
+  In frig-neutron/entretien-intake/issues/20 this will be useful to locate the email of the ticket
+  submitter.
+
+  ```json 
+  [
+    {"name": "Daniil", "email": "daniils.email@gmail.com", "roles": []},
+    {"name": "Charlie", "email": "charlies.email@gmail.com", "lang": "fr", "roles": []},
+  ]
+  ```
+  
+  The possible roles are: `BR_3735`, `BR_3737`, `BR_3739`, `BR_3743`, `BR_3745`, `TRIAGE`, `EMERG`
+
+There's this concept of "priority" which doesn't affect anything about the routing, but _does_
 affect email rendering. If a person is both a "Building rep" and an "Urgent" responder then how do
 you address them in the notification and which email do you choose to send? To resolve the
 question, I'm treating priority as descending from top to bottom - that is roles listed lower
-down override roles listed above.
+down override roles listed above. 
+TODO: is this true?
 
-`DIRECTORY`: contact details
-
-```yaml
-- { email: justin@gmx.de, name: Justin, lang: en }
-- { email: urgent_responder@alliance.ca, name: A. Responder, lang: fr }
-```
-
-The directory is used to look up the username of the recipient of a ticket notification.
-In frig-neutron/entretien-intake/issues/20 this will be useful to locate the email of the ticket
-submitter.
 
 ### Local testing
 
@@ -69,3 +90,5 @@ Running locally can be done w/ the `functions-framework`. Use the script command
 `--signature-type=event` makes it only listen to HTTP POST, so `curl -XPOST localhost:8080`.
 Removing the signature type makes it accept HTTP GET, but then it just hangs there. I think this is
 because it expects a response on the 2nd function param.
+
+[announcer]: ../announcer
