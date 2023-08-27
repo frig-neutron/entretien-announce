@@ -30,8 +30,11 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
     return findByRoleKey("TRIAGE")
   }
 
-  function findUrgent(): DirectoryEntry[] {
-    return findByRoleKey("URGENT")
+  // find urgent responders IF the issue is urgent
+  function findUrgent(form: IntakeFormData): DirectoryEntry[] {
+    return form.priority == "urgent"
+        ? findByRoleKey("URGENT")
+        : []
   }
 
   return {
@@ -63,7 +66,7 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
       const becauseUr = `You are receiving this email because you are an emergency responder`
       const brAnnouncement = findBr(form).map(d => render(d, becauseBr))
       const triageAnnouncement = findTriage().map(d => render(d, becauseTr))
-      const emergAnnouncement = findUrgent().map(d => render(d, becauseUr));
+      const emergAnnouncement = findUrgent(form).map(d => render(d, becauseUr));
       return [
         ...brAnnouncement,
         ...triageAnnouncement,

@@ -9,8 +9,8 @@ describe("ticket announcer", () => {
 
   const triageEmail = `triage_${seed}@email.com`
   const triageName = `Triager`
-  const urgentEmail  = `emerg_${seed}@email.com`
-  const urgentName  = `emerg ${seed}`
+  const urgentEmail = `emerg_${seed}@email.com`
+  const urgentName = `emerg ${seed}`
   const announcer = ticketAnnouncer([
     {name: "BR for 3735", email: "br-thirty-five@email.com", roles: ["BR_3735"]},
     {name: "BR for 3735", email: "co-br-thirty-five@email.com", roles: ["BR_3735"]},
@@ -46,6 +46,12 @@ describe("ticket announcer", () => {
       }
       const announcements = announcer.emailAnnouncement(issueKey, form);
       expect(announcements).someEmailMatches(brEmailSpec(brEmail, building, form, issueKey))
+      expect(announcements).not.someEmailMatches({ // this fails really weird, but it works
+        to: {
+          email: urgentEmail,
+          name: urgentName
+        }
+      })
     })
     test("co building-rep routing", () => {
       const form: IntakeFormData = {
@@ -64,12 +70,15 @@ describe("ticket announcer", () => {
           name: triageName
         },
         subject: "Maintenance report from A. Member",
-        source: formValues(),
-        reasonForReceiving: "you are a triage responder",
-        isUrgent: false,
-        issueKey: issueKey
+        bodyParts: {
+          source: formValues(),
+          reasonForReceiving: "you are a triage responder",
+          isUrgent: false,
+          issueKey: issueKey
+        }
       })
     })
+
     function brEmailSpec(brEmail: string, building: string, form: IntakeFormData, issueKey: string) {
       return {
         to: {
@@ -77,10 +86,12 @@ describe("ticket announcer", () => {
           name: `BR for ${building}`
         },
         subject: "Maintenance report from A. Member",
-        source: form,
-        reasonForReceiving: `you are a building representative for ${building}`,
-        isUrgent: false,
-        issueKey: issueKey
+        body: {
+          source: form,
+          reasonForReceiving: `you are a building representative for ${building}`,
+          isUrgent: false,
+          issueKey: issueKey
+        }
       };
     }
   })
@@ -106,10 +117,12 @@ describe("ticket announcer", () => {
           name: urgentName
         },
         subject: "Maintenance report from A. Member",
-        source: formValues(),
-        reasonForReceiving: "you are an emergency responder",
-        isUrgent: false,
-        issueKey: issueKey
+        bodyParts: {
+          source: formValues(),
+          reasonForReceiving: "you are an emergency responder",
+          isUrgent: false,
+          issueKey: issueKey
+        }
       })
     })
 
@@ -117,9 +130,9 @@ describe("ticket announcer", () => {
 })
 
 interface EmailMatchers {
-  emailMatches(emailSpec: EmailSpec): CustomMatcherResult
+  emailMatches(emailSpec: Partial<EmailSpec>): CustomMatcherResult
 
-  someEmailMatches(emailSpec: EmailSpec): CustomMatcherResult
+  someEmailMatches(emailSpec: Partial<EmailSpec>): CustomMatcherResult
 }
 
 declare global {
@@ -140,15 +153,17 @@ export type EmailSpec = {
     name: string
   }
   subject: string,
-  source: IntakeFormData,
-  reasonForReceiving: string,
-  isUrgent: boolean,
-  issueKey: string
+  bodyParts: {
+    source: IntakeFormData,
+    reasonForReceiving: string,
+    isUrgent: boolean,
+    issueKey: string
+  }
 }
 
 
 expect.extend({
-  someEmailMatches(received: Announcement[], expectedEmail: EmailSpec): CustomMatcherResult {
+  someEmailMatches(received: Announcement[], expectedEmail: Partial<EmailSpec>): CustomMatcherResult {
     type ErrOrMatchResult = CustomMatcherResult | Error
 
     const requireError = (e: unknown): Error => {
@@ -184,26 +199,35 @@ expect.extend({
       }
     }
   },
-  emailMatches(received: Announcement, expectedEmail: EmailSpec): CustomMatcherResult {
+  emailMatches(received: Announcement, expectedEmail: Partial<EmailSpec>): CustomMatcherResult {
 
-    expect(received.primary_recipient).toBe(expectedEmail.to.email)
-    expect(received.subject).toBe(expectedEmail.subject)
+    if (expectedEmail.to) {
+      expect(received.primary_recipient).toBe(expectedEmail.to.email)
+    }
+    if (expectedEmail.subject) {
+      expect(received.subject).toBe(expectedEmail.subject)
+    }
 
-    const bodyRe = (s: string) => expect(received.body).toMatch(new RegExp(s))
 
-    bodyRe(expectedEmail.source.reporter + " has submitted " +
-        (expectedEmail.isUrgent ? "an URGENT" : "a") +
-        " maintenance report")
+    const bodyParts = expectedEmail.bodyParts;
+    if (bodyParts) {
+      const bodyRe = (s: string) => expect(received.body).toMatch(new RegExp(s))
 
-    const jiraSummary = ((f: IntakeFormData) => f.building + " " + f.area + ": " + f.summary)(expectedEmail.source);
+      bodyRe(bodyParts.source.reporter + " has submitted " +
+          (bodyParts.isUrgent ? "an URGENT" : "a") +
+          " maintenance report")
 
-    bodyRe("^Dear " + expectedEmail.to.name + ", <br />\n")
-    bodyRe("<br />\n" + jiraSummary + " <br />\n" + expectedEmail.source.description)
-    bodyRe("\nYou are receiving this email because " + expectedEmail.reasonForReceiving)
-    bodyRe(
-        "\nJira ticket https://lalliance.atlassian.net/browse/" + expectedEmail.issueKey +
-        " has been assigned to this report."
-    )
+      const jiraSummary = ((f: IntakeFormData) => f.building + " " + f.area + ": " + f.summary)(bodyParts.source);
+      if (expectedEmail.to) {
+        bodyRe("^Dear " + expectedEmail.to.name + ", <br />\n")
+      }
+      bodyRe("\nYou are receiving this email because " + bodyParts.reasonForReceiving)
+      bodyRe(
+          "\nJira ticket https://lalliance.atlassian.net/browse/" + bodyParts.issueKey +
+          " has been assigned to this report."
+      )
+    }
+
 
     return {
       pass: true, message: () => "ummm 🙄"
