@@ -67,11 +67,23 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
       const brAnnouncement = findBr(form).map(d => render(d, becauseBr))
       const triageAnnouncement = findTriage().map(d => render(d, becauseTr))
       const emergAnnouncement = findUrgent(form).map(d => render(d, becauseUr));
-      return [
+      const allAnnouncements = [
         ...brAnnouncement,
         ...triageAnnouncement,
         ...emergAnnouncement
       ];
+      return deduplicateRecipients(allAnnouncements);
     }
   }
+}
+
+function deduplicateRecipients(allAnnouncements: Announcement[]): Announcement[] {
+  const dedupd: Announcement[] = [];
+  const alreadySeen = function (searchKey: Announcement): boolean {
+    return dedupd.find(a => a.primary_recipient === searchKey.primary_recipient) != undefined
+  }
+  allAnnouncements.forEach(a => {
+    if (! alreadySeen(a)) dedupd.push(a)
+  });
+  return dedupd;
 }

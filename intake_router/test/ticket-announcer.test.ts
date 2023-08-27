@@ -18,7 +18,9 @@ describe("ticket announcer", () => {
     {name: "BR for 3743", email: "br-forty-three@email.com", roles: ["BR_3743"]},
     {name: "BR for 3743", email: "br-forty-three@email.com", roles: ["BR_3743"]},
     {name: triageName, email: triageEmail, roles: ["TRIAGE"]},
-    {name: urgentName, email: urgentEmail, roles: ["URGENT"]}
+    {name: urgentName, email: urgentEmail, roles: ["URGENT"]},
+    {name: "BR w/ dup URGENT role", email: "br-duplicate@email.com", roles: ["BR_3737"]},
+    {name: "BR w/ dup URGENT role", email: "br-duplicate@email.com", roles: ["URGENT"]},
   ]);
 
   describe("non-urgent", () => {
@@ -124,6 +126,13 @@ describe("ticket announcer", () => {
           issueKey: issueKey
         }
       })
+    })
+
+    test("do not send duplicate email", () => {
+      const announcements = announcer.emailAnnouncement(issueKey, formValues());
+
+      const sentToDupBR = announcements.filter(a => a.primary_recipient === "br-duplicate@email.com")
+      expect(sentToDupBR.length).toEqual(1)
     })
 
   })
