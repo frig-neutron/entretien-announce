@@ -19,6 +19,7 @@ describe("ticket announcer", () => {
     {name: "BR for 3743", email: "br-forty-three@email.com", roles: ["BR_3743"]},
     {name: triageName, email: triageEmail, roles: ["TRIAGE"]},
     {name: urgentName, email: urgentEmail, roles: ["URGENT"]},
+    // the next two entries test what happens when one person is called up for two reasons
     {name: "BR w/ dup URGENT role", email: "br-duplicate@email.com", roles: ["BR_3737"]},
     {name: "BR w/ dup URGENT role", email: "br-duplicate@email.com", roles: ["URGENT"]},
   ]);
@@ -133,6 +134,26 @@ describe("ticket announcer", () => {
 
       const sentToDupBR = announcements.filter(a => a.primary_recipient === "br-duplicate@email.com")
       expect(sentToDupBR.length).toEqual(1)
+    })
+
+    test("prioritize emergency responder role in email body", () => {
+      // because some people get ornery when you call them by the wrong title
+      const announcements = announcer.emailAnnouncement(issueKey, formValues());
+
+      expect(announcements).someEmailMatches({
+        to: {
+          email: "br-duplicate@email.com",
+          name: "BR w/ dup URGENT role"
+        },
+        subject: "Maintenance report from A. Member",
+        bodyParts: {
+          source: formValues(),
+          reasonForReceiving: "you are an emergency responder",
+          isUrgent: false,
+          issueKey: issueKey
+        }
+      })
+
     })
 
   })

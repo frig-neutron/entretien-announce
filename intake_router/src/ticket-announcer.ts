@@ -68,9 +68,9 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
       const triageAnnouncement = findTriage().map(d => render(d, becauseTr))
       const emergAnnouncement = findUrgent(form).map(d => render(d, becauseUr));
       const allAnnouncements = [
+        ...emergAnnouncement,
         ...brAnnouncement,
-        ...triageAnnouncement,
-        ...emergAnnouncement
+        ...triageAnnouncement
       ];
       return deduplicateRecipients(allAnnouncements);
     }
