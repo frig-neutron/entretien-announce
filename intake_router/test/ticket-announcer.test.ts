@@ -6,6 +6,21 @@ import CustomMatcherResult = jest.CustomMatcherResult;
 describe("ticket announcer", () => {
   const seed = Math.floor(Math.random() * 1000);
   const issueKey = "PROJ-" + seed
+
+  const triageEmail = `triage_${seed}@email.com`
+  const triageName = `Triager`
+  const urgentEmail  = `emerg_${seed}@email.com`
+  const urgentName  = `emerg ${seed}`
+  const announcer = ticketAnnouncer([
+    {name: "BR for 3735", email: "br-thirty-five@email.com", roles: ["BR_3735"]},
+    {name: "BR for 3735", email: "co-br-thirty-five@email.com", roles: ["BR_3735"]},
+    {name: "BR for 3737", email: "br-thirty-seven@email.com", roles: ["BR_3737"]},
+    {name: "BR for 3743", email: "br-forty-three@email.com", roles: ["BR_3743"]},
+    {name: "BR for 3743", email: "br-forty-three@email.com", roles: ["BR_3743"]},
+    {name: triageName, email: triageEmail, roles: ["TRIAGE"]},
+    {name: urgentName, email: urgentEmail, roles: ["URGENT"]}
+  ]);
+
   describe("non-urgent", () => {
 
     const formValues: () => IntakeFormData = () => {
@@ -20,15 +35,6 @@ describe("ticket announcer", () => {
         mode: "production"
       }
     }
-    const triageEmail = `triage_${seed}@email.com`
-    const triageName = `Triager`
-    const announcer = ticketAnnouncer([
-      {name: "BR for 3735", email: "br-thirty-five@email.com", roles: ["BR_3735"]},
-      {name: "BR for 3735", email: "co-br-thirty-five@email.com", roles: ["BR_3735"]},
-      {name: "BR for 3737", email: "br-thirty-seven@email.com", roles: ["BR_3737"]},
-      {name: "BR for 3743", email: "br-forty-three@email.com", roles: ["BR_3743"]},
-      {name: triageName, email: triageEmail, roles: ["TRIAGE"]}
-    ]);
 
     it.each([
       ["3737", "br-thirty-seven@email.com"],
@@ -77,6 +83,36 @@ describe("ticket announcer", () => {
         issueKey: issueKey
       };
     }
+  })
+  describe("urgent", () => {
+    const formValues: () => IntakeFormData = () => {
+      return {
+        area: "Sous-sol",
+        building: "3737",
+        description: "L'eau chaude ne marche pas",
+        priority: "urgent",
+        reporter: "A. Member",
+        rowIndex: 0,
+        summary: "chauffe-eau",
+        mode: "production"
+      }
+    }
+
+    test("route to emergency responder", () => {
+      const announcements = announcer.emailAnnouncement(issueKey, formValues());
+      expect(announcements).someEmailMatches({
+        to: {
+          email: urgentEmail,
+          name: urgentName
+        },
+        subject: "Maintenance report from A. Member",
+        source: formValues(),
+        reasonForReceiving: "you are an emergency responder",
+        isUrgent: false,
+        issueKey: issueKey
+      })
+    })
+
   })
 })
 

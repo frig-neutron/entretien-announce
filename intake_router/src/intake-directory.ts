@@ -12,7 +12,8 @@ export enum Role {
   BR_3739,
   BR_3743,
   BR_3745,
-  TRIAGE
+  TRIAGE,
+  URGENT
 }
 
 export interface DirectoryEntry {
@@ -32,8 +33,7 @@ const directorySchema: JTDSchemaType<DirectoryEntry[]> = {
       },
       roles: {
         elements: {
-          enum:
-              ["TRIAGE", "BR_3735", "BR_3737", "BR_3739", "BR_3743", "BR_3745"]
+          enum: ["TRIAGE", "BR_3735", "BR_3737", "BR_3739", "BR_3743", "BR_3745", "URGENT"]
         }
       }
     }
