@@ -12,7 +12,7 @@
   "include": [
     "src/*",
     "test/*",
-    "node_modules/pubsub_lalliance/src/*", // ugh... hack
-    "node_modules/struct_lalliance/src/*", // ugh... hack
+    "node_modules/pubsub_lalliance/src/*", // the gcp loader wants this
+    "node_modules/struct_lalliance/src/*", // the gcp loader wants this
   ]
 }
