@@ -52,7 +52,9 @@ function parseDirectory(): Recipient[] {
 }
 
 function parsePubsubConfigEnv(): Promise<PublishConfig> {
-  return parsePublishConfig("PUBLISH_CONFIG");
+  return parsePublishConfig(
+      requireEnvVar("PUBLISH_CONFIG")
+  );
 }
 
 function parseEnvVarJson(envVarName: string) {
