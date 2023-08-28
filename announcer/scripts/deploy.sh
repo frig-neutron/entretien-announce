@@ -26,6 +26,7 @@ if [ ! -r $dirfile ]; then
 fi
 
 gcloud functions deploy announcer --project=$project_id --max-instances=1 \
+  --source="$source_path" \
   --runtime=nodejs16 --trigger-topic=announcer_trigger \
   --service-account=announcer@$project_id.iam.gserviceaccount.com \
   --set-secrets=ANNOUNCER_SECRETS=announcer:latest \
