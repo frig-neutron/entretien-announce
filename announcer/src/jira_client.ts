@@ -17,7 +17,6 @@ export interface JiraClient {
 
 const jqlDefaultConstants = {
   project: "TRIAG",
-  closedStatuses: "Closed, Done, Resolved",
   pageSize: 50
 }
 
@@ -96,7 +95,7 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
     async allOpenTickets(): Promise<JiraTicket[]> {
       const jql = [
         `project = ${jqlConst.project} AND `,
-        `status not in (${jqlConst.closedStatuses})`
+        `statusCategory != Done `
       ].join('')
 
       return await queryJira(jql, "open tickets");
@@ -113,8 +112,8 @@ export function jiraClientImpl(version2Client: Version2Client, jqlConst = jqlDef
     async ticketsClosed(interval: Interval): Promise<JiraTicket[]> {
       const jql = [
         `project = ${jqlConst.project} AND `,
-        `status in (${jqlConst.closedStatuses}) AND `,
-        `status changed to (${jqlConst.closedStatuses}) DURING (${formatInterval(interval)})`
+        `statusCategory = Done AND `,
+        `status changed DURING (${formatInterval(interval)})`
       ].join('')
 
       return await queryJira(jql, "newly closed tickets");
