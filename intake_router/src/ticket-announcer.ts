@@ -43,14 +43,16 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
       return []; //todo: send error to admin (https://github.com/frig-neutron/entretien-intake/issues/22)
     },
     emailAnnouncement(issueKey: String, form: IntakeFormData): Announcement[] {
+      const testModeSubj = form.mode === "production" ? "" : "TEST - "
+      const testModeBody = form.mode === "production" ? "" : "This is a test - ignore "
       function render(directoryEntry: DirectoryEntry, reasonForReceipt: String): Announcement {
         return {
           primary_recipient: directoryEntry.email,
           secondary_recipients: [],
-          subject: `Maintenance report from ${form.reporter}`,
+          subject: `${testModeSubj}Maintenance report from ${form.reporter}`,
           body: [`Dear ${directoryEntry.name},`,
             '',
-            `${form.reporter} has submitted a maintenance report`,
+            `${testModeBody}${form.reporter} has submitted a maintenance report`,
             '   ------------------ ',
             summarizeForJira(form),
             form.description,

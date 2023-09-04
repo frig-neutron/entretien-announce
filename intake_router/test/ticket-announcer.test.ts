@@ -2,6 +2,7 @@ import {IntakeFormData} from "../src/intake-form-data";
 import {ticketAnnouncer} from "../src/ticket-announcer";
 import {Announcement} from "struct_lalliance/src/announcement";
 import CustomMatcherResult = jest.CustomMatcherResult;
+import 'jest-extended'
 
 describe("ticket announcer", () => {
   const seed = Math.floor(Math.random() * 1000);
@@ -81,6 +82,19 @@ describe("ticket announcer", () => {
         }
       })
     })
+    test("test mode", () => {
+      const form: IntakeFormData = {
+        ...formValues(),
+        ...{mode: "test"}
+      }
+      const announcements = announcer.emailAnnouncement(issueKey, form);
+      const subjects = announcements.map(a => a.subject);
+      const bodies = announcements.map(a => a.body)
+
+      expect(subjects).toSatisfyAll(s => s && s.toString().startsWith("TEST - "))
+      expect(bodies).toSatisfyAll(b => b && b.toString().match(/This is a test/))
+    })
+
 
     function brEmailSpec(brEmail: string, building: string, form: IntakeFormData, issueKey: string) {
       return {
@@ -153,7 +167,6 @@ describe("ticket announcer", () => {
           issueKey: issueKey
         }
       })
-
     })
 
   })
