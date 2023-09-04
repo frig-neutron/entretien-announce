@@ -28,6 +28,7 @@
         "concurrently": "^7.1.0",
         "gts": "^3.1.0",
         "jest": "^27.5.1",
+        "jest-extended": "^4.0.1",
         "jest-mock-extended": "^2.0.4",
         "nodemon": "^2.0.15",
         "ts-jest": "^27.1.3",

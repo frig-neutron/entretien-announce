@@ -2,6 +2,7 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  'setupFilesAfterEnv': ['./jest.setup.ts'],
 
   // Automatically clear mock calls, instances and results before every test
   clearMocks: true,
@@ -10,18 +11,18 @@ module.exports = {
   collectCoverage: true,
 
   // The directory where Jest should output its coverage files
-  coverageDirectory: "coverage",
+  coverageDirectory: 'coverage',
 
-  collectCoverageFrom: ["src/**ts"],
+  collectCoverageFrom: ['src/**ts'],
 
   detectOpenHandles: true,
 
   // Indicates which provider should be used to instrument code for coverage
-  coverageProvider: "v8",
+  coverageProvider: 'v8',
   globals: {
-    "ts-jest": {}
+    'ts-jest': {},
   },
   modulePathIgnorePatterns: [
-      "<rootDir>/build/"
+    '<rootDir>/build/',
   ]
 };
