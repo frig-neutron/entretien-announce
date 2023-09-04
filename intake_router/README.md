@@ -83,6 +83,7 @@ question, I'm treating priority as descending from top to bottom - that is roles
 down override roles listed above. 
 TODO: is this true?
 
+## Testing
 
 ### Local testing
 
@@ -91,4 +92,13 @@ Running locally can be done w/ the `functions-framework`. Use the script command
 Removing the signature type makes it accept HTTP GET, but then it just hangs there. I think this is
 because it expects a response on the 2nd function param.
 
+### Manual testing
+
+Testing in the STG env has 2 levers
+- the `DIRECTORY`, which allows you to not bother the neighbours with email
+- [appscript][appscript] `MODE` config key, which allows you to either suppress ticket creation 
+  (`MODE=noop`) or prefix ticket+email (`MODE=test`).
+
+
 [announcer]: ../announcer
+[appscript]: ../intake_form
