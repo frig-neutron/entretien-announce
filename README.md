@@ -45,20 +45,24 @@ TBD, yo
 
 See [C4 container diagram](./doc/c4-container.puml) for a visual reference.
 
-### Intake and intake routing
+### [Intake form][intake_form_src]
 
-The actual intake happens via a Google Form which kicks off a Google Apps Script.
+This is our user-facing "ui". User fills out Google form, which goes to a spreadsheet. 
+Spreadsheet executes an apps script that forwards the form contents to the router.
 
-- The intake form scripts read the response values, package them up into a payload and fire it
-  at an HTTP enpoint running a google cloud function. All that code is in
-  [intake_form][intake_form_src]
-- The cloud function then reads the form values, constructs a jira ticket and some email
-  notifications. The jira ticket goes to Jira and the notifications get mailed out. That
-  function lives in [intake_router][intake_router_src]
+### [Intake router][intake_router_src]
+
+Inputs: 
+- Trigger by http endpoint. Payload contains json-serialized form contents.
+- Coop directory, configured via environment variable.
+
+Output: 
+- Jira ticket
+- A bunch of notifications, sent to the `sendmail` pubsub topic.
 
 ### [Announcer][announcer_src]
 
-Implements the business logic. 
+Reports on monthly ticket activity.
 
 Inputs:
 - Trigger by pubsub message on `announcer_trigger` topic. A Cloud Scheduler Job emits the 
