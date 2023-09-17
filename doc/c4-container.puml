@@ -2,17 +2,28 @@
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
 Person(entretienStaff, "Entretien Member")
-System(gmail, Gmail)
+Person(member, "Coop Member")
 System(jira, Jira)
+System(gmail, Gmail)
+
+System(form, "Maintenance report intake form", "Collect maintenance reports and forward them to ticket router")
+
 System_Boundary("gcp", "Google Cloud Platform"){
   Container(gcloudsched, "Trigger", "Google Cloud Scheduler", "Publish trigger message")
   Container(announcer_gcf, "Announcer", "Cloud Function", "Generate Jira ticket reports")
-  Container(mailer_gcf, "Mailer", "Cloud Function", "Mail report to addressee")
+  Container(router, "Ticket router", "Cloud Function", "Convert form submissions into tickets and mail notifications")
+  Container(mailer_gcf, "Sendmail", "Cloud Function", "Mail report to addressee")
 }
 
+Lay_L(router, announcer_gcf)
+
+Rel(member, form, "Submit report", "manual")
+Rel(form, router, "Form contents", "HTTP")
 Rel(gcloudsched, announcer_gcf, "Trigger", "Pubsub")
 Rel(announcer_gcf, jira, "Get all changes for report interval", "HTTP")
 Rel(announcer_gcf, mailer_gcf, "Addressed report", "Pubsub")
+Rel(router, mailer_gcf, "Notification of ticket", "Pubsub")
+Rel(router, jira, "Create ticket", "HTTP")
 Rel(mailer_gcf, gmail, "mail", "SMTP")
 Rel(gmail, entretienStaff, "Notify")
 @enduml
