@@ -1,3 +1,6 @@
 .idea
 .run
+.swp
+build
+coverage
 node_modules

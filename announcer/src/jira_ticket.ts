@@ -15,7 +15,6 @@ export interface JiraTicket {
 
   // todo: add "creator", parsing from ticket body
   // todo: add "resolution"
-  // todo: add priority
 }
 
 export interface Clock {

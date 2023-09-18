@@ -1,0 +1,21 @@
+{
+  "extends": "./node_modules/gts/tsconfig-google.json",
+  "compilerOptions": {
+    "esModuleInterop": true,
+    // https://www.reddit.com/r/typescript/comments/tx9bl4/tsc_hangs_unless_skiplibcheck/
+    // https://github.com/microsoft/TypeScript/issues/46900 (???)
+    "skipLibCheck": true, // some kind of hanging compilation bug
+    "lib": [
+      "es2019", // flatmap support
+      "dom"     // jirajs needs this
+    ],
+    "rootDir": ".",
+    "outDir": "build"
+  },
+  "include": [
+    "src/*.ts",
+    "test/*.ts",
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ]
+}

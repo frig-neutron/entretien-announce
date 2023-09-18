@@ -6,10 +6,19 @@ if [ -z "$env" ]; then
 fi
 
 set -euo pipefail
+scriptdir="../scripts"
 
+. "$scriptdir/_include.sh"
+
+require_function_root
 project_id=entretien-$env
 
-gcloud functions deploy sendmail --project=$project_id --max-instances=1 \
+source_path=`$scriptdir/publish_function.sh $project_id`
+
+cwd=`dirname $0`
+
+gcloud functions deploy sendmail --project=$project_id --max-instances=2 \
+  --source="$source_path" \
   --runtime=nodejs16 --trigger-topic=sendmail \
-  --service-account=announcer@$project_id.iam.gserviceaccount.com \
-  --set-secrets=SENDMAIL_SECRETS=announcer:latest
+  --set-secrets=SENDMAIL_SECRETS=announcer:latest \
+  --service-account=announcer@$project_id.iam.gserviceaccount.com 

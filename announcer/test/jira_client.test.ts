@@ -29,7 +29,6 @@ const issues: Issue[] = [
 
 const jiraQueryConst = {
   project: "PAPERCLIP",
-  closedStatuses: "DISAVOWED",
   pageSize: 2
 }
 
@@ -40,8 +39,8 @@ describe("jira client facade", () => {
   test("find closed tickets", async () => {
     setupPagingOverQuery(
         'project = PAPERCLIP AND ' +
-        'status in (DISAVOWED) AND ' +
-        'status changed to (DISAVOWED) DURING (2000-01-01, 2038-01-19)'
+        'statusCategory = Done AND ' +
+        'status changed DURING (2000-01-01, 2038-01-19)'
     )
     const tickets = await jiraClient.ticketsClosed(reportInterval);
     const ticketKeys = tickets.map(t => t.key());
@@ -55,7 +54,7 @@ describe("jira client facade", () => {
   test("find all open tickets", async () => {
     setupPagingOverQuery(
         'project = PAPERCLIP AND ' +
-        'status not in (DISAVOWED)'
+        'statusCategory != Done '
     );
 
     const tickets = await jiraClient.allOpenTickets()

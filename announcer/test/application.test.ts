@@ -6,8 +6,8 @@ import {mock, mockFn} from "jest-mock-extended";
 import {DateTime, Interval} from "luxon";
 import {ReportModel, ReportService} from "../src/report_service";
 import {AnnouncementFactory} from "../src/announcement_factory";
-import {Sender} from "../src/sender";
-import {Announcement} from "../src/announcement";
+import {Announcement} from "struct_lalliance/src/announcement";
+import {Sender} from "pubsub_lalliance/src/sender";
 
 
 const jiraClient = mock<JiraClient>()
