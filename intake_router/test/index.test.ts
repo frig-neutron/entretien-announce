@@ -62,6 +62,10 @@ describe("mainline", () => {
 
   const server = getTestServer("intake_router")
 
+  afterAll(() => {
+    server.close()
+  })
+
   test("happy path", async () => {
     const f = new MockFixture()
     const issueKey = "IssueKey-" + rnd;
