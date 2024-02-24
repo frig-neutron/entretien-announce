@@ -81,7 +81,7 @@ describe("ticket announcer", () => {
           topLine: "A. Member has submitted a maintenance report",
           reasonForReceiving: "you are a triage responder",
           isUrgent: false,
-          issueKey: issueKey
+          issue: issueKey
         }
       })
     })
@@ -94,10 +94,9 @@ describe("ticket announcer", () => {
       expect(announcements).not.someEmailMatches({
         bodyParts: {
           source: expect.anything(),
-          topLine: "xx",
           reasonForReceiving: "you are the reporter",
           isUrgent: false,
-          issueKey: expect.anything()
+          issue: expect.anything()
         }
       })
     })
@@ -116,9 +115,9 @@ describe("ticket announcer", () => {
         bodyParts: {
           source: form,
           topLine: "Your maintenance report has been received.",
-          reasonForReceiving: "you are the reporter",
+          reasonForReceiving: "the ticket was submitted on your behalf",
           isUrgent: false,
-          issueKey: issueKey
+          issue: issueKey
         }
       })
     })
@@ -148,7 +147,7 @@ describe("ticket announcer", () => {
           topLine: `${form.reporter} has submitted a maintenance report`,
           reasonForReceiving: `you are a building representative for ${building}`,
           isUrgent: false,
-          issueKey: issueKey
+          issue: issueKey
         }
       };
     }
@@ -180,7 +179,7 @@ describe("ticket announcer", () => {
           topLine: "A. Member has submitted a maintenance report",
           reasonForReceiving: "you are an emergency responder",
           isUrgent: false,
-          issueKey: issueKey
+          issue: issueKey
         }
       })
     })
@@ -207,7 +206,7 @@ describe("ticket announcer", () => {
           topLine: "A. Member has submitted a maintenance report",
           reasonForReceiving: "you are an emergency responder",
           isUrgent: false,
-          issueKey: issueKey
+          issue: issueKey
         }
       })
     })
@@ -241,10 +240,10 @@ export type EmailSpec = {
   subject: string,
   bodyParts: {
     source: IntakeFormData,
-    topLine: string,
+    topLine?: string,
     reasonForReceiving: string,
     isUrgent: boolean,
-    issueKey: string
+    issue: string
   }
 }
 
@@ -300,17 +299,16 @@ expect.extend({
     if (bodyParts) {
       const bodyRe = (s: string) => expect(received.body).toMatch(new RegExp(s))
 
-      bodyRe(bodyParts.topLine)
+      if(bodyParts.topLine) {
+        bodyRe(bodyParts.topLine)
+      }
 
       const jiraSummary = ((f: IntakeFormData) => f.building + " " + f.area + ": " + f.summary)(bodyParts.source);
       if (expectedEmail.to) {
         bodyRe("^Dear " + expectedEmail.to.name + ", <br />\n")
       }
       bodyRe("\nYou are receiving this email because " + bodyParts.reasonForReceiving)
-      bodyRe(
-          "\nJira ticket https://lalliance.atlassian.net/browse/" + bodyParts.issueKey +
-          " has been assigned to this report."
-      )
+      bodyRe("\nJira ticket " + bodyParts.issue + " has been assigned to this report.")
     }
 
 

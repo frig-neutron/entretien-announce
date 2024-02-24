@@ -2,6 +2,9 @@ import {IntakeFormData} from "./intake-form-data";
 import {Announcement} from "struct_lalliance/src/announcement";
 import {DirectoryEntry, Role} from "./intake-directory";
 import {log} from "./logger";
+import {Locales, TranslationFunctions} from "./i18n/i18n-types";
+import {i18nObject} from "./i18n/i18n-util";
+import {loadAllLocales} from "./i18n/i18n-util.sync";
 
 /**
  * A factory of Announcement
@@ -13,6 +16,7 @@ export interface TicketAnnouncer {
 }
 
 export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
+  loadAllLocales()
   const summarizeForJira = (f: IntakeFormData) => f.building + " " + f.area + ": " + f.summary;
 
   function findByRoleKey(brRoleKey: keyof typeof Role) {
@@ -46,7 +50,7 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
       log.error(cause)
       return []; //todo: send error to admin (https://github.com/frig-neutron/entretien-intake/issues/22)
     },
-    emailAnnouncement(issueKey: String, form: IntakeFormData): Announcement[] {
+    emailAnnouncement(issueKey: string, form: IntakeFormData): Announcement[] {
       const testModeSubj = form.mode === "production" ? "" : "TEST - "
       const testModeBody = form.mode === "production" ? "" : "This is a test - ignore "
 
@@ -62,26 +66,28 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
             summarizeForJira(form),
             form.description,
             '   ------------------ ',
-            `Jira ticket https://lalliance.atlassian.net/browse/${issueKey} has been assigned to this report.`,
+            `Jira ticket ${issueKey} has been assigned to this report.`,
             reasonForReceipt,
           ].join(" <br />\n")
         }
       }
 
       function renderReportAcknowledgement(directoryEntry: DirectoryEntry): Announcement {
+        const L: TranslationFunctions = i18nObject("en")
+
         return {
           primary_recipient: directoryEntry.email,
           secondary_recipients: [],
-          subject: `${testModeSubj}Maintenance report received`,
-          body: [`Dear ${form.reporter},`,
+          subject: testModeSubj + L.ticketReceived.subject(),
+          body: [L.ticketReceived.greeting({name: form.reporter}),
             '',
-            `${testModeBody}Your maintenance report has been received.`,
+            testModeBody + L.ticketReceived.topLine(),
             '   ------------------ ',
             summarizeForJira(form),
             form.description,
             '   ------------------ ',
-            `Jira ticket https://lalliance.atlassian.net/browse/${issueKey} has been assigned to this report.`,
-            'You are receiving this email because you are the reporter.'
+            L.ticketReceived.jiraTicket({issueKey: issueKey}),
+            L.ticketReceived.reasonForReceiving()
           ].join(" <br />\n")
         }
       }

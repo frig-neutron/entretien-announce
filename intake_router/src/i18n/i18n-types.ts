@@ -14,18 +14,55 @@ export type Translation = RootTranslation
 export type Translations = RootTranslation
 
 type RootTranslation = {
-	/**
-	 * H​i​ ​{​n​a​m​e​}​!​ ​P​l​e​a​s​e​ ​l​e​a​v​e​ ​a​ ​s​t​a​r​ ​i​f​ ​y​o​u​ ​l​i​k​e​ ​t​h​i​s​ ​p​r​o​j​e​c​t​:​ ​h​t​t​p​s​:​/​/​g​i​t​h​u​b​.​c​o​m​/​i​v​a​n​h​o​f​e​r​/​t​y​p​e​s​a​f​e​-​i​1​8​n
-	 * @param {string} name
-	 */
-	HI: RequiredParams<'name'>
+	ticketReceived: {
+		/**
+		 * M​a​i​n​t​e​n​a​n​c​e​ ​r​e​p​o​r​t​ ​r​e​c​e​i​v​e​d
+		 */
+		subject: string
+		/**
+		 * D​e​a​r​ ​{​n​a​m​e​}​,
+		 * @param {string} name
+		 */
+		greeting: RequiredParams<'name'>
+		/**
+		 * Y​o​u​r​ ​m​a​i​n​t​e​n​a​n​c​e​ ​r​e​p​o​r​t​ ​h​a​s​ ​b​e​e​n​ ​r​e​c​e​i​v​e​d​.
+		 */
+		topLine: string
+		/**
+		 * J​i​r​a​ ​t​i​c​k​e​t​ ​{​i​s​s​u​e​K​e​y​}​ ​h​a​s​ ​b​e​e​n​ ​a​s​s​i​g​n​e​d​ ​t​o​ ​t​h​i​s​ ​r​e​p​o​r​t​.
+		 * @param {string} issueKey
+		 */
+		jiraTicket: RequiredParams<'issueKey'>
+		/**
+		 * Y​o​u​ ​a​r​e​ ​r​e​c​e​i​v​i​n​g​ ​t​h​i​s​ ​e​m​a​i​l​ ​b​e​c​a​u​s​e​ ​t​h​e​ ​t​i​c​k​e​t​ ​w​a​s​ ​s​u​b​m​i​t​t​e​d​ ​o​n​ ​y​o​u​r​ ​b​e​h​a​l​f​.
+		 */
+		reasonForReceiving: string
+	}
 }
 
 export type TranslationFunctions = {
-	/**
-	 * Hi {name}! Please leave a star if you like this project: https://github.com/ivanhofer/typesafe-i18n
-	 */
-	HI: (arg: { name: string }) => LocalizedString
+	ticketReceived: {
+		/**
+		 * Maintenance report received
+		 */
+		subject: () => LocalizedString
+		/**
+		 * Dear {name},
+		 */
+		greeting: (arg: { name: string }) => LocalizedString
+		/**
+		 * Your maintenance report has been received.
+		 */
+		topLine: () => LocalizedString
+		/**
+		 * Jira ticket {issueKey} has been assigned to this report.
+		 */
+		jiraTicket: (arg: { issueKey: string }) => LocalizedString
+		/**
+		 * You are receiving this email because the ticket was submitted on your behalf.
+		 */
+		reasonForReceiving: () => LocalizedString
+	}
 }
 
 export type Formatters = {}
