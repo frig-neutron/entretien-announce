@@ -18,6 +18,7 @@
         "pubsub_lalliance": "file:./lib/pubsub",
         "struct_lalliance": "file:./lib/struct",
         "supertest": "^6.2.4",
+        "typesafe-i18n": "^5.26.2",
         "winston": "^3.6.0"
     },
     "devDependencies": {
