@@ -23,6 +23,8 @@ describe("ticket announcer", () => {
     // the next two entries test what happens when one person is called up for two reasons
     {name: "BR w/ dup URGENT role", email: "br-duplicate@email.com", roles: ["BR_3737"]},
     {name: "BR w/ dup URGENT role", email: "br-duplicate@email.com", roles: ["URGENT"]},
+    // the next two entries test the acknowledgement email
+    {name: "En Member", email: "en-member@email.com", roles: []}
   ]);
 
   describe("non-urgent", () => {
@@ -76,7 +78,45 @@ describe("ticket announcer", () => {
         subject: "Maintenance report from A. Member",
         bodyParts: {
           source: formValues(),
+          topLine: "A. Member has submitted a maintenance report",
           reasonForReceiving: "you are a triage responder",
+          isUrgent: false,
+          issueKey: issueKey
+        }
+      })
+    })
+    test("no acknowledgement email", () => {
+      const form: IntakeFormData = {
+        ...formValues(),
+        ...{reporter: "En Member"}
+      }
+      const announcements = announcer.emailAnnouncement(issueKey, form);
+      expect(announcements).not.someEmailMatches({
+        bodyParts: {
+          source: expect.anything(),
+          topLine: "xx",
+          reasonForReceiving: "you are the reporter",
+          isUrgent: false,
+          issueKey: expect.anything()
+        }
+      })
+    })
+    test("english acknowledgement email", () => {
+      const form: IntakeFormData = {
+        ...formValues(),
+        ...{reporter: "En Member"}
+      }
+      const announcements = announcer.emailAnnouncement(issueKey, form);
+      expect(announcements).someEmailMatches({
+        to: {
+          email: "en-member@email.com",
+          name: form.reporter
+        },
+        subject: "Maintenance report received",
+        bodyParts: {
+          source: form,
+          topLine: "Your maintenance report has been received.",
+          reasonForReceiving: "you are the reporter",
           isUrgent: false,
           issueKey: issueKey
         }
@@ -96,15 +136,16 @@ describe("ticket announcer", () => {
     })
 
 
-    function brEmailSpec(brEmail: string, building: string, form: IntakeFormData, issueKey: string) {
+    function brEmailSpec(brEmail: string, building: string, form: IntakeFormData, issueKey: string): EmailSpec {
       return {
         to: {
           email: brEmail,
           name: `BR for ${building}`
         },
         subject: "Maintenance report from A. Member",
-        body: {
+        bodyParts: {
           source: form,
+          topLine: `${form.reporter} has submitted a maintenance report`,
           reasonForReceiving: `you are a building representative for ${building}`,
           isUrgent: false,
           issueKey: issueKey
@@ -136,6 +177,7 @@ describe("ticket announcer", () => {
         subject: "Maintenance report from A. Member",
         bodyParts: {
           source: formValues(),
+          topLine: "A. Member has submitted a maintenance report",
           reasonForReceiving: "you are an emergency responder",
           isUrgent: false,
           issueKey: issueKey
@@ -162,6 +204,7 @@ describe("ticket announcer", () => {
         subject: "Maintenance report from A. Member",
         bodyParts: {
           source: formValues(),
+          topLine: "A. Member has submitted a maintenance report",
           reasonForReceiving: "you are an emergency responder",
           isUrgent: false,
           issueKey: issueKey
@@ -198,6 +241,7 @@ export type EmailSpec = {
   subject: string,
   bodyParts: {
     source: IntakeFormData,
+    topLine: string,
     reasonForReceiving: string,
     isUrgent: boolean,
     issueKey: string
@@ -256,9 +300,7 @@ expect.extend({
     if (bodyParts) {
       const bodyRe = (s: string) => expect(received.body).toMatch(new RegExp(s))
 
-      bodyRe(bodyParts.source.reporter + " has submitted " +
-          (bodyParts.isUrgent ? "an URGENT" : "a") +
-          " maintenance report")
+      bodyRe(bodyParts.topLine)
 
       const jiraSummary = ((f: IntakeFormData) => f.building + " " + f.area + ": " + f.summary)(bodyParts.source);
       if (expectedEmail.to) {
