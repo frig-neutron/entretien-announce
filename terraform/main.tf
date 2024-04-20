@@ -18,6 +18,7 @@ data "google_billing_account" "default" {
 
 resource "google_project_service" "enabled_services" {
   for_each = toset([
+    "artifactregistry.googleapis.com",
     "cloudbuild.googleapis.com", # support cloud functions
     "cloudfunctions.googleapis.com",
     "cloudscheduler.googleapis.com",
