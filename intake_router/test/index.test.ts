@@ -10,6 +10,7 @@ import {FormDataRouter, formDataRouter} from "../src/form-data-router";
 import {DirectoryEntry, parseRoutingDirectory} from "../src/intake-directory";
 import {ticketAnnouncer, TicketAnnouncer} from "../src/ticket-announcer";
 import {JiraConfig, jiraService, parseJiraBasicAuth} from "../src/jira-service";
+import { Server } from 'http';
 
 jest.mock("../src/form-data-router")
 jest.mock("../src/intake-directory")
@@ -19,7 +20,16 @@ jest.mock("../src/ticket-announcer")
 jest.mock("pubsub_lalliance/src/sender")
 
 describe("mainline", () => {
-  functions.http('intake_router', intake_router);
+  let server: Server;
+
+  beforeEach(() => {
+    functions.http('intake_router', intake_router);
+    server = getTestServer("intake_router")
+  })
+
+  afterEach(() => {
+    server.close()
+  })
 
   const sampleDirectory: DirectoryEntry = {
     email: "hurdygurdy@thefair", name: "Hurdly Gurdly", roles: []
@@ -58,12 +68,6 @@ describe("mainline", () => {
     process.env[Env.DIRECTORY] = "routing"
     process.env[Env.SECRETS] = "jcreds"
     process.env[Env.JIRA_OPTIONS] = "jopts"
-  })
-
-  const server = getTestServer("intake_router")
-
-  afterAll(() => {
-    server.close()
   })
 
   test("happy path", async () => {

@@ -26,8 +26,7 @@ export enum Env {
 // Absolutely MUST use the 3-param version b/c otherwise there seems to be no way to terminate the function properly.
 // Returning a resolved Promise doesn't cut it - you still get "Finished with status: response error"
 export const intake_router: ff.HttpFunction = async (req: ff.Request, res: ff.Response) => {
-  application.use(text())
-  const input = req.rawBody;
+  const input = req.rawBody?.toString();
   log.info(`Starting with data=${input?.toString()}, headers=${JSON.stringify(req.rawHeaders)}`)
 
   const jira = jiraService(await jiraCreds());
