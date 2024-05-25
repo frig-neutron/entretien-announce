@@ -16,9 +16,15 @@ export enum Role {
   URGENT
 }
 
+export enum Lang {
+  en,
+  fr
+}
+
 export interface DirectoryEntry {
   name: string,
   email: string,
+  lang: (keyof typeof Lang),
   roles: (keyof typeof Role)[]
 }
 
@@ -35,6 +41,9 @@ const directorySchema: JTDSchemaType<DirectoryEntry[]> = {
         elements: {
           enum: ["TRIAGE", "BR_3735", "BR_3737", "BR_3739", "BR_3743", "BR_3745", "URGENT"]
         }
+      },
+      lang: {
+        enum: ["en", "fr"]
       }
     }
   }

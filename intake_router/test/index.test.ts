@@ -32,7 +32,7 @@ describe("mainline", () => {
   })
 
   const sampleDirectory: DirectoryEntry = {
-    email: "hurdygurdy@thefair", name: "Hurdly Gurdly", roles: []
+    email: "hurdygurdy@thefair", lang: "en", name: "Hurdly Gurdly", roles: []
   }
 
   const rnd = Math.random();

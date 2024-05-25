@@ -13,18 +13,19 @@ describe("ticket announcer", () => {
   const urgentEmail = `emerg_${seed}@email.com`
   const urgentName = `emerg ${seed}`
   const announcer = ticketAnnouncer([
-    {name: "BR for 3735", email: "br-thirty-five@email.com", roles: ["BR_3735"]},
-    {name: "BR for 3735", email: "co-br-thirty-five@email.com", roles: ["BR_3735"]},
-    {name: "BR for 3737", email: "br-thirty-seven@email.com", roles: ["BR_3737"]},
-    {name: "BR for 3743", email: "br-forty-three@email.com", roles: ["BR_3743"]},
-    {name: "BR for 3743", email: "br-forty-three@email.com", roles: ["BR_3743"]},
-    {name: triageName, email: triageEmail, roles: ["TRIAGE"]},
-    {name: urgentName, email: urgentEmail, roles: ["URGENT"]},
+    {name: "BR for 3735", lang: "en", email: "br-thirty-five@email.com", roles: ["BR_3735"]},
+    {name: "BR for 3735", lang: "en", email: "co-br-thirty-five@email.com", roles: ["BR_3735"]},
+    {name: "BR for 3737", lang: "en", email: "br-thirty-seven@email.com", roles: ["BR_3737"]},
+    {name: "BR for 3743", lang: "en", email: "br-forty-three@email.com", roles: ["BR_3743"]},
+    {name: "BR for 3743", lang: "en", email: "br-forty-three@email.com", roles: ["BR_3743"]},
+    {name: triageName, lang: "en", email: triageEmail, roles: ["TRIAGE"]},
+    {name: urgentName, lang: "en", email: urgentEmail, roles: ["URGENT"]},
     // the next two entries test what happens when one person is called up for two reasons
-    {name: "BR w/ dup URGENT role", email: "br-duplicate@email.com", roles: ["BR_3737"]},
-    {name: "BR w/ dup URGENT role", email: "br-duplicate@email.com", roles: ["URGENT"]},
+    {name: "BR w/ dup URGENT role", lang: "en", email: "br-duplicate@email.com", roles: ["BR_3737"]},
+    {name: "BR w/ dup URGENT role", lang: "en", email: "br-duplicate@email.com", roles: ["URGENT"]},
     // the next two entries test the acknowledgement email
-    {name: "En Member", email: "en-member@email.com", roles: []}
+    {name: "En Member", lang: "en", email: "en-member@email.com", roles: []},
+    {name: "Fr Member", lang: "fr", email: "fr-member@email.com", roles: []}
   ]);
 
   describe("non-urgent", () => {
