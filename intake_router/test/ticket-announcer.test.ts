@@ -3,6 +3,7 @@ import {ticketAnnouncer} from "../src/ticket-announcer";
 import {Announcement} from "struct_lalliance/src/announcement";
 import CustomMatcherResult = jest.CustomMatcherResult;
 import 'jest-extended'
+import dedent from "dedent";
 
 describe("ticket announcer", () => {
   const seed = Math.floor(Math.random() * 1000);
@@ -134,15 +135,16 @@ describe("ticket announcer", () => {
           name: form.reporter
         },
         subject: "Rapport de maintenance reçu",
-        body: `Cher ${form.reporter}, <br />
-<br />
-Votre rapport de maintenance a été reçu. <br />
-   ------------------ <br />
-3737 Sous-sol: chauffe-eau <br />
-L'eau chaude ne marche pas <br />
-   ------------------ <br />
-Un ticket Jira ${issueKey} a été attribué à ce rapport. <br />
-Vous recevez cet email parce que le ticket a été soumis en votre nom.`
+        body: dedent`
+          Cher ${form.reporter}, <br />
+          <br />
+          Votre rapport de maintenance a été reçu. <br />
+             ------------------ <br />
+          3737 Sous-sol: chauffe-eau <br />
+          L'eau chaude ne marche pas <br />
+             ------------------ <br />
+          Un ticket Jira ${issueKey} a été attribué à ce rapport. <br />
+          Vous recevez cet email parce que le ticket a été soumis en votre nom.`
       })
     })
     test("test mode", () => {

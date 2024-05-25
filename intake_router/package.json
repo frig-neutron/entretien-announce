@@ -10,6 +10,7 @@
         "@google-cloud/pubsub": "^3.0.1",
         "ajv": "^8.11.0",
         "ajv-formats": "^2.1.1",
+        "dedent": "^1.5.3",
         "dotenv": "^16.0.0",
         "express": "^4.17.3",
         "jira.js": "2.11.0",
