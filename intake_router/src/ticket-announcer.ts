@@ -73,22 +73,22 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
       }
 
       function renderReportAcknowledgement(directoryEntry: DirectoryEntry): Announcement {
-        const L: TranslationFunctions = i18nObject("en")
+        const L: TranslationFunctions = i18nObject(directoryEntry.lang)
 
         return {
           primary_recipient: directoryEntry.email,
           secondary_recipients: [],
           subject: testModeSubj + L.ticketReceived.subject(),
-          body: [L.ticketReceived.greeting({name: form.reporter}),
+          body: [L.ticketReceived.greeting({name: form.reporter}) + ' ',
             '',
-            testModeBody + L.ticketReceived.topLine(),
+            testModeBody + L.ticketReceived.topLine() + ' ',
             '   ------------------ ',
-            summarizeForJira(form),
-            form.description,
+            summarizeForJira(form) + ' ',
+            form.description + ' ',
             '   ------------------ ',
-            L.ticketReceived.jiraTicket({issueKey: issueKey}),
+            L.ticketReceived.jiraTicket({issueKey: issueKey}) + ' ',
             L.ticketReceived.reasonForReceiving()
-          ].join(" <br />\n")
+          ].join("<br />\n")
         }
       }
 

@@ -122,6 +122,29 @@ describe("ticket announcer", () => {
         }
       })
     })
+    test("french acknowledgement email", () => {
+      const form: IntakeFormData = {
+        ...formValues(),
+        ...{reporter: "Fr Member"}
+      }
+      const announcements = announcer.emailAnnouncement(issueKey, form);
+      expect(announcements).someEmailMatches({
+        to: {
+          email: "fr-member@email.com",
+          name: form.reporter
+        },
+        subject: "Rapport de maintenance reçu",
+        body: `Cher ${form.reporter}, <br />
+<br />
+Votre rapport de maintenance a été reçu. <br />
+   ------------------ <br />
+3737 Sous-sol: chauffe-eau <br />
+L'eau chaude ne marche pas <br />
+   ------------------ <br />
+Un ticket Jira ${issueKey} a été attribué à ce rapport. <br />
+Vous recevez cet email parce que le ticket a été soumis en votre nom.`
+      })
+    })
     test("test mode", () => {
       const form: IntakeFormData = {
         ...formValues(),
@@ -149,7 +172,7 @@ describe("ticket announcer", () => {
           reasonForReceiving: `you are a building representative for ${building}`,
           isUrgent: false,
           issue: issueKey
-        }
+        },
       };
     }
   })
@@ -239,13 +262,14 @@ export type EmailSpec = {
     name: string
   }
   subject: string,
-  bodyParts: {
+  bodyParts?: {
     source: IntakeFormData,
     topLine?: string,
     reasonForReceiving: string,
     isUrgent: boolean,
     issue: string
   }
+  body?: string
 }
 
 
@@ -296,11 +320,15 @@ expect.extend({
     }
 
 
+    if (expectedEmail.body) {
+      expect(received.body).toBe(expectedEmail.body)
+    }
+
     const bodyParts = expectedEmail.bodyParts;
     if (bodyParts) {
       const bodyRe = (s: string) => expect(received.body).toMatch(new RegExp(s))
 
-      if(bodyParts.topLine) {
+      if (bodyParts.topLine) {
         bodyRe(bodyParts.topLine)
       }
 
