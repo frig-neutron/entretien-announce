@@ -90,11 +90,8 @@ Removing the signature type makes it accept HTTP GET, but then it just hangs the
 because it expects a response on the 2nd function param.
 
 ## Technical
-### Localization
 
-- done using the [`typesafe-i18n`][typesafe-i18n] lib
-- requires a generator. The generator watches files of interest, unless you specify --no-watch
-  (check `package.json` for script details)
+### [Localization](../doc/localization.md)
   
 ## ADR
 
