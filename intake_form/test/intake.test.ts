@@ -106,6 +106,47 @@ describe("intake end-to-end", () => {
         mode: "production"
       })
     })
+    test("retry http errors", () => {
+      mockPropertiesServiceModeKey("production")
+      mockSheetsApp(responseValues)
+      const urlFetch = mockUrlFetchApp(
+          responseValues,
+          "Request failed for https://cloudfunctions.net returned code 500"
+      );
+
+      toJira(null);
+
+      urlFetch.assertTicketCreated({
+        area: "Sous-sol",
+        building: "3737",
+        description: "L'eau chaude ne marche pas",
+        priority: "regular",
+        reporter: "A. Member",
+        rowIndex: 2,
+        summary: "chauffe-eau",
+        mode: "production"
+      })
+    })
+
+    test("http error retry limit", () => {
+      mockPropertiesServiceModeKey("production")
+      mockSheetsApp(responseValues)
+      const urlFetch = mockUrlFetchApp(
+          responseValues,
+          "Request failed for https://cloudfunctions.net returned code 500",
+          "Request failed for https://us-central1.cloudfunctions.net returned code 429. Truncated server response: Rate exceeded",
+          "What now?",
+      );
+
+      let diedWithException = true;
+      try {
+        toJira(null);
+        diedWithException = false;
+      } catch ({message}) {
+        expect(message).toContain("What now?")
+      }
+      expect(diedWithException).toBe(true)
+    })
   })
 
   describe("invocation validation", () => {
