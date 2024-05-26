@@ -4,6 +4,7 @@ import {Announcement} from "struct_lalliance/src/announcement";
 import CustomMatcherResult = jest.CustomMatcherResult;
 import 'jest-extended'
 import dedent from "dedent";
+import exp from "node:constants";
 
 describe("ticket announcer", () => {
   const seed = Math.floor(Math.random() * 1000);
@@ -14,6 +15,7 @@ describe("ticket announcer", () => {
   const urgentEmail = `emerg_${seed}@email.com`
   const urgentName = `emerg ${seed}`
   const announcer = ticketAnnouncer([
+    {name: "Admin", lang: "en", email: "the-admin@gmail.com", roles: ["ADMIN"]},
     {name: "BR for 3735", lang: "en", email: "br-thirty-five@email.com", roles: ["BR_3735"]},
     {name: "BR for 3735", lang: "en", email: "co-br-thirty-five@email.com", roles: ["BR_3735"]},
     {name: "BR for 3737", lang: "en", email: "br-thirty-seven@email.com", roles: ["BR_3737"]},
@@ -155,9 +157,13 @@ describe("ticket announcer", () => {
       const announcements = announcer.emailAnnouncement(issueKey, form);
       const subjects = announcements.map(a => a.subject);
       const bodies = announcements.map(a => a.body)
+      const recipients = announcements.map(a => a.primary_recipient);
 
-      expect(subjects).toSatisfyAll(s => s && s.toString().startsWith("TEST - "))
-      expect(bodies).toSatisfyAll(b => b && b.toString().match(/This is a test/))
+      const matchesRe = (re: RegExp)  => (o: any): boolean => o && o.toString().match(re);
+
+      expect(subjects).toSatisfyAll(matchesRe(/^TEST - /))
+      expect(bodies).toSatisfyAll(matchesRe(/This is a test/))
+      expect(recipients).toSatisfyAll(matchesRe(/the-admin\+test-[a-z0-9_-]+@gmail.com/))
     })
 
 

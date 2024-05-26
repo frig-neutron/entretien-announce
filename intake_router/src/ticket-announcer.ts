@@ -34,6 +34,10 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
     return findByRoleKey("TRIAGE")
   }
 
+  function findAdmin(): DirectoryEntry[] {
+    return findByRoleKey("ADMIN")
+  }
+
   // find urgent responders IF the issue is urgent
   function findUrgent(form: IntakeFormData): DirectoryEntry[] {
     return form.priority == "urgent"
@@ -51,12 +55,24 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
       return []; //todo: send error to admin (https://github.com/frig-neutron/entretien-intake/issues/22)
     },
     emailAnnouncement(issueKey: string, form: IntakeFormData): Announcement[] {
-      const testModeSubj = form.mode === "production" ? "" : "TEST - "
-      const testModeBody = form.mode === "production" ? "" : "This is a test - ignore "
+      const testMode = form.mode !== "production"
+      const testModeSubj = testMode ? "TEST - " : ""
+      const testModeBody = testMode ? "This is a test - ignore " : ""
+
+      function recipientOrAdmin(directoryEntry: DirectoryEntry): string {
+        if (testMode) {
+          const admin = findAdmin()[0];
+          const [adminLocalPart, adminDomainPart] = admin.email.split("@");
+          const recipientLocalPart = directoryEntry.email.split("@")[0]
+          return `${adminLocalPart}+test-${recipientLocalPart}@${adminDomainPart}`
+        } else {
+          return directoryEntry.email;
+        }
+      }
 
       function renderServiceRequest(directoryEntry: DirectoryEntry, reasonForReceipt: String): Announcement {
         return {
-          primary_recipient: directoryEntry.email,
+          primary_recipient: recipientOrAdmin(directoryEntry),
           secondary_recipients: [],
           subject: `${testModeSubj}Maintenance report from ${form.reporter}`,
           body: [`Dear ${directoryEntry.name},`,
@@ -76,7 +92,7 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
         const L: TranslationFunctions = i18nObject(directoryEntry.lang)
 
         return {
-          primary_recipient: directoryEntry.email,
+          primary_recipient: recipientOrAdmin(directoryEntry),
           secondary_recipients: [],
           subject: testModeSubj + L.ticketReceived.subject(),
           body: [L.ticketReceived.greeting({name: form.reporter}) + ' ',
