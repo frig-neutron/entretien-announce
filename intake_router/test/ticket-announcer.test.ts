@@ -3,6 +3,7 @@ import {ticketAnnouncer} from "../src/ticket-announcer";
 import {Announcement} from "struct_lalliance/src/announcement";
 import CustomMatcherResult = jest.CustomMatcherResult;
 import 'jest-extended'
+import dedent from "dedent";
 
 describe("ticket announcer", () => {
   const seed = Math.floor(Math.random() * 1000);
@@ -13,16 +14,19 @@ describe("ticket announcer", () => {
   const urgentEmail = `emerg_${seed}@email.com`
   const urgentName = `emerg ${seed}`
   const announcer = ticketAnnouncer([
-    {name: "BR for 3735", email: "br-thirty-five@email.com", roles: ["BR_3735"]},
-    {name: "BR for 3735", email: "co-br-thirty-five@email.com", roles: ["BR_3735"]},
-    {name: "BR for 3737", email: "br-thirty-seven@email.com", roles: ["BR_3737"]},
-    {name: "BR for 3743", email: "br-forty-three@email.com", roles: ["BR_3743"]},
-    {name: "BR for 3743", email: "br-forty-three@email.com", roles: ["BR_3743"]},
-    {name: triageName, email: triageEmail, roles: ["TRIAGE"]},
-    {name: urgentName, email: urgentEmail, roles: ["URGENT"]},
+    {name: "BR for 3735", lang: "en", email: "br-thirty-five@email.com", roles: ["BR_3735"]},
+    {name: "BR for 3735", lang: "en", email: "co-br-thirty-five@email.com", roles: ["BR_3735"]},
+    {name: "BR for 3737", lang: "en", email: "br-thirty-seven@email.com", roles: ["BR_3737"]},
+    {name: "BR for 3743", lang: "en", email: "br-forty-three@email.com", roles: ["BR_3743"]},
+    {name: "BR for 3743", lang: "en", email: "br-forty-three@email.com", roles: ["BR_3743"]},
+    {name: triageName, lang: "en", email: triageEmail, roles: ["TRIAGE"]},
+    {name: urgentName, lang: "en", email: urgentEmail, roles: ["URGENT"]},
     // the next two entries test what happens when one person is called up for two reasons
-    {name: "BR w/ dup URGENT role", email: "br-duplicate@email.com", roles: ["BR_3737"]},
-    {name: "BR w/ dup URGENT role", email: "br-duplicate@email.com", roles: ["URGENT"]},
+    {name: "BR w/ dup URGENT role", lang: "en", email: "br-duplicate@email.com", roles: ["BR_3737"]},
+    {name: "BR w/ dup URGENT role", lang: "en", email: "br-duplicate@email.com", roles: ["URGENT"]},
+    // the next two entries test the acknowledgement email
+    {name: "En Member", lang: "en", email: "en-member@email.com", roles: []},
+    {name: "Fr Member", lang: "fr", email: "fr-member@email.com", roles: []}
   ]);
 
   describe("non-urgent", () => {
@@ -76,10 +80,71 @@ describe("ticket announcer", () => {
         subject: "Maintenance report from A. Member",
         bodyParts: {
           source: formValues(),
+          topLine: "A. Member has submitted a maintenance report",
           reasonForReceiving: "you are a triage responder",
           isUrgent: false,
-          issueKey: issueKey
+          issue: issueKey
         }
+      })
+    })
+    test("no acknowledgement email", () => {
+      const form: IntakeFormData = {
+        ...formValues(),
+        ...{reporter: "En Member"}
+      }
+      const announcements = announcer.emailAnnouncement(issueKey, form);
+      expect(announcements).not.someEmailMatches({
+        bodyParts: {
+          source: expect.anything(),
+          reasonForReceiving: "you are the reporter",
+          isUrgent: false,
+          issue: expect.anything()
+        }
+      })
+    })
+    test("english acknowledgement email", () => {
+      const form: IntakeFormData = {
+        ...formValues(),
+        ...{reporter: "En Member"}
+      }
+      const announcements = announcer.emailAnnouncement(issueKey, form);
+      expect(announcements).someEmailMatches({
+        to: {
+          email: "en-member@email.com",
+          name: form.reporter
+        },
+        subject: "Maintenance report received",
+        bodyParts: {
+          source: form,
+          topLine: "Your maintenance report has been received.",
+          reasonForReceiving: "the ticket was submitted on your behalf",
+          isUrgent: false,
+          issue: issueKey
+        }
+      })
+    })
+    test("french acknowledgement email", () => {
+      const form: IntakeFormData = {
+        ...formValues(),
+        ...{reporter: "Fr Member"}
+      }
+      const announcements = announcer.emailAnnouncement(issueKey, form);
+      expect(announcements).someEmailMatches({
+        to: {
+          email: "fr-member@email.com",
+          name: form.reporter
+        },
+        subject: "Rapport de maintenance reçu",
+        body: dedent`
+          Cher ${form.reporter}, <br />
+          <br />
+          Votre rapport de maintenance a été reçu. <br />
+             ------------------ <br />
+          3737 Sous-sol: chauffe-eau <br />
+          L'eau chaude ne marche pas <br />
+             ------------------ <br />
+          Un ticket Jira ${issueKey} a été attribué à ce rapport. <br />
+          Vous recevez cet email parce que le ticket a été soumis en votre nom.`
       })
     })
     test("test mode", () => {
@@ -96,19 +161,20 @@ describe("ticket announcer", () => {
     })
 
 
-    function brEmailSpec(brEmail: string, building: string, form: IntakeFormData, issueKey: string) {
+    function brEmailSpec(brEmail: string, building: string, form: IntakeFormData, issueKey: string): EmailSpec {
       return {
         to: {
           email: brEmail,
           name: `BR for ${building}`
         },
         subject: "Maintenance report from A. Member",
-        body: {
+        bodyParts: {
           source: form,
+          topLine: `${form.reporter} has submitted a maintenance report`,
           reasonForReceiving: `you are a building representative for ${building}`,
           isUrgent: false,
-          issueKey: issueKey
-        }
+          issue: issueKey
+        },
       };
     }
   })
@@ -136,9 +202,10 @@ describe("ticket announcer", () => {
         subject: "Maintenance report from A. Member",
         bodyParts: {
           source: formValues(),
+          topLine: "A. Member has submitted a maintenance report",
           reasonForReceiving: "you are an emergency responder",
           isUrgent: false,
-          issueKey: issueKey
+          issue: issueKey
         }
       })
     })
@@ -162,9 +229,10 @@ describe("ticket announcer", () => {
         subject: "Maintenance report from A. Member",
         bodyParts: {
           source: formValues(),
+          topLine: "A. Member has submitted a maintenance report",
           reasonForReceiving: "you are an emergency responder",
           isUrgent: false,
-          issueKey: issueKey
+          issue: issueKey
         }
       })
     })
@@ -196,12 +264,14 @@ export type EmailSpec = {
     name: string
   }
   subject: string,
-  bodyParts: {
+  bodyParts?: {
     source: IntakeFormData,
+    topLine?: string,
     reasonForReceiving: string,
     isUrgent: boolean,
-    issueKey: string
+    issue: string
   }
+  body?: string
 }
 
 
@@ -252,23 +322,24 @@ expect.extend({
     }
 
 
+    if (expectedEmail.body) {
+      expect(received.body).toBe(expectedEmail.body)
+    }
+
     const bodyParts = expectedEmail.bodyParts;
     if (bodyParts) {
       const bodyRe = (s: string) => expect(received.body).toMatch(new RegExp(s))
 
-      bodyRe(bodyParts.source.reporter + " has submitted " +
-          (bodyParts.isUrgent ? "an URGENT" : "a") +
-          " maintenance report")
+      if (bodyParts.topLine) {
+        bodyRe(bodyParts.topLine)
+      }
 
       const jiraSummary = ((f: IntakeFormData) => f.building + " " + f.area + ": " + f.summary)(bodyParts.source);
       if (expectedEmail.to) {
         bodyRe("^Dear " + expectedEmail.to.name + ", <br />\n")
       }
       bodyRe("\nYou are receiving this email because " + bodyParts.reasonForReceiving)
-      bodyRe(
-          "\nJira ticket https://lalliance.atlassian.net/browse/" + bodyParts.issueKey +
-          " has been assigned to this report."
-      )
+      bodyRe("\nJira ticket " + bodyParts.issue + " has been assigned to this report.")
     }
 
 

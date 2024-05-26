@@ -10,7 +10,18 @@ function seterr() {
 function require_function_root() {
   test -f package.json || {
     echo "package.json not found"
-    echo "Script must be executed from root of function "
+    echo "❌ Script must be executed from root of function "
+    exit 1
+  }
+}
+
+# param: $1 - top level config key whose value to check
+# param: $2 - path to gcf yaml vars-file
+function validate_config_key() {
+  seterr
+  CONFIG_VALUE="`yq .$1 $2`"
+  echo $CONFIG_VALUE | jq fromjson > /dev/null || {
+    echo "❌ $2.$1 contains invalid JSON"
     exit 1
   }
 }

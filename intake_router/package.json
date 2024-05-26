@@ -10,6 +10,7 @@
         "@google-cloud/pubsub": "^3.0.1",
         "ajv": "^8.11.0",
         "ajv-formats": "^2.1.1",
+        "dedent": "^1.5.3",
         "dotenv": "^16.0.0",
         "express": "^4.17.3",
         "jira.js": "2.11.0",
@@ -18,6 +19,7 @@
         "pubsub_lalliance": "file:./lib/pubsub",
         "struct_lalliance": "file:./lib/struct",
         "supertest": "^6.2.4",
+        "typesafe-i18n": "^5.26.2",
         "winston": "^3.6.0"
     },
     "devDependencies": {

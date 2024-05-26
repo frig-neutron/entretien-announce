@@ -13,6 +13,7 @@ describe("intake directory", () => {
   test.each(roleLiterals)("Parse routing directory with role %p", (role) => {
     const dir: DirectoryEntry = {
       email: `gurdy${Math.random()}@gurdy.com` ,
+      lang: "en",
       name: "'🐱' + Math.random()",
       roles: [role as keyof typeof Role]
     }
@@ -25,6 +26,7 @@ describe("intake directory", () => {
   test("validate email", () => {
     const dir: DirectoryEntry = {
       email: 'not an email' ,
+      lang: "en",
       name: "drifter",
       roles: ["TRIAGE"]
     }
