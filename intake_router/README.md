@@ -90,7 +90,10 @@ TODO: is this true?
 
 - Running locally can be done w/ the `functions-framework`.
 - Use the script command `function-watch`
-- Send events with `curl -XPOST localhost:8080`
+- Send events with 
+  ```bash
+    echo ' ... get sample json above ...' | curl -XPOST -d @- localhost:8080
+  ```
     - The `functions-framework` `--signature-type=event` parameter makes it only listen to HTTP
       POST, which is why it's a post. Removing the signature type makes it accept HTTP GET, but then
       it just hangs there. I think this is because it expects a response on the 2nd function param.
