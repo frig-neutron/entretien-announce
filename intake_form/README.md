@@ -9,10 +9,7 @@ Scripts that handle conversion of maintenance intake form responses into Jira ti
  - configure the `FUNCTION_ENDPOINT` key to point the HTTP endpoint
    - by hand: `⚙️ Project Settings` > `Script Properties` > `Add script property`
    - by code: call `setSendEndpoint(url)` w/ clasp CLI (*FIXME: bork atm*)
- - set the `MODE` key to either of 
-   - `production`: normal operations. Sends email, creates jira tickets.
-   - `test`: prefixes all Jira tickets with `TEST - `
-   - `noop`: don't create Jira tickets. Keep the `TEST - ` prefix. Still send email. 
+- set the `MODE` key in script configuration to `production`
 
 ## Manual Testing
 
@@ -21,6 +18,17 @@ Testing can be done on a [staging sheet](#staging).
 Using the staging sheet allows to you talk to the staging router function, which is deployed 
 with a dummy email directory (to avoid bothering the neighbours). We only have one Jira instance,
 so the "staging environment" doesn't fully isolate the users. That's where the `noop` mode comes in.
+
+- set the `MODE` key to either of
+   - `production`: normal operations. Sends email, creates jira tickets.
+   - `test`
+      - prefixes all Jira tickets with `TEST - `
+      - send email with `TEST - ` in subject and `This is a test - ignore` prefixing the body
+   - `noop`
+      - don't create Jira tickets.
+      - send email with `TEST - ` in subject and `This is a test - ignore` prefixing the body
+
+⚠️ All modes send email ATM. There is no way to suppress email-sending altogether, so careful.
 
 ## Addresses of sheets
 ### Production

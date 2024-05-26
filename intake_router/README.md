@@ -13,14 +13,14 @@ The only param is the actual form submission:
 
 ```json
 {
-    "area": "apartment",
-    "building": "1234",
-    "priority": "regular",
-    "reporter": "guest",
-    "rowIndex": 666,
-    "summary": "this is test issue",
-    "description": "test description.",
-    "mode": "noop"
+  "area": "apartment",
+  "building": "1234",
+  "priority": "regular",
+  "reporter": "guest",
+  "rowIndex": 666,
+  "summary": "this is test issue",
+  "description": "test description.",
+  "mode": "noop"
 }
 ```
 
@@ -35,6 +35,7 @@ The `mode` field is a configuration option. It can take the values
 
 Configuration done using environment variables.
 todo: validate how this affects [announcer][announcer]
+
 * `SECRETS`: Injected from GCP secret manager. Shares a secret with the other functions.
   ```json5
   // Caveat: since the secret is shared, there could be other keys
@@ -69,36 +70,46 @@ todo: validate how this affects [announcer][announcer]
 
   ```json 
   [
-    {"name": "Daniil", "email": "daniils.email@gmail.com", "roles": []},
-    {"name": "Charlie", "email": "charlies.email@gmail.com", "lang": "fr", "roles": []},
+    {"lang": "en", "name": "Daniil", "email": "daniils.email@gmail.com", "roles": []},
+    {"lang": "fr", "name": "Charlie", "email": "charlies.email@gmail.com", "roles": []}
   ]
   ```
-  
+
   The possible roles are: `BR_3735`, `BR_3737`, `BR_3739`, `BR_3743`, `BR_3745`, `TRIAGE`, `EMERG`
 
 There's this concept of "priority" which doesn't affect anything about the routing, but _does_
 affect email rendering. If a person is both a "Building rep" and an "Urgent" responder then how do
 you address them in the notification and which email do you choose to send? To resolve the
 question, I'm treating priority as descending from top to bottom - that is roles listed lower
-down override roles listed above. 
+down override roles listed above.
 TODO: is this true?
 
 ## Testing
 
 ### Local testing
 
-Running locally can be done w/ the `functions-framework`. Use the script command. The
-`--signature-type=event` makes it only listen to HTTP POST, so `curl -XPOST localhost:8080`.
-Removing the signature type makes it accept HTTP GET, but then it just hangs there. I think this is
-because it expects a response on the 2nd function param.
+- Running locally can be done w/ the `functions-framework`.
+- Use the script command `function-watch`
+- Send events with `curl -XPOST localhost:8080`
+    - The `functions-framework` `--signature-type=event` parameter makes it only listen to HTTP
+      POST, which is why it's a post. Removing the signature type makes it accept HTTP GET, but then
+      it just hangs there. I think this is because it expects a response on the 2nd function param.
 
 ### Manual testing
 
+#### Staging environment
 Testing in the STG env has 2 levers
-- the `DIRECTORY`, which allows you to not bother the neighbours with email
-- [appscript][appscript] `MODE` config key, which allows you to either suppress ticket creation 
-  (`MODE=noop`) or prefix ticket+email (`MODE=test`).
 
+- the `DIRECTORY`, which allows you to not bother the neighbours with email
+- [appscript][appscript] `MODE` config key, which allows you to either 
+  - suppress ticket creation (`MODE=noop`) or 
+  - prefix ticket+email (`MODE=test`).
+
+#### Prod environment
+
+To test in prod, manually set the `MODE` config key in the script configuration  to `noop` or `test`
+- ⚠️ All modes current send email. 
 
 [announcer]: ../announcer
+
 [appscript]: ../intake_form
