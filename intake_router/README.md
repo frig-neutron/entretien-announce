@@ -75,14 +75,18 @@ todo: validate how this affects [announcer][announcer]
   ]
   ```
 
-  The possible roles are: `BR_3735`, `BR_3737`, `BR_3739`, `BR_3743`, `BR_3745`, `TRIAGE`, `EMERG`
+  The possible roles are: `BR_3735`, `BR_3737`, `BR_3739`, `BR_3743`, `BR_3745`, `TRIAGE`, `ADMIN`
 
 There's this concept of "priority" which doesn't affect anything about the routing, but _does_
 affect email rendering. If a person is both a "Building rep" and an "Urgent" responder then how do
 you address them in the notification and which email do you choose to send? To resolve the
 question, I'm treating priority as descending from top to bottom - that is roles listed lower
 down override roles listed above.
-TODO: is this true?
+
+The `ADMIN` role is only used for testing, atm. If a message is being processed in test mode (i.
+e.: with `mode` set to either `noop` or `test`), then the outgoing message recipent email is 
+transformed into `<admin-local-part>+test-<original-recipient-local-part>@gmail.com`. I say at 
+gmail.com b/c the `+-in-the-local-part` trick is Gmail specific. 
 
 ## Testing
 
@@ -101,17 +105,21 @@ TODO: is this true?
 ### Manual testing
 
 #### Staging environment
-Testing in the STG env has 2 levers
+Testing in the STG env has 2 levers:
 
 - the `DIRECTORY`, which allows you to not bother the neighbours with email
-- [appscript][appscript] `MODE` config key, which allows you to either 
-  - suppress ticket creation (`MODE=noop`) or 
-  - prefix ticket+email (`MODE=test`).
+- [appscript][appscript] `MODE` config key redirects all email to the first user having `ADMIN`, 
+  and in addition: 
+  - suppresses ticket creation (`MODE=noop`) or 
+  - creates the ticket, but both ticket + email (`MODE=test`).
 
 #### Prod environment
+Testing in PRD env has just 1 lever: 
 
-To test in prod, manually set the `MODE` config key in the script configuration  to `noop` or `test`
-- ⚠️ All modes current send email. 
+To test in prod, manually set the `MODE` config key in the script configuration  to `noop` or 
+`test`. Either one of those will redirect email to the admin, but `noop` will also prevent 
+tickets from being created.
+
 
 [announcer]: ../announcer
 

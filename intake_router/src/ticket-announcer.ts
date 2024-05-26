@@ -60,8 +60,9 @@ export function ticketAnnouncer(directory: DirectoryEntry[]): TicketAnnouncer {
       const testModeBody = testMode ? "This is a test - ignore " : ""
 
       function recipientOrAdmin(directoryEntry: DirectoryEntry): string {
-        if (testMode) {
-          const admin = findAdmin()[0];
+        const admin = findAdmin()[0];
+
+        if (testMode && admin.email !== directoryEntry.email) {
           const [adminLocalPart, adminDomainPart] = admin.email.split("@");
           const recipientLocalPart = directoryEntry.email.split("@")[0]
           return `${adminLocalPart}+test-${recipientLocalPart}@${adminDomainPart}`

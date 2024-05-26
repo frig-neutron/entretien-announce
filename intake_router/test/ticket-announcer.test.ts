@@ -159,11 +159,24 @@ describe("ticket announcer", () => {
       const bodies = announcements.map(a => a.body)
       const recipients = announcements.map(a => a.primary_recipient);
 
-      const matchesRe = (re: RegExp)  => (o: any): boolean => o && o.toString().match(re);
+      const matchesRe = (re: RegExp) => (o: any): boolean => o && o.toString().match(re);
 
       expect(subjects).toSatisfyAll(matchesRe(/^TEST - /))
       expect(bodies).toSatisfyAll(matchesRe(/This is a test/))
       expect(recipients).toSatisfyAll(matchesRe(/the-admin\+test-[a-z0-9_-]+@gmail.com/))
+    })
+    test("test mode admin email redirection does not apply to admin", () => {
+      const form: IntakeFormData = {
+        ...formValues(),
+        ...{
+          mode: "test",
+          reporter: "Admin"
+        }
+      }
+      const announcements = announcer.emailAnnouncement(issueKey, form);
+      const recipients = announcements.map(a => a.primary_recipient);
+
+      expect(recipients).toSatisfyAny(r => r === "the-admin@gmail.com")
     })
 
 
