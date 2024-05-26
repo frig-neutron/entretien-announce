@@ -11,6 +11,7 @@ let logSheet: Sheet
 
 let columnIndex: { [k: string]: number }
 let jiraBasicAuthToken: string
+const maxRetries = 3;
 const jiraPriorityUrgent = "urgent"
 const jiraPriorityRegular = "regular"
 const functionEndpointConfigKey = "FUNCTION_ENDPOINT"
@@ -174,7 +175,26 @@ function sendOne(ticketContext: TicketContext): HTTPResponse {
     "payload": payload
   };
 
-  return UrlFetchApp.fetch(url, options);
+  // If you hit a sleeping function:
+  // Exception: Request failed for https://us-central1-entretien-stg.cloudfunctions.net returned code 429. Truncated server response: Rate exceeded. (use muteHttpExceptions option to examine full response)
+  // If your function errors out on ye
+  // Exception: Request failed for https://us-central1-entretien-stg.cloudfunctions.net returned code 500 at myFunction (Code:5:28) at __GS_INTERNAL_top_function_call__.gs:1:8
+  // everything is wrapped
+  return retry(() => UrlFetchApp.fetch(url, options));
+}
+
+function retry(f: () => HTTPResponse): HTTPResponse {
+  let n: number = 0
+  let error
+  while (n < maxRetries) {
+    try {
+      return f()
+    } catch (e) {
+      n ++
+      error = e
+    }
+  }
+  throw error
 }
 
 function markSent(ticketContext: TicketContext) {

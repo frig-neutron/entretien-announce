@@ -47,10 +47,15 @@ function extendJestWithJiraMatcher(resp: Responses, functionEndpoint: string) {
 }
 
 
-function mockTheUrlFetchApp(issueKey: string) {
+function mockTheUrlFetchApp(issueKey: string, errors: string[]) {
+  let fetchAttempt: number = 0
+
   return mock<UrlFetchApp>({
     fetch: jest.fn((): HTTPResponse => {
-
+      if (fetchAttempt < errors.length) {
+        fetchAttempt++
+        throw Error(errors[fetchAttempt - 1])
+      }
       return mock<HTTPResponse>({
             getContentText() {
               return issueKey
@@ -61,15 +66,19 @@ function mockTheUrlFetchApp(issueKey: string) {
   });
 }
 
-export function mockUrlFetchApp(resp: Responses) {
+/**
+ * @param resp - the goods
+ * @param errors - throw all these errors before returning a response
+ */
+export function mockUrlFetchApp(resp: Responses,  ... errors: string[]) {
   const issueKey = "ISSUE-" + Math.random()
   const functionEndpoint = "http://endpoint_" + Math.random()
-  const urlFetchApp = mockTheUrlFetchApp(issueKey);
+  const urlFetchApp = mockTheUrlFetchApp(issueKey, errors);
 
   const urlFetchAppInteractions = {
     issueKey: issueKey,
     assertTicketCreated(t: FormData) {
-      expect(urlFetchApp.fetch.mock.calls[0]).filesJiraTicket(t)
+      expect(urlFetchApp.fetch.mock.calls[errors.length]).filesJiraTicket(t)
     },
   };
 
