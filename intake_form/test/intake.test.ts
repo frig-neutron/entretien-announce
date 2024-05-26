@@ -134,7 +134,7 @@ describe("intake end-to-end", () => {
       const urlFetch = mockUrlFetchApp(
           responseValues,
           "Request failed for https://cloudfunctions.net returned code 500",
-          "Request failed for https://us-central1-entretien-stg.cloudfunctions.net returned code 429. Truncated server response: Rate exceeded",
+          "Request failed for https://us-central1.cloudfunctions.net returned code 429. Truncated server response: Rate exceeded",
           "What now?",
       );
 
