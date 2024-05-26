@@ -27,8 +27,7 @@ so the "staging environment" doesn't fully isolate the users. That's where the `
    - `noop`
       - don't create Jira tickets.
       - send email with `TEST - ` in subject and `This is a test - ignore` prefixing the body
-
-⚠️ All modes send email ATM. There is no way to suppress email-sending altogether, so careful.
+Both `test` and `noop` cause outgoing email to redirect to the `ADMIN` role holder.
 
 ## Addresses of sheets
 ### Production
