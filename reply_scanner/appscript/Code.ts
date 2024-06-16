@@ -3,6 +3,8 @@ import GmailThread = GoogleAppsScript.Gmail.GmailThread;
 import GmailMessage = GoogleAppsScript.Gmail.GmailMessage;
 import URLFetchRequestOptions = GoogleAppsScript.URL_Fetch.URLFetchRequestOptions;
 
+export const robotEmail = "theRobot@gmail.com"
+
 export interface EmailReceived {
   ticket: string;
   email_id: string; // GCF processes each email individually by ID
@@ -21,7 +23,8 @@ export function to_comment() {
 
 function threadToEmailOps(thread: GmailThread): MessageOp[] {
   const messages: GmailMessage[] = thread.getMessages();
-  return messages.map(messageToEmailOps)
+  const notFromTheRobot: (msg: GmailMessage) => boolean = msg => msg.getFrom() !== robotEmail
+  return messages.filter(notFromTheRobot).map(messageToEmailOps)
 }
 
 function messageToEmailOps(m: GmailMessage): MessageOp {
@@ -37,6 +40,10 @@ function messageToEmailOps(m: GmailMessage): MessageOp {
 }
 
 function publishEvents(emailOps: MessageOp[]) {
+  if (emailOps.length === 0) {
+    return
+  }
+
   const options: URLFetchRequestOptions = {
     "payload": JSON.stringify(emailOps.map(m => m.message))
   };

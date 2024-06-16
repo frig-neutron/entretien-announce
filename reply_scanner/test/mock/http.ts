@@ -47,7 +47,11 @@ export function mockUrlFetchApp(expectToPublish: EmailReceived[]): UrlFetchAppIn
   extendJestWithMessageEventMatcher()
   return {
     assertUrlFetchInteractions() {
-      expect(urlFetchApp.fetch.mock.calls[0]).publishesEvents(expectToPublish)
+      if (expectToPublish.length === 0) {
+        expect(urlFetchApp.fetch).toHaveBeenCalledTimes(0)
+      } else {
+        expect(urlFetchApp.fetch.mock.calls[0]).publishesEvents(expectToPublish)
+      }
     }
   }
 }
