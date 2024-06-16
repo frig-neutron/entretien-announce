@@ -18,12 +18,21 @@ triggering a GCF if one is found.
 - wake up every N minutes on a timed
   trigger, [subject to limits](#wakeup-frequency--processing-time)
 - search for `in:Inbox -label:automation/event_sent -label:automation/irrelevant` threads
-    - if message contains ticket info,
+    - if message contains ticket info, queue up operation to 
         - produce event to GCF HTTP endpoint, and
         - label with `automation/event_sent`
     - else, 
-      - mark with `-label:automation/irrelevant` (exclude google account messages)
+      - synchronously mark with `-label:automation/irrelevant` (exclude google account messages)
       - archive
+
+### Event structure
+
+```typescript
+interface EmailReceived {
+    ticket: string;
+    email_id: string; // GCF processes each email individually by ID
+}
+```
 
 ### [Limits][quotas-and-limits]
 
@@ -52,14 +61,16 @@ Conclusion: 5m wakeup schedule could be feasible.
 
 ## Addresses of scripts
 
+Scripts have to live in the Entretien Robot account b/c that's where the Gmail account lives.
+
 ### Production
 
-- https://script.google.com/d/1oLa9skBGGYo1MP11I0lAL3h42hz4BLM7PtiFH5cSl-ZekD9cpBIIJ-FT/edit
-- `{"scriptId":"1oLa9skBGGYo1MP11I0lAL3h42hz4BLM7PtiFH5cSl-ZekD9cpBIIJ-FT"}`
+- https://script.google.com/d/13NajHhRJdLSpnOqInDGL90so-vn0dtSCwYNS11kOg2uuEewKmdqBlK_t
+- `{"scriptId":"13NajHhRJdLSpnOqInDGL90so-vn0dtSCwYNS11kOg2uuEewKmdqBlK_t"}`
 
 ### Staging
 
-- https://script.google.com/d/19VHS408PfXrd9MMFYc7jSaUBGYjyaYy0_z64CwnMsM_Ysruz3D8pwlgp/edit
-- `{"scriptId":"19VHS408PfXrd9MMFYc7jSaUBGYjyaYy0_z64CwnMsM_Ysruz3D8pwlgp"}`
+- https://script.google.com/d/1uRcp7axu72g242JSr2a3-RUcxOtIBiWGKXtn9xV0KykENUsd9lN216p3/edit
+- `{"scriptId":"1uRcp7axu72g242JSr2a3-RUcxOtIBiWGKXtn9xV0KykENUsd9lN216p3"}`
 
 [quotas-and-limits]: https://developers.google.com/apps-script/guides/services/quotas
