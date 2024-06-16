@@ -47,4 +47,13 @@ nothing to do, and shut down. Occasionally it will have to call out to GCF, whic
 
 Conclusion: 5m wakeup schedule could be feasible.
 
+## Addresses of scripts
+### Production
+- https://script.google.com/d/1oLa9skBGGYo1MP11I0lAL3h42hz4BLM7PtiFH5cSl-ZekD9cpBIIJ-FT/edit
+- `{"scriptId":"1oLa9skBGGYo1MP11I0lAL3h42hz4BLM7PtiFH5cSl-ZekD9cpBIIJ-FT"}`
+### Staging
+- https://script.google.com/d/19VHS408PfXrd9MMFYc7jSaUBGYjyaYy0_z64CwnMsM_Ysruz3D8pwlgp/edit
+- `{"scriptId":"19VHS408PfXrd9MMFYc7jSaUBGYjyaYy0_z64CwnMsM_Ysruz3D8pwlgp"}`
+
+
 [quotas-and-limits]: https://developers.google.com/apps-script/guides/services/quotas
