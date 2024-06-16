@@ -13,16 +13,19 @@ triggering a GCF if one is found.
     - by code: call `setSendEndpoint(url)` w/ clasp CLI (*FIXME: bork atm*)
 - set the `MODE` key in script configuration to `production`
 
-## Operation principle
+## Operation principles
 
 - wake up every N minutes on a timed
   trigger, [subject to limits](#wakeup-frequency--processing-time)
-- search for replies to notifications that do not have the "received" label attached.
-- for each such message, attach "in-progress" label
-- produce event to GCF HTTP endpoint
-- replace "in-progress" label with "received"
+- search for `in:Inbox -label:automation/event_sent -label:automation/irrelevant` threads
+    - if message contains ticket info,
+        - produce event to GCF HTTP endpoint, and
+        - label with `automation/event_sent`
+    - else, 
+      - mark with `-label:automation/irrelevant` (exclude google account messages)
+      - archive
 
-## [Limits][quotas-and-limits]
+### [Limits][quotas-and-limits]
 
 GAS resource limits (for non-workspace customers)
 
@@ -42,18 +45,21 @@ runtime.
 | 10 min        | 144              | 22s         |
 | 15 min        | 96               | 56s         |
 
-That's if runtime is uniform, though. Most executions will wake up the script, see that there's 
-nothing to do, and shut down. Occasionally it will have to call out to GCF, which takes about 30s. 
+That's if runtime is uniform, though. Most executions will wake up the script, see that there's
+nothing to do, and shut down. Occasionally it will have to call out to GCF, which takes about 30s.
 
 Conclusion: 5m wakeup schedule could be feasible.
 
 ## Addresses of scripts
+
 ### Production
+
 - https://script.google.com/d/1oLa9skBGGYo1MP11I0lAL3h42hz4BLM7PtiFH5cSl-ZekD9cpBIIJ-FT/edit
 - `{"scriptId":"1oLa9skBGGYo1MP11I0lAL3h42hz4BLM7PtiFH5cSl-ZekD9cpBIIJ-FT"}`
+
 ### Staging
+
 - https://script.google.com/d/19VHS408PfXrd9MMFYc7jSaUBGYjyaYy0_z64CwnMsM_Ysruz3D8pwlgp/edit
 - `{"scriptId":"19VHS408PfXrd9MMFYc7jSaUBGYjyaYy0_z64CwnMsM_Ysruz3D8pwlgp"}`
-
 
 [quotas-and-limits]: https://developers.google.com/apps-script/guides/services/quotas
