@@ -12,7 +12,8 @@ interface SearchOp {
 }
 
 export interface MessageSpec {
-  from?: string
+  from: string,
+  body?: string
 }
 export interface GmailAppInteractions {
   assertGmailInteractions(): void
@@ -44,6 +45,7 @@ export function gmailThread(messages: GmailMessage[]): GmailThread {
 export function gmailMessage(messageSpec: MessageSpec): GmailMessage {
   return mock<GmailMessage>({
     getFrom: () => resultIfDefine("from", messageSpec.from),
+    getBody: () => resultIfDefine("body", messageSpec.body),
   })
 }
 

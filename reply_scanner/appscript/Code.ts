@@ -4,9 +4,10 @@ import GmailMessage = GoogleAppsScript.Gmail.GmailMessage;
 import URLFetchRequestOptions = GoogleAppsScript.URL_Fetch.URLFetchRequestOptions;
 
 export const robotEmail = "theRobot@gmail.com"
+export const ticketTagPattern: RegExp = /(TRIAG-([0-9]+))/g
 
 export interface EmailReceived {
-  ticket: string;
+  ticket: string[];
   email_id: string; // GCF processes each email individually by ID
 }
 
@@ -28,9 +29,20 @@ function threadToEmailOps(thread: GmailThread): MessageOp[] {
 }
 
 function messageToEmailOps(m: GmailMessage): MessageOp {
+  function parseBody(): string[] {
+    const body: string = m.getBody()
+    let matches: RegExpExecArray | null;
+    const extractedTickets: string[] = [];
+
+    while ((matches = ticketTagPattern.exec(body)) !== null) {
+      extractedTickets.push(matches[0]);
+    }
+
+    return [...new Set(extractedTickets)].sort()
+  }
   return {
     message: {
-      ticket: "ticket",
+      ticket: parseBody(),
       email_id: ""
     },
     onEventSuccess(): string {

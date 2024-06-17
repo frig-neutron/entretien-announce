@@ -24,7 +24,7 @@ function extendJestWithMessageEventMatcher() {
       const [url, options] = received
       const payload = JSON.parse(options.payload)
 
-      expect(payload).toHaveLength(events.length)
+      expect(payload).toMatchObject(events)
       return {
         pass: true,
         message: () => "I ain't nothing to say to you"

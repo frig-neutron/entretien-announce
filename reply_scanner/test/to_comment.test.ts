@@ -23,14 +23,27 @@ describe("reply scanner", () => {
       searchQuery: relevantMessageQuery,
       searchResult: [
         gmailThread([gmailMessage({
-          from: "a.member@gmail.com"
+          from: "a.member@gmail.com",
+          body:  `
+           I just don't wanna know
+           TRIAG-667 anymore
+           life shifts up and down everybody knows it's wrong
+           life shifts up and down everybody knows it's wrong
+           life shifts up and down everybody knows it's wrong
+           why don't you care? TRIAG-666
+           life
+           shifts
+           up 
+           down
+           wrong TRIAG-666
+          `
         })])
       ]
     })
 
     const urlFetchAppInteractions = mockUrlFetchApp([
       {
-        ticket: "ticket",
+        ticket: ["TRIAG-666", "TRIAG-667"],
         email_id: ""
       }
     ])
