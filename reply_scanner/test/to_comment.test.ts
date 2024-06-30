@@ -1,6 +1,7 @@
-import {robotEmail, to_comment} from "../appscript/Code"
+import {to_comment} from "../appscript/Code"
 import {GmailAppInteractions, gmailMessage, gmailThread, mockGmailApp} from "./mock/gmail";
 import {mockUrlFetchApp} from "./mock/http";
+import {mockRobotEmail} from "./mock/properties";
 
 
 describe("reply scanner", () => {
@@ -19,6 +20,7 @@ describe("reply scanner", () => {
   });
 
   test("convert message to event", () => {
+    mockRobotEmail("not.a.robot@gmail.com")
     const gmailInteractions: GmailAppInteractions = mockGmailApp({
       searchQuery: relevantMessageQuery,
       searchResult: [
@@ -56,12 +58,13 @@ describe("reply scanner", () => {
   })
 
   test("ignore messages from robot", () => {
+    mockRobotEmail("just.a.robot@gmail.com")
     mockGmailApp({
       searchQuery: relevantMessageQuery,
       searchResult: [
         gmailThread([
           gmailMessage({
-            from: robotEmail
+            from: "just.a.robot@gmail.com"
           })
         ])
       ]

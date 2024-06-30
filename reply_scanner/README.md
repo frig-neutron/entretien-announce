@@ -16,6 +16,7 @@ triggering a GCF if one is found.
     - by hand: `⚙️ Project Settings` > `Script Properties` > `Add script property`
     - by code: call `setSendEndpoint(url)` w/ clasp CLI (*FIXME: bork atm*)
 - set the `MODE` key in script configuration to `production`
+- set the `ROBOT_EMAIL` key in script configuration to the robot's actual email address.
 
 ## Operation principles
 

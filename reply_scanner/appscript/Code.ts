@@ -3,7 +3,9 @@ import GmailThread = GoogleAppsScript.Gmail.GmailThread;
 import GmailMessage = GoogleAppsScript.Gmail.GmailMessage;
 import URLFetchRequestOptions = GoogleAppsScript.URL_Fetch.URLFetchRequestOptions;
 
-export const robotEmail = "theRobot@gmail.com"
+const functionEndpointConfigKey = "FUNCTION_ENDPOINT"
+const modeConfigKey = "MODE"
+const robotEmailConfigKey = "ROBOT_EMAIL"
 export const ticketTagPattern: RegExp = /(TRIAG-([0-9]+))/g
 
 export interface EmailReceived {
@@ -24,6 +26,7 @@ export function to_comment() {
 
 function threadToEmailOps(thread: GmailThread): MessageOp[] {
   const messages: GmailMessage[] = thread.getMessages();
+  const robotEmail = scriptProperty(robotEmailConfigKey)
   const notFromTheRobot: (msg: GmailMessage) => boolean = msg => msg.getFrom() !== robotEmail
   return messages.filter(notFromTheRobot).map(messageToEmailOps)
 }
@@ -62,3 +65,13 @@ function publishEvents(emailOps: MessageOp[]) {
 
   UrlFetchApp.fetch("https://example.com", options)
 }
+
+function scriptProperty(propertyKey: string): string {
+  const prop = PropertiesService.getScriptProperties().getProperty(propertyKey);
+  if (!prop) {
+    throw Error("Configure property: " + propertyKey)
+  }
+  return prop
+}
+
+export { functionEndpointConfigKey, modeConfigKey, robotEmailConfigKey }
