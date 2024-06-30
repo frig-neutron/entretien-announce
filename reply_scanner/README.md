@@ -7,6 +7,10 @@ triggering a GCF if one is found.
 
 - Install `pnpm`
 - `make init`
+  - this prompts OAuth. Annoyingly, clasp keeps its token in a global home location. Since the 
+    intake form is using a different account that means you have to re-login when switching 
+    between scripts belonging to different accounts.
+- You might need to enable apps script API by visiting https://script.google.com/home/usersettings
 - run `ENV=[stg|prd) ./deploy/deploy.sh`
 - configure the `FUNCTION_ENDPOINT` key to point the HTTP endpoint
     - by hand: `⚙️ Project Settings` > `Script Properties` > `Add script property`
@@ -16,7 +20,7 @@ triggering a GCF if one is found.
 ## Operation principles
 
 - wake up every N minutes on a timed
-  trigger, [subject to limits](#wakeup-frequency--processing-time)
+  trigger, [subject to limits](#limitsquotas-and-limits)
 - search for `in:Inbox -label:automation/event_sent -label:automation/irrelevant` threads
     - if message contains ticket info, queue up operation to 
         - produce event to GCF HTTP endpoint, and
@@ -59,18 +63,20 @@ nothing to do, and shut down. Occasionally it will have to call out to GCF, whic
 
 Conclusion: 5m wakeup schedule could be feasible.
 
-## Addresses of scripts
+## Deployment
+
+Addresses of scripts
 
 Scripts have to live in the Entretien Robot account b/c that's where the Gmail account lives.
 
 ### Production
 
-- https://script.google.com/d/13NajHhRJdLSpnOqInDGL90so-vn0dtSCwYNS11kOg2uuEewKmdqBlK_t
+- https://script.google.com/home/projects/13NajHhRJdLSpnOqInDGL90so-vn0dtSCwYNS11kOg2uuEewKmdqBlK_t
 - `{"scriptId":"13NajHhRJdLSpnOqInDGL90so-vn0dtSCwYNS11kOg2uuEewKmdqBlK_t"}`
 
 ### Staging
 
-- https://script.google.com/d/1uRcp7axu72g242JSr2a3-RUcxOtIBiWGKXtn9xV0KykENUsd9lN216p3/edit
+- https://script.google.com/home/projects/1uRcp7axu72g242JSr2a3-RUcxOtIBiWGKXtn9xV0KykENUsd9lN216p3/
 - `{"scriptId":"1uRcp7axu72g242JSr2a3-RUcxOtIBiWGKXtn9xV0KykENUsd9lN216p3"}`
 
 [quotas-and-limits]: https://developers.google.com/apps-script/guides/services/quotas
