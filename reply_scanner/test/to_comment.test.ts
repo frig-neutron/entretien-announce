@@ -1,7 +1,7 @@
 import {to_comment} from "../appscript/Code"
 import {GmailAppInteractions, gmailMessage, gmailThread, mockGmailApp} from "./mock/gmail";
 import {mockUrlFetchApp} from "./mock/http";
-import {mockRobotEmail} from "./mock/properties";
+import {mockPropertiesServiceFunctionEndpoint, mockRobotEmail} from "./mock/properties";
 
 
 describe("reply scanner", () => {
@@ -21,6 +21,7 @@ describe("reply scanner", () => {
 
   test("convert message to event", () => {
     mockRobotEmail("not.a.robot@gmail.com")
+    mockPropertiesServiceFunctionEndpoint("http://endpoint_0.1234567890")
     const gmailInteractions: GmailAppInteractions = mockGmailApp({
       searchQuery: relevantMessageQuery,
       searchResult: [
@@ -49,7 +50,7 @@ describe("reply scanner", () => {
         ticket: ["TRIAG-666", "TRIAG-667", "TRIAG-668", "TRIAG-669"],
         email_id: "amboog-a-lard"
       }
-    ])
+    ], "http://endpoint_0.1234567890")
 
     to_comment()
 

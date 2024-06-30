@@ -7,7 +7,7 @@ import CustomMatcherResult = jest.CustomMatcherResult;
 declare var global: typeof globalThis; // can't use @types/node
 
 interface MessageEventMatchers {
-  publishesEvents(events: EmailReceived[]): void
+  publishesEvents(events: EmailReceived[], expectedUrl?: string): void
 }
 
 declare global {
@@ -20,10 +20,11 @@ declare global {
 
 function extendJestWithMessageEventMatcher() {
   expect.extend({
-    publishesEvents(received, events: EmailReceived[]): CustomMatcherResult {
+    publishesEvents(received, events: EmailReceived[], expectedUrl?: string): CustomMatcherResult {
       const [url, options] = received
       const payload = JSON.parse(options.payload)
 
+      expect(url).toEqual(expectedUrl)
       expect(payload).toMatchObject(events)
       return {
         pass: true,
@@ -37,7 +38,7 @@ export interface UrlFetchAppInteractions {
   assertUrlFetchInteractions(): void
 }
 
-export function mockUrlFetchApp(expectToPublish: EmailReceived[]): UrlFetchAppInteractions {
+export function mockUrlFetchApp(expectToPublish: EmailReceived[], url?: string): UrlFetchAppInteractions {
   const urlFetchApp = mock<UrlFetchApp>({
     fetch: jest.fn()
   })
@@ -50,7 +51,7 @@ export function mockUrlFetchApp(expectToPublish: EmailReceived[]): UrlFetchAppIn
       if (expectToPublish.length === 0) {
         expect(urlFetchApp.fetch).toHaveBeenCalledTimes(0)
       } else {
-        expect(urlFetchApp.fetch.mock.calls[0]).publishesEvents(expectToPublish)
+        expect(urlFetchApp.fetch.mock.calls[0]).publishesEvents(expectToPublish, url)
       }
     }
   }

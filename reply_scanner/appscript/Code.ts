@@ -1,4 +1,3 @@
-import {} from "../appscript/Code"
 import GmailThread = GoogleAppsScript.Gmail.GmailThread;
 import GmailMessage = GoogleAppsScript.Gmail.GmailMessage;
 import URLFetchRequestOptions = GoogleAppsScript.URL_Fetch.URLFetchRequestOptions;
@@ -63,7 +62,7 @@ function publishEvents(emailOps: MessageOp[]) {
     "payload": JSON.stringify(emailOps.map(m => m.message))
   };
 
-  UrlFetchApp.fetch("https://example.com", options)
+  UrlFetchApp.fetch(scriptProperty(functionEndpointConfigKey), options)
 }
 
 function scriptProperty(propertyKey: string): string {
