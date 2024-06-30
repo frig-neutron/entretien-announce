@@ -43,7 +43,7 @@ function messageToEmailOps(m: GmailMessage): MessageOp {
   return {
     message: {
       ticket: parseBody(),
-      email_id: ""
+      email_id: m.getId()
     },
     onEventSuccess(): string {
       return "";

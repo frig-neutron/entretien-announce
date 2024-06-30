@@ -28,6 +28,8 @@ triggering a GCF if one is found.
     - else, 
       - synchronously mark with `-label:automation/irrelevant` (exclude google account messages)
       - archive
+- The message only contains the necessary identifiers: ticket number and gmail message ID
+    - the GCF will fetch the full message from Gmail API
 
 ### Event structure
 

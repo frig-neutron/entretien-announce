@@ -23,6 +23,7 @@ describe("reply scanner", () => {
       searchQuery: relevantMessageQuery,
       searchResult: [
         gmailThread([gmailMessage({
+          id: "amboog-a-lard",
           from: "a.member@gmail.com",
           body:  `
            I just don't wanna know
@@ -44,7 +45,7 @@ describe("reply scanner", () => {
     const urlFetchAppInteractions = mockUrlFetchApp([
       {
         ticket: ["TRIAG-666", "TRIAG-667", "TRIAG-668", "TRIAG-669"],
-        email_id: ""
+        email_id: "amboog-a-lard"
       }
     ])
 
