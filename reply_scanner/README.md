@@ -22,12 +22,12 @@ triggering a GCF if one is found.
 
 - wake up every N minutes on a timed
   trigger, [subject to limits](#limitsquotas-and-limits)
-- search for `in:Inbox -label:automation/event_sent -label:automation/irrelevant` threads
+- search for `in:Inbox is:unread` threads
     - if message contains ticket info, queue up operation to 
         - produce event to GCF HTTP endpoint, and
-        - label with `automation/event_sent`
+        - mark as `read` <sup>[1][1]</sup>
     - else, 
-      - synchronously mark with `-label:automation/irrelevant` (exclude google account messages)
+      - mark `read` (exclude google account messages)
       - archive
 - The message only contains the necessary identifiers: ticket number and gmail message ID
     - the GCF will fetch the full message from Gmail API
@@ -82,4 +82,34 @@ Scripts have to live in the Entretien Robot account b/c that's where the Gmail a
 - https://script.google.com/home/projects/1uRcp7axu72g242JSr2a3-RUcxOtIBiWGKXtn9xV0KykENUsd9lN216p3/
 - `{"scriptId":"1uRcp7axu72g242JSr2a3-RUcxOtIBiWGKXtn9xV0KykENUsd9lN216p3"}`
 
+## Decision history
+
+### Labels vs Read status
+
+Moving from using labels for marking processed messages to using the `read` status. 
+
+- Reason: Labels apply to threads. If a thread is marked as "processed" and a new message 
+  arrives, that message will be skipped in future scans.
+- Read status applies to individual messages. If a message is marked as "read" and a new 
+  message arrives, the new message will be scanned.
+- Not as fine-grained labels, but whatcha gonna do?
+
+Alternatives
+
+Cloud Function keeps track of processed messages
+
+- Always send ids for all new messages arrived within the last N minutes.
+- GCF keeps a datastore index of processed message IDs.
+- Advantage: simple script, don't even need to parse anything
+- Disadvantage: introduction of persistent store into GCF dependencies. 
+
+Using archive instead of label
+
+- derp, same problem - archiving is thread-granular
+
+Using stars instead of label
+
+- would also work. Valid alternative.
+
 [quotas-and-limits]: https://developers.google.com/apps-script/guides/services/quotas
+[1]: #labels-vs-read-status
