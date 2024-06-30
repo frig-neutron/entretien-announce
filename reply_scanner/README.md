@@ -53,7 +53,9 @@ GAS resource limits (for non-workspace customers)
 Quotas are per user and reset 24 hours after the first request
 
 The biggest limiter is the 90-minute total runtime, placing an upper limit on the min
-runtime.
+runtime. The GCF runtime can actually affect this, if the function takes a while to process the 
+messages we send it. It would be much better if we could publish directly to pubsub from the GAS 
+Hmm... TODO
 
 | Response time | Executions / 24h | Max runtime |
 |---------------|------------------|-------------|
