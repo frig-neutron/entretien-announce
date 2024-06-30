@@ -30,7 +30,7 @@ function threadToEmailOps(thread: GmailThread): MessageOp[] {
 
 function messageToEmailOps(m: GmailMessage): MessageOp {
   function parseBody(): string[] {
-    const body: string = m.getBody()
+    const body: string = m.getBody()  // TODO: does this contain attachments?
     let matches: RegExpExecArray | null;
     const extractedTickets: string[] = [];
 

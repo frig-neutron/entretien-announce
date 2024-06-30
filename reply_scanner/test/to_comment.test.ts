@@ -28,7 +28,7 @@ describe("reply scanner", () => {
            I just don't wanna know
            TRIAG-667 anymore
            life shifts up and down everybody knows it's wrong
-           life shifts up and down everybody knows it's wrong
+           life shifts TRIAG-669 up and down everybody TRIAG-668 knows it's wrong
            life shifts up and down everybody knows it's wrong
            why don't you care? TRIAG-666
            life
@@ -43,7 +43,7 @@ describe("reply scanner", () => {
 
     const urlFetchAppInteractions = mockUrlFetchApp([
       {
-        ticket: ["TRIAG-666", "TRIAG-667"],
+        ticket: ["TRIAG-666", "TRIAG-667", "TRIAG-668", "TRIAG-669"],
         email_id: ""
       }
     ])
