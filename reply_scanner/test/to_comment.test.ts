@@ -23,7 +23,7 @@ describe("reply scanner", () => {
     mockRobotEmail("not.a.robot@gmail.com")
     mockPropertiesServiceFunctionEndpoint("http://endpoint_0.1234567890")
 
-    const message = gmailMessage({
+    const messageWithTicket = gmailMessage({
       id: "amboog-a-lard",
       from: "a.member@gmail.com",
       body:  `
@@ -40,11 +40,16 @@ describe("reply scanner", () => {
        wrong TRIAG-666
       `
     });
+    const messageSansTicket = gmailMessage({
+      id: "iamnotanumber",
+      from: "a.member@gmail.com",
+      body:  "no ticket here bruh"
+    });
 
     const gmailInteractions: GmailAppInteractions = mockGmailApp({
       searchQuery: relevantMessageQuery,
       searchResult: [
-        gmailThread([message])
+        gmailThread([messageWithTicket, messageSansTicket])
       ]
     })
 
@@ -52,6 +57,10 @@ describe("reply scanner", () => {
       {
         ticket: ["TRIAG-666", "TRIAG-667", "TRIAG-668", "TRIAG-669"],
         email_id: "amboog-a-lard"
+      },
+      {
+        ticket: [],
+        email_id: "iamnotanumber"
       }
     ], "http://endpoint_0.1234567890")
 
@@ -59,7 +68,7 @@ describe("reply scanner", () => {
 
     gmailInteractions.assertGmailInteractions()
     urlFetchAppInteractions.assertUrlFetchInteractions()
-    expect(message.markRead).toBeCalled()
+    expect(messageWithTicket.markRead).toBeCalled()
   })
 
   test("dont mark message processed if send fails", () => {
@@ -98,13 +107,14 @@ describe("reply scanner", () => {
   })
 
   test("ignore messages from robot", () => {
-    mockRobotEmail("just.a.robot@gmail.com")
+    const robotEmail = "just.a.robot@gmail.com";
+    mockRobotEmail(robotEmail)
     mockGmailApp({
       searchQuery: relevantMessageQuery,
       searchResult: [
         gmailThread([
           gmailMessage({
-            from: "just.a.robot@gmail.com"
+            from: robotEmail
           })
         ])
       ]

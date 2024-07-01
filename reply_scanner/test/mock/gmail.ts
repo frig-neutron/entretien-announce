@@ -52,7 +52,6 @@ export function gmailMessage(messageSpec: MessageSpec): GmailMessage {
     getBody: () => resultIfDefine("body", messageSpec.body),
     getId: () => resultIfDefine("id", messageSpec.id),
     markRead: jest.fn(() => {
-      console.log("markRead called")
       return holder.mock!!
     })
   });

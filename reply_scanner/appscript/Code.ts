@@ -3,9 +3,8 @@ import GmailMessage = GoogleAppsScript.Gmail.GmailMessage;
 import URLFetchRequestOptions = GoogleAppsScript.URL_Fetch.URLFetchRequestOptions;
 
 const functionEndpointConfigKey = "FUNCTION_ENDPOINT"
-const modeConfigKey = "MODE"
 const robotEmailConfigKey = "ROBOT_EMAIL"
-export const ticketTagPattern: RegExp = /(TRIAG-([0-9]+))/g
+const ticketTagPattern: RegExp = /(TRIAG-([0-9]+))/g
 
 export interface EmailReceived {
   ticket: string[];
@@ -64,6 +63,7 @@ function publishEvents(emailOps: MessageOp[]) {
 
   UrlFetchApp.fetch(scriptProperty(functionEndpointConfigKey), options)
 
+  console.log(`Sent ${emailOps.length} messages`)
   emailOps.forEach(m => m.onEventSuccess())
 }
 
@@ -75,4 +75,6 @@ function scriptProperty(propertyKey: string): string {
   return prop
 }
 
-export { functionEndpointConfigKey, modeConfigKey, robotEmailConfigKey }
+// DO NOT export identifiers at declaration time - the GAS TS transpiler will declare them as `exports.foo = `...
+// which makes them invisible to uses from the same file
+export { functionEndpointConfigKey, robotEmailConfigKey, ticketTagPattern }
