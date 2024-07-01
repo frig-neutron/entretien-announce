@@ -62,8 +62,9 @@ function publishEvents(emailOps: MessageOp[]) {
     "payload": JSON.stringify(emailOps.map(m => m.message))
   };
 
-  emailOps.forEach(m => m.onEventSuccess())
   UrlFetchApp.fetch(scriptProperty(functionEndpointConfigKey), options)
+
+  emailOps.forEach(m => m.onEventSuccess())
 }
 
 function scriptProperty(propertyKey: string): string {

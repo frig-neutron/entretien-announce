@@ -56,3 +56,19 @@ export function mockUrlFetchApp(expectToPublish: EmailReceived[], url?: string):
     }
   }
 }
+
+export function mockUrlFetchError(): UrlFetchAppInteractions {
+  const urlFetchApp = mock<UrlFetchApp>({
+    fetch: jest.fn(() => {
+      throw new Error("mock error")
+    })
+  })
+
+  // noinspection JSUnusedLocalSymbols
+  global.UrlFetchApp = urlFetchApp
+  return {
+    assertUrlFetchInteractions() {
+      expect(urlFetchApp.fetch).toHaveBeenCalledTimes(1)
+    }
+  }
+}

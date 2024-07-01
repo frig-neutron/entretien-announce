@@ -1,6 +1,6 @@
 import {to_comment} from "../appscript/Code"
 import {GmailAppInteractions, gmailMessage, gmailThread, mockGmailApp} from "./mock/gmail";
-import {mockUrlFetchApp} from "./mock/http";
+import {mockUrlFetchApp, mockUrlFetchError} from "./mock/http";
 import {mockPropertiesServiceFunctionEndpoint, mockRobotEmail} from "./mock/properties";
 
 
@@ -60,6 +60,41 @@ describe("reply scanner", () => {
     gmailInteractions.assertGmailInteractions()
     urlFetchAppInteractions.assertUrlFetchInteractions()
     expect(message.markRead).toBeCalled()
+  })
+
+  test("dont mark message processed if send fails", () => {
+    mockRobotEmail("could.be.a.robot@gmail.com")
+    mockPropertiesServiceFunctionEndpoint("http://endpoint_0.1234567890")
+
+
+    const message = gmailMessage({
+      id: "amboog-a-lard",
+      from: "a.member@gmail.com",
+      body:  "TRIAG-667 went kablooey"
+    });
+
+    const gmailInteractions: GmailAppInteractions = mockGmailApp({
+      searchQuery: relevantMessageQuery,
+      searchResult: [
+        gmailThread([message])
+      ]
+    })
+
+    const urlFetchAppInteractions = mockUrlFetchError()
+
+    try {
+      to_comment()
+    } catch (e: unknown) {
+      if (e instanceof Error) {
+        expect(e.message).toBe("mock error")
+      } else {
+        throw e
+      }
+    }
+
+    gmailInteractions.assertGmailInteractions()
+    urlFetchAppInteractions.assertUrlFetchInteractions()
+    expect(message.markRead).not.toBeCalled()
   })
 
   test("ignore messages from robot", () => {
