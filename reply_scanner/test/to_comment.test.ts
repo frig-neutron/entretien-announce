@@ -22,26 +22,29 @@ describe("reply scanner", () => {
   test("convert message to event", () => {
     mockRobotEmail("not.a.robot@gmail.com")
     mockPropertiesServiceFunctionEndpoint("http://endpoint_0.1234567890")
+
+    const message = gmailMessage({
+      id: "amboog-a-lard",
+      from: "a.member@gmail.com",
+      body:  `
+       I just don't wanna know
+       TRIAG-667 anymore
+       life shifts up and down everybody knows it's wrong
+       life shifts TRIAG-669 up and down everybody TRIAG-668 knows it's wrong
+       life shifts up and down everybody knows it's wrong
+       why don't you care? TRIAG-666
+       life
+       shifts
+       up 
+       down
+       wrong TRIAG-666
+      `
+    });
+
     const gmailInteractions: GmailAppInteractions = mockGmailApp({
       searchQuery: relevantMessageQuery,
       searchResult: [
-        gmailThread([gmailMessage({
-          id: "amboog-a-lard",
-          from: "a.member@gmail.com",
-          body:  `
-           I just don't wanna know
-           TRIAG-667 anymore
-           life shifts up and down everybody knows it's wrong
-           life shifts TRIAG-669 up and down everybody TRIAG-668 knows it's wrong
-           life shifts up and down everybody knows it's wrong
-           why don't you care? TRIAG-666
-           life
-           shifts
-           up 
-           down
-           wrong TRIAG-666
-          `
-        })])
+        gmailThread([message])
       ]
     })
 
@@ -56,6 +59,7 @@ describe("reply scanner", () => {
 
     gmailInteractions.assertGmailInteractions()
     urlFetchAppInteractions.assertUrlFetchInteractions()
+    expect(message.markRead).toBeCalled()
   })
 
   test("ignore messages from robot", () => {

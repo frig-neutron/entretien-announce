@@ -44,11 +44,19 @@ export function gmailThread(messages: GmailMessage[]): GmailThread {
 }
 
 export function gmailMessage(messageSpec: MessageSpec): GmailMessage {
-  return mock<GmailMessage>({
+  const holder: {mock?: ReturnType<typeof mock<GmailMessage>>} = {
+
+  }
+  holder.mock = mock<GmailMessage>({
     getFrom: () => resultIfDefine("from", messageSpec.from),
     getBody: () => resultIfDefine("body", messageSpec.body),
-    getId: () => resultIfDefine("id", messageSpec.id)
-  })
+    getId: () => resultIfDefine("id", messageSpec.id),
+    markRead: jest.fn(() => {
+      console.log("markRead called")
+      return holder.mock!!
+    })
+  });
+  return holder.mock;
 }
 
 function resultIfDefine(n: string, f: undefined | string): string {
