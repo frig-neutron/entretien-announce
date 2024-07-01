@@ -86,6 +86,32 @@ Scripts have to live in the Entretien Robot account b/c that's where the Gmail a
 
 ## Decision history
 
+### HTTP GCF trigger vs Pubsub-via-HTTP
+
+Sure HTTP triggers are simple to implement, but they're synchronous with message processing on 
+the GCF side. If the GCF takes a long time to process the message, it will eat into the 
+90-minute daily CPU budget. This could become an issue when dealing with attachments, as is the 
+plan.
+
+Pro:
+
+- simpler message troubleshooting: a backup subscription on the topic that gives 7d retention to 
+  everything the topic got
+- more message replay options: replay by rewinding the sub
+- presumably a more reliable call from the script side, which is less likely to time out
+
+Con: 
+
+- more complex to make a call: need 2 calls to google oauth API (get a JWT token and exchange it 
+  for a Bearer token)
+- need more resources on the GCP side: publisher SA + topic + subs in addition to function.
+- 10 MB payload limit (not really an issue - but it's a limit )
+
+Conclusion:
+
+- GCF + HTTP has always been a pain to work with. The GAS->Pubsub approach is easy enough to set 
+  up ∴ going to use that. CYA HTTP GCFs.
+
 ### Labels vs Read status
 
 Moving from using labels for marking processed messages to using the `read` status. 
