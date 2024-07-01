@@ -12,11 +12,15 @@ triggering a GCF if one is found.
     between scripts belonging to different accounts.
 - You might need to enable apps script API by visiting https://script.google.com/home/usersettings
 - run `ENV=[stg|prd) ./deploy/deploy.sh`
-- configure the `FUNCTION_ENDPOINT` key to point the HTTP endpoint
-    - by hand: `⚙️ Project Settings` > `Script Properties` > `Add script property`
-    - by code: call `setSendEndpoint(url)` w/ clasp CLI (*FIXME: bork atm*)
-- set the `MODE` key in script configuration to `production`
-- set the `ROBOT_EMAIL` key in script configuration to the robot's actual email address.
+- configure script configuration keys:
+  - `GCP_PROJECT`: project hosting the pubsub topic to notify
+  - `PUBSUB_TARGET`: name of topic that will receive email notifications
+  - `PUBLISHER_SA_KEY`: JSON key of the Service account that will publish messages
+  - `ROBOT_EMAIL`: the robot's actual email address.
+  
+Key configuration can be done
+  - by hand: `⚙️ Project Settings` > `Script Properties` > `Add script property`
+  - by code: *FIXME: bork atm*
 
 ## Operation principles
 
