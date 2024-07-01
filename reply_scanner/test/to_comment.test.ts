@@ -5,7 +5,7 @@ import {mockPropertiesServiceFunctionEndpoint, mockRobotEmail} from "./mock/prop
 
 
 describe("reply scanner", () => {
-  const relevantMessageQuery = "in:Inbox -label:automation/event_sent -label:automation/irrelevant"
+  const relevantMessageQuery = "in:Inbox is:unread"
   test("nothing to do", () => {
     const gmailInteractions: GmailAppInteractions = mockGmailApp({
       searchQuery: relevantMessageQuery,

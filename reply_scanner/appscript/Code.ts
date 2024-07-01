@@ -18,7 +18,7 @@ interface MessageOp {
 }
 
 export function to_comment() {
-  const threads: GmailThread[] = GmailApp.search("in:Inbox -label:automation/event_sent -label:automation/irrelevant");
+  const threads: GmailThread[] = GmailApp.search("in:Inbox is:unread");
   const emailOps: MessageOp[] = threads.map(threadToEmailOps).flatMap(x => x);
   publishEvents(emailOps);
 }
