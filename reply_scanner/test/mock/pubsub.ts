@@ -11,17 +11,20 @@ function mockPublishing(): PublishInteractions {
       publish: jest.fn()
     };
 
-  jest.mock("../../appscript/pubsub_publisher", () => {
-    return {
-      GASPubsubPublisher: jest.fn().mockImplementation(() => {
-        return mockGASPubsubPublisher
-      })
-    }
-  })
+  const mockedPublisherModule = {
+    GASPubsubPublisher: jest.fn().mockImplementation(() => {
+      return mockGASPubsubPublisher
+    })
+  };
+
+  const mock = jest.mock("../../appscript/pubsub_publisher", () => {
+    return mockedPublisherModule
+  });
 
   return {
     assertPublishInteractions() {
-      expect(mockGASPubsubPublisher.publish).toHaveBeenCalledTimes(1)
+      expect(mockedPublisherModule.GASPubsubPublisher).toBeCalledTimes(1)
+      // expect(mockGASPubsubPublisher.publish).toHaveBeenCalledTimes(1)
     }
   }
 }

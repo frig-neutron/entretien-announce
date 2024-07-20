@@ -6,6 +6,7 @@ import {GASPubsubPublisher} from "./pubsub_publisher";
 const functionEndpointConfigKey = "FUNCTION_ENDPOINT"
 const robotEmailConfigKey = "ROBOT_EMAIL"
 const ticketTagPattern: RegExp = /(TRIAG-([0-9]+))/g
+const publisher = new GASPubsubPublisher()
 
 export interface EmailReceived {
   ticket: string[];

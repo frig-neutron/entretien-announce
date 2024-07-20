@@ -22,9 +22,11 @@ describe("reply scanner", () => {
       searchResult: []
     })
     const urlFetchAppInteractions = mockUrlFetchApp([])
+    const publishInteractions = mockPublishing();
 
     await run_to_comment()
 
+    publishInteractions.assertPublishInteractions()
     gmailInteractions.assertGmailInteractions()
     urlFetchAppInteractions.assertUrlFetchInteractions()
   });
@@ -74,8 +76,11 @@ describe("reply scanner", () => {
       }
     ], "http://endpoint_0.1234567890")
 
+    const publishInteractions = mockPublishing();
+
     await run_to_comment()
 
+    publishInteractions.assertPublishInteractions()
     gmailInteractions.assertGmailInteractions()
     urlFetchAppInteractions.assertUrlFetchInteractions()
     expect(messageWithTicket.markRead).toBeCalled()
@@ -100,6 +105,7 @@ describe("reply scanner", () => {
     })
 
     const urlFetchAppInteractions = mockUrlFetchError()
+    const publishInteractions = mockPublishing();
 
     try {
       await run_to_comment()
@@ -111,12 +117,13 @@ describe("reply scanner", () => {
       }
     }
 
+    publishInteractions.assertPublishInteractions()
     gmailInteractions.assertGmailInteractions()
     urlFetchAppInteractions.assertUrlFetchInteractions()
     expect(message.markRead).not.toBeCalled()
   })
 
-  test("ignore messages from robot", () => {
+  test("ignore messages from robot", async () => {
     const robotEmail = "just.a.robot@gmail.com";
     mockRobotEmail(robotEmail)
     mockGmailApp({
@@ -130,15 +137,11 @@ describe("reply scanner", () => {
       ]
     })
     const urlFetchAppInteractions = mockUrlFetchApp([])
+    const publishInteractions = mockPublishing();
 
-    // to_comment()
-
-    urlFetchAppInteractions.assertUrlFetchInteractions()
-  })
-
-  test("mockin classes", async () => {
-    const publishInteractions = await mockPublishing();
     await run_to_comment()
+
     publishInteractions.assertPublishInteractions()
+    urlFetchAppInteractions.assertUrlFetchInteractions()
   })
 })
