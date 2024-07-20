@@ -1,5 +1,5 @@
 import {GmailAppInteractions, gmailMessage, gmailThread, mockGmailApp} from "./mock/gmail";
-import {mockPropertiesServiceFunctionEndpoint, mockRobotEmail} from "./mock/properties";
+import {mockConfigProps} from "./mock/properties";
 import {mockPublishing, mockPublishingError} from "./mock/pubsub";
 import {EmailReceived} from "../appscript/Code";
 
@@ -30,8 +30,13 @@ describe("reply scanner", () => {
   });
 
   test("convert message to event", async () => {
-    mockRobotEmail("not.a.robot@gmail.com")
-    mockPropertiesServiceFunctionEndpoint("http://endpoint_0.1234567890")
+    mockConfigProps({
+      functionEndpoint: "http://endpoint_0.1234567890",
+      gcpProject: "",
+      publisherSAKey: "",
+      pubsubTarget: "",
+      robotEmail: "not.a.robot@gmail.com"
+    })
 
     const messageWithTicket = gmailMessage({
       id: "amboog-a-lard",
@@ -84,9 +89,13 @@ describe("reply scanner", () => {
   })
 
   test("dont mark message processed if send fails", async () => {
-    mockRobotEmail("could.be.a.robot@gmail.com")
-    mockPropertiesServiceFunctionEndpoint("http://endpoint_0.1234567890")
-
+    mockConfigProps({
+      functionEndpoint: "http://endpoint_0.1234567890",
+      gcpProject: "",
+      publisherSAKey: "",
+      pubsubTarget: "",
+      robotEmail: "could.be.a.robot@gmail.com"
+    })
 
     const message = gmailMessage({
       id: "amboog-a-lard",
@@ -120,7 +129,14 @@ describe("reply scanner", () => {
 
   test("ignore messages from robot", async () => {
     const robotEmail = "just.a.robot@gmail.com";
-    mockRobotEmail(robotEmail)
+    mockConfigProps({
+      functionEndpoint: "http://endpoint_0.1234567890",
+      gcpProject: "",
+      publisherSAKey: "",
+      pubsubTarget: "",
+      robotEmail: robotEmail
+    })
+
     mockGmailApp({
       searchQuery: relevantMessageQuery,
       searchResult: [

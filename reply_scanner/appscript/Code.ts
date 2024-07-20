@@ -3,8 +3,13 @@ import GmailMessage = GoogleAppsScript.Gmail.GmailMessage;
 import URLFetchRequestOptions = GoogleAppsScript.URL_Fetch.URLFetchRequestOptions;
 import {GASPubsubPublisher} from "./pubsub_publisher";
 
-const functionEndpointConfigKey = "FUNCTION_ENDPOINT"
-const robotEmailConfigKey = "ROBOT_EMAIL"
+const configKeys = {
+  gcpProject: "GCP_PROJECT",
+  pubsubTarget: "PUBSUB_TARGET",
+  publisherSAKey: "PUBLISHER_SA_KEY",
+  robotEmail: "ROBOT_EMAIL",
+  functionEndpoint: "FUNCTION_ENDPOINT"
+}
 const ticketTagPattern: RegExp = /(TRIAG-([0-9]+))/g
 const publisher = new GASPubsubPublisher()
 
@@ -26,7 +31,7 @@ export function to_comment() {
 
 function threadToEmailOps(thread: GmailThread): MessageOp[] {
   const messages: GmailMessage[] = thread.getMessages();
-  const robotEmail = scriptProperty(robotEmailConfigKey)
+  const robotEmail = scriptProperty(configKeys.robotEmail)
   const notFromTheRobot: (msg: GmailMessage) => boolean = msg => msg.getFrom() !== robotEmail
   return messages.filter(notFromTheRobot).map(messageToEmailOps)
 }
@@ -79,4 +84,4 @@ function scriptProperty(propertyKey: string): string {
 
 // DO NOT export identifiers at declaration time - the GAS TS transpiler will declare them as `exports.foo = `...
 // which makes them invisible to uses from the same file
-export { functionEndpointConfigKey, robotEmailConfigKey, ticketTagPattern }
+export { configKeys, ticketTagPattern }

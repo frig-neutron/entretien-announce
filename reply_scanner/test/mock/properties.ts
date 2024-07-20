@@ -1,7 +1,8 @@
 import {mock} from "jest-mock-extended";
 import PropertiesService = GoogleAppsScript.Properties.PropertiesService;
 import Properties = GoogleAppsScript.Properties.Properties;
-import {functionEndpointConfigKey, robotEmailConfigKey} from "../../appscript/Code";
+import {configKeys} from "../../appscript/Code";
+import {Conf} from "@google/clasp/build/src/conf";
 
 declare var global: typeof globalThis; // can't use @types/node
 
@@ -19,16 +20,10 @@ const propertiesService = mock<PropertiesService>({
 
 global.PropertiesService = propertiesService
 
-export function mockPropertiesServiceFunctionEndpoint(functionEndpoint: string) {
-  mockedConfigKeys[functionEndpointConfigKey] = functionEndpoint
-  return {
-    propertiesService: propertiesService,
-    assertEndpointHasBeenSet: () => {
-      expect(mockProps.setProperty).toBeCalledWith(functionEndpointConfigKey, functionEndpoint)
-    }
+type ConfigKey = keyof typeof configKeys
+export function mockConfigProps(configProps: {[ key in ConfigKey]: string}): void {
+  let k: keyof typeof configProps
+  for (k in configProps) {
+    mockedConfigKeys[configKeys[k]] = configProps[k]
   }
-}
-
-export function mockRobotEmail(robotEmail: string): void {
-  mockedConfigKeys[robotEmailConfigKey] = robotEmail
 }
