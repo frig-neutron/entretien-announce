@@ -1,10 +1,7 @@
-import {t, to_comment} from "../appscript/Code"
 import {GmailAppInteractions, gmailMessage, gmailThread, mockGmailApp} from "./mock/gmail";
 import {mockUrlFetchApp, mockUrlFetchError} from "./mock/http";
 import {mockPropertiesServiceFunctionEndpoint, mockRobotEmail} from "./mock/properties";
-// import {mockPublishing} from "./mock/pubsub";
-
-
+import {mockPublishing} from "./mock/pubsub";
 
 describe("reply scanner", () => {
 
@@ -12,21 +9,27 @@ describe("reply scanner", () => {
     jest.resetModules();
   });
 
+  async function run_to_comment() {
+    const Code = await import("../appscript/Code")
+    const to_comment: () => void = Code["to_comment"];
+    to_comment()
+  }
+
   const relevantMessageQuery = "in:Inbox is:unread"
-  test("nothing to do", () => {
+  test("nothing to do", async () => {
     const gmailInteractions: GmailAppInteractions = mockGmailApp({
       searchQuery: relevantMessageQuery,
       searchResult: []
     })
     const urlFetchAppInteractions = mockUrlFetchApp([])
 
-    to_comment()
+    await run_to_comment()
 
     gmailInteractions.assertGmailInteractions()
     urlFetchAppInteractions.assertUrlFetchInteractions()
   });
 
-  test("convert message to event", () => {
+  test("convert message to event", async () => {
     mockRobotEmail("not.a.robot@gmail.com")
     mockPropertiesServiceFunctionEndpoint("http://endpoint_0.1234567890")
 
@@ -71,14 +74,14 @@ describe("reply scanner", () => {
       }
     ], "http://endpoint_0.1234567890")
 
-    to_comment()
+    await run_to_comment()
 
     gmailInteractions.assertGmailInteractions()
     urlFetchAppInteractions.assertUrlFetchInteractions()
     expect(messageWithTicket.markRead).toBeCalled()
   })
 
-  test("dont mark message processed if send fails", () => {
+  test("dont mark message processed if send fails", async () => {
     mockRobotEmail("could.be.a.robot@gmail.com")
     mockPropertiesServiceFunctionEndpoint("http://endpoint_0.1234567890")
 
@@ -99,7 +102,7 @@ describe("reply scanner", () => {
     const urlFetchAppInteractions = mockUrlFetchError()
 
     try {
-      to_comment()
+      await run_to_comment()
     } catch (e: unknown) {
       if (e instanceof Error) {
         expect(e.message).toBe("mock error")
@@ -128,12 +131,13 @@ describe("reply scanner", () => {
     })
     const urlFetchAppInteractions = mockUrlFetchApp([])
 
-    to_comment()
+    // to_comment()
 
     urlFetchAppInteractions.assertUrlFetchInteractions()
   })
 
-  test("mockin classes", () => {
-    t()
+  test("mockin classes", async () => {
+    const publishInteractions = await mockPublishing();
+    publishInteractions.assertPublishInteractions()
   })
 })

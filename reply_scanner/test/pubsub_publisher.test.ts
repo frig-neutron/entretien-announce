@@ -9,6 +9,5 @@ describe("GoogleAppScript-compatible pubsub publisher", () => {
   test("mockin classes", async () => {
     // const m = await import("../appscript/Code");
 
-    c.t()
   })
 })
