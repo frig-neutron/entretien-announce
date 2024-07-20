@@ -6,21 +6,21 @@ import CustomMatcherResult = jest.CustomMatcherResult;
 
 declare var global: typeof globalThis; // can't use @types/node
 
-interface MessageEventMatchers {
-  publishesEvents(events: EmailReceived[], expectedUrl?: string): void
+interface HttpEventMatchers {
+  httpRequest(events: EmailReceived[], expectedUrl?: string): void
 }
 
 declare global {
   namespace jest {
     // noinspection JSUnusedGlobalSymbols - need this to give expect matcher hints
-    interface Matchers<R> extends MessageEventMatchers {
+    interface Matchers<R> extends HttpEventMatchers {
     }
   }
 }
 
 function extendJestWithMessageEventMatcher() {
   expect.extend({
-    publishesEvents(received, events: EmailReceived[], expectedUrl?: string): CustomMatcherResult {
+    httpRequest(received, events: EmailReceived[], expectedUrl?: string): CustomMatcherResult {
       const [url, options] = received
       const payload = JSON.parse(options.payload)
 
@@ -51,7 +51,7 @@ export function mockUrlFetchApp(expectToPublish: EmailReceived[], url?: string):
       if (expectToPublish.length === 0) {
         expect(urlFetchApp.fetch).toHaveBeenCalledTimes(0)
       } else {
-        expect(urlFetchApp.fetch.mock.calls[0]).publishesEvents(expectToPublish, url)
+        expect(urlFetchApp.fetch.mock.calls[0]).httpRequest(expectToPublish, url)
       }
     }
   }

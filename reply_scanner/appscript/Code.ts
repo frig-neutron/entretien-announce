@@ -63,7 +63,7 @@ function publishEvents(emailOps: MessageOp[]) {
     "payload": JSON.stringify(emailOps.map(m => m.message))
   };
 
-  UrlFetchApp.fetch(scriptProperty(functionEndpointConfigKey), options)
+  publisher.publish(JSON.stringify(emailOps.map(m => m.message)))
 
   console.log(`Sent ${emailOps.length} messages`)
   emailOps.forEach(m => m.onEventSuccess())

@@ -1,7 +1,7 @@
 import {GmailAppInteractions, gmailMessage, gmailThread, mockGmailApp} from "./mock/gmail";
-import {mockUrlFetchApp, mockUrlFetchError} from "./mock/http";
 import {mockPropertiesServiceFunctionEndpoint, mockRobotEmail} from "./mock/properties";
-import {mockPublishing} from "./mock/pubsub";
+import {mockPublishing, mockPublishingError} from "./mock/pubsub";
+import {EmailReceived} from "../appscript/Code";
 
 describe("reply scanner", () => {
 
@@ -21,14 +21,12 @@ describe("reply scanner", () => {
       searchQuery: relevantMessageQuery,
       searchResult: []
     })
-    const urlFetchAppInteractions = mockUrlFetchApp([])
-    const publishInteractions = mockPublishing();
+    const publishInteractions = mockPublishing([]);
 
     await run_to_comment()
 
     publishInteractions.assertPublishInteractions()
     gmailInteractions.assertGmailInteractions()
-    urlFetchAppInteractions.assertUrlFetchInteractions()
   });
 
   test("convert message to event", async () => {
@@ -65,7 +63,7 @@ describe("reply scanner", () => {
       ]
     })
 
-    const urlFetchAppInteractions = mockUrlFetchApp([
+    const expectToPublish: EmailReceived[] = [
       {
         ticket: ["TRIAG-666", "TRIAG-667", "TRIAG-668", "TRIAG-669"],
         email_id: "amboog-a-lard"
@@ -74,15 +72,14 @@ describe("reply scanner", () => {
         ticket: [],
         email_id: "iamnotanumber"
       }
-    ], "http://endpoint_0.1234567890")
+    ];
 
-    const publishInteractions = mockPublishing();
+    const publishInteractions = mockPublishing(expectToPublish);
 
     await run_to_comment()
 
     publishInteractions.assertPublishInteractions()
     gmailInteractions.assertGmailInteractions()
-    urlFetchAppInteractions.assertUrlFetchInteractions()
     expect(messageWithTicket.markRead).toBeCalled()
   })
 
@@ -104,8 +101,7 @@ describe("reply scanner", () => {
       ]
     })
 
-    const urlFetchAppInteractions = mockUrlFetchError()
-    const publishInteractions = mockPublishing();
+    const publishInteractions = mockPublishingError();
 
     try {
       await run_to_comment()
@@ -119,7 +115,6 @@ describe("reply scanner", () => {
 
     publishInteractions.assertPublishInteractions()
     gmailInteractions.assertGmailInteractions()
-    urlFetchAppInteractions.assertUrlFetchInteractions()
     expect(message.markRead).not.toBeCalled()
   })
 
@@ -136,12 +131,10 @@ describe("reply scanner", () => {
         ])
       ]
     })
-    const urlFetchAppInteractions = mockUrlFetchApp([])
-    const publishInteractions = mockPublishing();
+    const publishInteractions = mockPublishing([]);
 
     await run_to_comment()
 
     publishInteractions.assertPublishInteractions()
-    urlFetchAppInteractions.assertUrlFetchInteractions()
   })
 })
