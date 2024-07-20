@@ -5,7 +5,7 @@ class GASPubsubPublisher {
   constructor() {
   }
 
-  publish(data: String): void {
+  public publish(data: String): void {
     console.log("real publish")
   }
 }

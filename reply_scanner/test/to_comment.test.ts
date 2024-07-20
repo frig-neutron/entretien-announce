@@ -138,6 +138,7 @@ describe("reply scanner", () => {
 
   test("mockin classes", async () => {
     const publishInteractions = await mockPublishing();
+    await run_to_comment()
     publishInteractions.assertPublishInteractions()
   })
 })
