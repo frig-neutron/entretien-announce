@@ -1,10 +1,17 @@
-import {to_comment} from "../appscript/Code"
+import {t, to_comment} from "../appscript/Code"
 import {GmailAppInteractions, gmailMessage, gmailThread, mockGmailApp} from "./mock/gmail";
 import {mockUrlFetchApp, mockUrlFetchError} from "./mock/http";
 import {mockPropertiesServiceFunctionEndpoint, mockRobotEmail} from "./mock/properties";
+// import {mockPublishing} from "./mock/pubsub";
+
 
 
 describe("reply scanner", () => {
+
+  beforeEach(() => {
+    jest.resetModules();
+  });
+
   const relevantMessageQuery = "in:Inbox is:unread"
   test("nothing to do", () => {
     const gmailInteractions: GmailAppInteractions = mockGmailApp({
@@ -124,5 +131,9 @@ describe("reply scanner", () => {
     to_comment()
 
     urlFetchAppInteractions.assertUrlFetchInteractions()
+  })
+
+  test("mockin classes", () => {
+    t()
   })
 })

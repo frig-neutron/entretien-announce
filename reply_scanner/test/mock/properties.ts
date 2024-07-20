@@ -1,7 +1,7 @@
 import {mock} from "jest-mock-extended";
 import PropertiesService = GoogleAppsScript.Properties.PropertiesService;
 import Properties = GoogleAppsScript.Properties.Properties;
-import {functionEndpointConfigKey, modeConfigKey, robotEmailConfigKey} from "../../appscript/Code";
+import {functionEndpointConfigKey, robotEmailConfigKey} from "../../appscript/Code";
 
 declare var global: typeof globalThis; // can't use @types/node
 
@@ -27,10 +27,6 @@ export function mockPropertiesServiceFunctionEndpoint(functionEndpoint: string) 
       expect(mockProps.setProperty).toBeCalledWith(functionEndpointConfigKey, functionEndpoint)
     }
   }
-}
-
-export function mockPropertiesServiceModeKey(mode: any){
-  mockedConfigKeys[modeConfigKey] = mode
 }
 
 export function mockRobotEmail(robotEmail: string): void {

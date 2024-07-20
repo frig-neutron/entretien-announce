@@ -1,6 +1,7 @@
 import GmailThread = GoogleAppsScript.Gmail.GmailThread;
 import GmailMessage = GoogleAppsScript.Gmail.GmailMessage;
 import URLFetchRequestOptions = GoogleAppsScript.URL_Fetch.URLFetchRequestOptions;
+import {GASPubsubPublisher} from "./pubsub_publisher";
 
 const functionEndpointConfigKey = "FUNCTION_ENDPOINT"
 const robotEmailConfigKey = "ROBOT_EMAIL"
