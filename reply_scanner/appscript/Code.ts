@@ -9,9 +9,18 @@ const configKeys = {
   publisherSAKey: "PUBLISHER_SA_KEY",
   robotEmail: "ROBOT_EMAIL",
   functionEndpoint: "FUNCTION_ENDPOINT"
-}
+} as const;
+
+type ConfigProperty = (typeof configKeys)[keyof typeof configKeys]
+
 const ticketTagPattern: RegExp = /(TRIAG-([0-9]+))/g
-const publisher = new GASPubsubPublisher()
+function mkPublisher() {
+  return new GASPubsubPublisher(
+      scriptProperty(configKeys.gcpProject),
+      scriptProperty(configKeys.pubsubTarget),
+      scriptProperty(configKeys.publisherSAKey)
+  )
+}
 
 export interface EmailReceived {
   ticket: string[];
@@ -68,13 +77,13 @@ function publishEvents(emailOps: MessageOp[]) {
     "payload": JSON.stringify(emailOps.map(m => m.message))
   };
 
-  publisher.publish(JSON.stringify(emailOps.map(m => m.message)))
+  mkPublisher().publish(JSON.stringify(emailOps.map(m => m.message)))
 
   console.log(`Sent ${emailOps.length} messages`)
   emailOps.forEach(m => m.onEventSuccess())
 }
 
-function scriptProperty(propertyKey: string): string {
+function scriptProperty(propertyKey: ConfigProperty): string {
   const prop = PropertiesService.getScriptProperties().getProperty(propertyKey);
   if (!prop) {
     throw Error("Configure property: " + propertyKey)

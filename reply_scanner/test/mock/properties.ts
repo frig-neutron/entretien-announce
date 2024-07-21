@@ -2,7 +2,6 @@ import {mock} from "jest-mock-extended";
 import PropertiesService = GoogleAppsScript.Properties.PropertiesService;
 import Properties = GoogleAppsScript.Properties.Properties;
 import {configKeys} from "../../appscript/Code";
-import {Conf} from "@google/clasp/build/src/conf";
 
 declare var global: typeof globalThis; // can't use @types/node
 
@@ -21,9 +20,12 @@ const propertiesService = mock<PropertiesService>({
 global.PropertiesService = propertiesService
 
 type ConfigKey = keyof typeof configKeys
-export function mockConfigProps(configProps: {[ key in ConfigKey]: string}): void {
+type ConfigProps = {[ key in ConfigKey]: string}
+export function mockConfigProps(configProps: ConfigProps): void {
   let k: keyof typeof configProps
   for (k in configProps) {
     mockedConfigKeys[configKeys[k]] = configProps[k]
   }
 }
+
+export { ConfigKey, ConfigProps }

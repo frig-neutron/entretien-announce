@@ -2,6 +2,7 @@ import {GASPubsubPublisher} from "../../appscript/pubsub_publisher";
 import {EmailReceived} from "../../appscript/Code";
 import CustomMatcherResult = jest.CustomMatcherResult;
 import {mock} from "jest-mock-extended";
+import {ConfigProps} from "./properties";
 
 declare var global: typeof globalThis; // can't use @types/node
 
@@ -41,15 +42,20 @@ export interface PublishInteractions {
   assertPublishInteractions(): void
 }
 
-function mockPublishing(expectToPublish: EmailReceived[]): PublishInteractions {
+function mockPublishing(expectToPublish: EmailReceived[], configProps: ConfigProps): PublishInteractions {
   const {mockedModule, mockedPublisher} = setupMocks();
   extendJestWithMessageEventMatcher()
   return {
     assertPublishInteractions() {
-      expect(mockedModule.GASPubsubPublisher).toBeCalledTimes(1)
       if (expectToPublish.length === 0) {
+        expect(mockedModule.GASPubsubPublisher).toBeCalledTimes(0)
         expect(mockedPublisher.publish).toHaveBeenCalledTimes(0)
       } else {
+        expect(mockedModule.GASPubsubPublisher).toBeCalledWith(
+            configProps.gcpProject,
+            configProps.pubsubTarget,
+            configProps.publisherSAKey
+        )
         expect(mockedPublisher.publish.mock.calls[0]).publishesEvents(expectToPublish)
       }
     }

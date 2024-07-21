@@ -1,5 +1,5 @@
 import {GmailAppInteractions, gmailMessage, gmailThread, mockGmailApp} from "./mock/gmail";
-import {mockConfigProps} from "./mock/properties";
+import {ConfigProps, mockConfigProps} from "./mock/properties";
 import {mockPublishing, mockPublishingError} from "./mock/pubsub";
 import {EmailReceived} from "../appscript/Code";
 
@@ -17,11 +17,18 @@ describe("reply scanner", () => {
 
   const relevantMessageQuery = "in:Inbox is:unread"
   test("nothing to do", async () => {
+    const configProps: ConfigProps = {
+      functionEndpoint: rndId("f"),
+      gcpProject: rndId("proj"),
+      publisherSAKey: rndId("{SA_KEY}"),
+      pubsubTarget: rndId("topic"),
+      robotEmail: "damn.robot@gmail.com"
+    };
     const gmailInteractions: GmailAppInteractions = mockGmailApp({
       searchQuery: relevantMessageQuery,
       searchResult: []
     })
-    const publishInteractions = mockPublishing([]);
+    const publishInteractions = mockPublishing([], configProps);
 
     await run_to_comment()
 
@@ -30,13 +37,14 @@ describe("reply scanner", () => {
   });
 
   test("convert message to event", async () => {
-    mockConfigProps({
-      functionEndpoint: "http://endpoint_0.1234567890",
-      gcpProject: "",
-      publisherSAKey: "",
-      pubsubTarget: "",
+    const configProps = {
+      functionEndpoint: rndId("f"),
+      gcpProject: rndId("proj"),
+      publisherSAKey: rndId("{SA_KEY}"),
+      pubsubTarget: rndId("topic"),
       robotEmail: "not.a.robot@gmail.com"
-    })
+    };
+    mockConfigProps(configProps)
 
     const messageWithTicket = gmailMessage({
       id: "amboog-a-lard",
@@ -79,7 +87,7 @@ describe("reply scanner", () => {
       }
     ];
 
-    const publishInteractions = mockPublishing(expectToPublish);
+    const publishInteractions = mockPublishing(expectToPublish, configProps);
 
     await run_to_comment()
 
@@ -90,10 +98,10 @@ describe("reply scanner", () => {
 
   test("dont mark message processed if send fails", async () => {
     mockConfigProps({
-      functionEndpoint: "http://endpoint_0.1234567890",
-      gcpProject: "",
-      publisherSAKey: "",
-      pubsubTarget: "",
+      functionEndpoint: rndId("f"),
+      gcpProject: rndId("proj"),
+      publisherSAKey: rndId("{SA_KEY}"),
+      pubsubTarget: rndId("topic"),
       robotEmail: "could.be.a.robot@gmail.com"
     })
 
@@ -128,29 +136,33 @@ describe("reply scanner", () => {
   })
 
   test("ignore messages from robot", async () => {
-    const robotEmail = "just.a.robot@gmail.com";
-    mockConfigProps({
-      functionEndpoint: "http://endpoint_0.1234567890",
-      gcpProject: "",
-      publisherSAKey: "",
-      pubsubTarget: "",
-      robotEmail: robotEmail
-    })
+    const configProps = {
+      functionEndpoint: rndId("f"),
+      gcpProject: rndId("proj"),
+      publisherSAKey: rndId("{SA_KEY}"),
+      pubsubTarget: rndId("topic"),
+      robotEmail: "just.a.robot@gmail.com"
+    };
+    mockConfigProps(configProps)
 
     mockGmailApp({
       searchQuery: relevantMessageQuery,
       searchResult: [
         gmailThread([
           gmailMessage({
-            from: robotEmail
+            from: configProps.robotEmail
           })
         ])
       ]
     })
-    const publishInteractions = mockPublishing([]);
+    const publishInteractions = mockPublishing([], configProps);
 
     await run_to_comment()
 
     publishInteractions.assertPublishInteractions()
   })
 })
+
+function rndId(pfx: string) {
+  return pfx + Math.floor(Math.random() * 100)
+}

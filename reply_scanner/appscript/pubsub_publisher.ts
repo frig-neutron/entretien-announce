@@ -2,7 +2,7 @@
 console.log("Real publisher loaded")
 class GASPubsubPublisher {
 
-  constructor() {
+  constructor(gcpProject: string, pubsubTarget: string, publisherSAKey: string) {
   }
 
   public publish(data: String): void {
