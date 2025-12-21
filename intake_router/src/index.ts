@@ -64,4 +64,7 @@ function intakeDirectory() {
   return parseRoutingDirectory(process.env[Env.DIRECTORY])
 }
 
-ff.http("intake_router", intake_router)
+const functionName = "intake_router";
+console.log("Registering http handler " + functionName);
+
+ff.http(functionName, intake_router)
