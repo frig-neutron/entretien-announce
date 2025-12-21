@@ -22,9 +22,10 @@ validate_config_key DIRECTORY $vars_file
 validate_config_key PUBLISH_CONFIG $vars_file
 validate_config_key JIRA_OPTIONS $vars_file
 
-gcloud run deploy intake_router --project=$project_id \
+gcloud run deploy intake-router --project=$project_id \
   --max-instances=2 \
   --min-instances=0 \
+  --region=us-central1 \
   --source="$source_path" \
   --base-image=nodejs20 \
   --allow-unauthenticated \
