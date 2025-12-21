@@ -59,7 +59,7 @@ export function parsePublishConfig(data: any): Promise<PublishConfig> {
     );
   }
 
-  const parser = ajv.compileParser(publishConfigSchema);
+  const parser: JTDParser<PublishConfig> = ajv.compileParser(publishConfigSchema);
   const parseResult = parser(String(data));
   return parseResult
     ? Promise.resolve(parseResult)
